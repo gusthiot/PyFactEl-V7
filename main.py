@@ -28,6 +28,7 @@ from importes import (Client,
                       Reservation,
                       Categorie,
                       User,
+                      NoShow,
                       DossierSource,
                       DossierDestination)
 from outils import Outils
@@ -162,16 +163,17 @@ if pe_present:
     reservations = Reservation(dossier_source)
     categories = Categorie(dossier_source)
     users = User(dossier_source)
+    noshows = NoShow(dossier_source)
 
     verification = Verification()
 
     if verification.verification_date(edition, acces, clients, comptes, users, livraisons, machines, prestations,
-                                      reservations) > 0:
+                                      reservations, noshows) > 0:
         sys.exit("Erreur dans les dates")
 
     if verification.verification_coherence(generaux, edition, acces, clients, emoluments, coefprests, comptes, users,
                                            livraisons, machines, prestations, reservations, categories, categprix,
-                                           docpdf) > 0:
+                                           docpdf, noshows) > 0:
         sys.exit("Erreur dans la cohérence")
 
     livraisons.calcul_montants(prestations, coefprests, clients, verification, comptes)
@@ -219,11 +221,13 @@ if pe_present:
     Recapitulatifs.lvr(dossier_destination, edition, lvr_lignes)
     res_lignes = Recapitulatifs.res_lignes(edition, reservations, comptes, clients, users, machines)
     Recapitulatifs.res(dossier_destination, edition, res_lignes)
+    nos_lignes = Recapitulatifs.nos_lignes(edition, noshows, comptes, clients, users, machines, categories)
+    Recapitulatifs.nos(dossier_destination, edition, nos_lignes)
 
     for fichier in [acces.nom_fichier, clients.nom_fichier, emoluments.nom_fichier, coefprests.nom_fichier,
                     comptes.nom_fichier, livraisons.nom_fichier, machines.nom_fichier, prestations.nom_fichier,
                     reservations.nom_fichier, categories.nom_fichier, users.nom_fichier, generaux.nom_fichier,
-                    edition.nom_fichier, categprix.nom_fichier, paramannexe.nom_fichier]:
+                    edition.nom_fichier, categprix.nom_fichier, paramannexe.nom_fichier, noshows.nom_fichier]:
         dossier_destination.ecrire(fichier, dossier_source.lire(fichier))
     if docpdf is not None:
         dossier_destination.ecrire(docpdf.nom_fichier, dossier_source.lire(docpdf.nom_fichier))
@@ -234,7 +238,7 @@ if pe_present:
             Resumes.supprimmer(generaux.code_cfact_centre, edition.mois, edition.annee,
                                DossierSource(dossier_enregistrement), DossierDestination(dossier_enregistrement))
         elif Outils.existe(Outils.chemin([dossier_enregistrement, "csv_0"])):
-            maj = [bm_lignes, bc_lignes, det_lignes, cae_lignes, lvr_lignes, res_lignes]
+            maj = [bm_lignes, bc_lignes, det_lignes, cae_lignes, lvr_lignes, res_lignes, nos_lignes]
             Resumes.mise_a_jour(edition, clients, DossierSource(dossier_enregistrement),
                                 DossierDestination(dossier_enregistrement), maj, f_html_sections)
 

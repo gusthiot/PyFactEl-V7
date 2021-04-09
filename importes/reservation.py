@@ -20,7 +20,7 @@ class Reservation(Fichier):
     def est_coherent(self, comptes, machines, users):
         """
         vérifie que les données du fichier importé sont cohérentes (id compte parmi comptes,
-        id machine parmi machines), et efface les colonnes mois et année
+        id machine parmi machines, id user parmi users), et efface les colonnes mois et année
         :param comptes: comptes importés
         :param machines: machines importées
         :param users: users importés

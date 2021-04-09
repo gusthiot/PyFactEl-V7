@@ -12,3 +12,4 @@ from .categorie import Categorie
 from .categprix import CategPrix
 from .user import User
 from .dossier import DossierSource, DossierDestination
+from .noshow import NoShow

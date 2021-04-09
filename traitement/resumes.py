@@ -6,8 +6,8 @@ class Resumes(object):
     Classe pour la création et la modification des résumés statistiques mensuels
     """
 
-    fichiers = ["bilan", "bilan-comptes", "detail", "cae", "lvr", "res"]
-    positions = [3, 3, 2, 7, 7, 7]
+    fichiers = ["bilan", "bilan-comptes", "detail", "cae", "lvr", "res", "noshow"]
+    positions = [3, 3, 2, 7, 7, 7, 14]
 
     @staticmethod
     def base(edition, dossier_source, dossier_destination):
