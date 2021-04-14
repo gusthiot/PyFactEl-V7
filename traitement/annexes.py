@@ -11,7 +11,7 @@ class Annexes(object):
     """
     @staticmethod
     def annexes(sommes, clients, edition, livraisons, acces, machines, reservations, comptes, paramannexe, generaux,
-                users, categories, docpdf):
+                users, categories, noshows, docpdf):
         """
         création des annexes
         :param sommes: sommes calculées
@@ -26,6 +26,7 @@ class Annexes(object):
         :param generaux: paramètres généraux
         :param users: users importés
         :param categories: catégories importées
+        :param noshows: no show importés
         :param docpdf: paramètres d'ajout de document pdf
         """
 
@@ -185,9 +186,6 @@ class Annexes(object):
 
                     # ## compte
 
-            contenu_cae_xmu = TablesAnnexes.contenu_tps_m_cae_xmu(code_client, scl, acces.sommes, machines, users,
-                                                                  comptes)
-
             suffixe = "_" + str(edition.annee) + "_" + Outils.mois_string(edition.mois) + "_"
             suffixe += str(edition.version) + "_" + code_client
 
@@ -208,7 +206,7 @@ class Annexes(object):
                     if av_hc == "BONUS":
                         contenu_annexe_client += TablesAnnexes.table_points_xbmu(code_client, scl, acces.sommes,
                                                                                  machines, users)
-                    contenu_annexe_client += TablesAnnexes.table_prix_xrmu(code_client, scl, reservations.sommes,
+                    contenu_annexe_client += TablesAnnexes.table_prix_xrmu(code_client, scl, noshows.sommes,
                                                                            machines, users)
                     contenu_annexe_client += r'''\end{document}'''
                     Latex.creer_latex_pdf('Annexe-client' + suffixe, contenu_annexe_client)
@@ -223,16 +221,13 @@ class Annexes(object):
 
                 if todo['Annexe-détails'] != "NO":
                     contenu_details_2 = ""
-                    if code_client in reservations.sommes or contenu_cae_xmu != "":
+                    if code_client in noshows.sommes:
                         contenu_details_2 += Annexes.titre_annexe(client, edition, generaux, reference,
                                                                   "Annexe détaillée des pénalités de réservation",
                                                                   "Annexe facture")
                         contenu_details_2 += Annexes.section(client, generaux, reference,
                                                              "Annexe détaillée des pénalités de réservation")
-                        contenu_details_2 += TablesAnnexes.table_tps_penares_xmu(code_client, scl, acces.sommes,
-                                                                                 reservations.sommes, machines, users)
-                        contenu_details_2 += TablesAnnexes.table_tps_m_cae_xmu(code_client, acces, contenu_cae_xmu)
-                        contenu_details_2 += TablesAnnexes.table_tps_res_xmu(code_client, reservations, machines, users)
+                        contenu_details_2 += TablesAnnexes.table_no_show_xmu(code_client, noshows, machines, users)
                     if not contenu_details == "" or not contenu_details_2 == "":
                         contenu_annexe_details = Annexes.entete(edition)
                         contenu_annexe_details += contenu_details

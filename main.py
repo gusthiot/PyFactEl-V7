@@ -179,9 +179,10 @@ if pe_present:
     livraisons.calcul_montants(prestations, coefprests, clients, verification, comptes)
     acces.calcul_montants(machines, categprix, clients, verification, comptes)
     reservations.calcul_montants(machines, categprix, clients, comptes, verification)
+    noshows.calcul_montants(machines, categprix, clients, comptes, verification)
 
     sommes = Sommes(verification, generaux)
-    sommes.calculer_toutes(livraisons, reservations, acces, clients, machines)
+    sommes.calculer_toutes(livraisons, reservations, acces, clients, machines, noshows)
 
     for donnee in paramannexe.donnees:
         donnee['chemin'] = Outils.chemin([dossier_enregistrement, donnee['dossier']], generaux)
@@ -192,7 +193,7 @@ if pe_present:
     # faire les annexes avant la facture, que le ticket puisse vérifier leur existence
     if Latex.possibles():
         Annexes.annexes(sommes, clients, edition, livraisons, acces, machines, reservations, comptes, paramannexe,
-                        generaux, users, categories, docpdf)
+                        generaux, users, categories, noshows, docpdf)
 
     Outils.copier_dossier("./reveal.js/", "js", dossier_enregistrement)
     Outils.copier_dossier("./reveal.js/", "css", dossier_enregistrement)

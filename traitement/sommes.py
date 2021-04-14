@@ -29,7 +29,7 @@ class Sommes(object):
         self.categories = generaux.codes_d3()
         self.min_fact_rese = generaux.min_fact_rese
 
-    def calculer_toutes(self, livraisons, reservations, acces, clients, machines):
+    def calculer_toutes(self, livraisons, reservations, acces, clients, machines, noshows):
         """
         calculer toutes les sommes, par compte et par client
         :param livraisons: livraisons importées et vérifiées
@@ -37,9 +37,10 @@ class Sommes(object):
         :param acces: accès machines importés et vérifiés
         :param clients: clients importés et vérifiés
         :param machines: machines importées et vérifiées
+        :param noshows: no show importés et vérifiés
         """
         self.somme_par_compte(livraisons, acces, clients)
-        self.somme_par_client(clients, reservations, machines, acces)
+        self.somme_par_client(clients, reservations, machines, acces, noshows)
 
     def nouveau_somme(self, cles):
         """
@@ -145,12 +146,13 @@ class Sommes(object):
         self.sco = 1
         self.sommes_comptes = spco
 
-    def somme_par_client(self, clients, reservations, machines, acces):
+    def somme_par_client(self, clients, reservations, machines, acces, noshows):
         """
         calcule les sommes par clients sous forme de dictionnaire : client->clés_sommes
         :param clients: clients importés et vérifiés
         :param reservations: réservations importées et vérifiées
         :param machines: machines importées et vérifiées
+        :param noshows: no show importés et vérifiés
         :param acces: accès machines importés et vérifiés
         """
 
@@ -165,6 +167,7 @@ class Sommes(object):
                 spcl[code_client] = self.nouveau_somme(Sommes.cles_somme_client)
                 somme = spcl[code_client]
                 somme['res'] = {}
+                somme['nos'] = {}
                 somme['rm'] = 0
                 somme['rr'] = 0
                 somme['r'] = 0
@@ -229,7 +232,47 @@ class Sommes(object):
 
                         somme['res'][id_machine]['mont_hp'] = round(somme['res'][id_machine]['tot_hp'] * pu_hp / 60, 2)
                         somme['res'][id_machine]['mont_hc'] = round(somme['res'][id_machine]['tot_hc'] * pu_hc / 60, 2)
-                        somme['rm'] += somme['res'][id_machine]['mont_hp'] + somme['res'][id_machine]['mont_hc']
+                #        somme['rm'] += somme['res'][id_machine]['mont_hp'] + somme['res'][id_machine]['mont_hc']
+
+                # rm = math.floor(somme['rm'])
+                # somme['rm_d'] = rm - somme['rm']
+                # somme['rm'] = rm
+                # somme['rr'] = Rabais.rabais_reservation_petit_montant(somme['rm'], self.min_fact_rese)
+                # somme['r'] = somme['rm'] - somme['rr']
+
+            # no show
+            for code_client in noshows.sommes:
+                if code_client not in spcl:
+                    spcl[code_client] = self.nouveau_somme(Sommes.cles_somme_client)
+                    spcl[code_client]['nos'] = {}
+                somme = spcl[code_client]
+                somme_nos = noshows.sommes[code_client]
+
+                for id_machine in somme_nos.keys():
+                    np_hp = somme_nos[id_machine]['np_hp']
+                    np_hc = somme_nos[id_machine]['np_hc']
+                    pu_hp = somme_nos[id_machine]['pu_hp']
+                    pu_hc = somme_nos[id_machine]['pu_hc']
+
+                    if np_hp > 0 or np_hc > 0:
+                        somme['nos'][id_machine] = {'tot_hp': 0, 'tot_hc': 0, 'users': {}, 'mont_hp': 0,
+                                                    'mont_hc': 0}
+
+                        users = somme['nos'][id_machine]['users']
+                        for id_user, s_u in somme_nos[id_machine]['users'].items():
+                            if id_user not in users:
+                                users[id_user] = {'np_hp': s_u['np_hp'],
+                                                  'np_hc': s_u['np_hc']}
+
+                        for id_user, s_u in users.items():
+                            somme['nos'][id_machine]['tot_hp'] += s_u['np_hp']
+                            somme['nos'][id_machine]['tot_hc'] += s_u['np_hc']
+                        somme['nos'][id_machine]['tot_hp'] = max(0, somme['nos'][id_machine]['tot_hp'])
+                        somme['nos'][id_machine]['tot_hc'] = max(0, somme['nos'][id_machine]['tot_hc'])
+
+                        somme['nos'][id_machine]['mont_hp'] = round(somme['nos'][id_machine]['tot_hp'] * pu_hp, 2)
+                        somme['nos'][id_machine]['mont_hc'] = round(somme['nos'][id_machine]['tot_hc'] * pu_hc, 2)
+                        somme['rm'] += somme['nos'][id_machine]['mont_hp'] + somme['nos'][id_machine]['mont_hc']
 
                 rm = math.floor(somme['rm'])
                 somme['rm_d'] = rm - somme['rm']

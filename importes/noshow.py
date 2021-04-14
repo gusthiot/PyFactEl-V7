@@ -1,6 +1,5 @@
 from importes import Fichier
 from outils import Outils
-from traitement import Rabais
 
 
 class NoShow(Fichier):
@@ -14,6 +13,7 @@ class NoShow(Fichier):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.sommes = {}
 
     def est_coherent(self, comptes, machines, users):
         """
@@ -55,6 +55,11 @@ class NoShow(Fichier):
                 msg += "le user id '" + donnee['id_user'] + "' de la ligne " + str(ligne) \
                        + " n'est pas référencé\n"
 
+            if donnee['type'] == "":
+                msg += "HP/HC " + str(ligne) + " ne peut être vide\n"
+            elif donnee['type'] != "HP" and donnee['type'] != "HC":
+                msg += "HP/HC " + str(ligne) + " doit être égal à HP ou HC\n"
+
             donnee['penalite'], info = Outils.est_un_nombre(donnee['penalite'], "la pénalité", ligne)
             msg += info
 
@@ -72,3 +77,75 @@ class NoShow(Fichier):
             Outils.affiche_message(msg)
             return 1
         return 0
+
+    def calcul_montants(self, machines, categprix, clients, comptes, verification):
+        """
+        calcule les sous-totaux nécessaires
+        :param machines: machines importées et vérifiées
+        :param categprix: catégories prix importés et vérifiés
+        :param clients: clients importés et vérifiés
+        :param comptes: comptes importés
+        :param verification: pour vérifier si les dates et les cohérences sont correctes
+        """
+        if verification.a_verifier != 0:
+            info = self.libelle + ". vous devez faire les vérifications avant de calculer les montants"
+            Outils.affiche_message(info)
+            return
+
+        donnees_list = []
+        pos = 0
+        for donnee in self.donnees:
+            id_compte = donnee['id_compte']
+            compte = comptes.donnees[id_compte]
+            code_client = compte['code_client']
+            id_machine = donnee['id_machine']
+            id_user = donnee['id_user']
+
+            machine = machines.donnees[id_machine]
+            client = clients.donnees[code_client]
+            prix_mach = categprix.donnees[client['nature'] + machine['id_cat_mach']]['prix_unit']
+            pu_hp = round(prix_mach * machine['tx_penalite_hp'] / 100, 2)
+            pu_hc = round(prix_mach * machine['tx_penalite_hc'] / 100 * (1 - machine['tx_rabais_hc'] / 100), 2)
+
+            tx_hp = machine['tx_occ_eff_hp']
+            tx_hc = machine['tx_occ_eff_hc']
+            if donnee['type'] == "HP":
+                np_hp = round(donnee['penalite'], 1)
+                np_hc = 0
+            else:
+                np_hc = round(donnee['penalite'], 1)
+                np_hp = 0
+            ok_hp = False
+            ok_hc = False
+            if np_hp > 0 and pu_hp > 0 and tx_hp > 0:
+                ok_hp = True
+            if np_hc > 0 and pu_hc > 0 and tx_hc > 0:
+                ok_hc = True
+
+            if ok_hp or ok_hc:
+                if code_client not in self.sommes:
+                    self.sommes[code_client] = {}
+                scl = self.sommes[code_client]
+
+                if id_machine not in scl:
+                    scl[id_machine] = {'np_hp': 0, 'np_hc': 0, 'pu_hp': pu_hp, 'pu_hc': pu_hc, 'users': {}}
+
+                scm = scl[id_machine]
+
+                if ok_hp:
+                    scm['np_hp'] += np_hp
+                if ok_hc:
+                    scm['np_hc'] += np_hc
+
+                if id_user not in scm['users']:
+                    scm['users'][id_user] = {'np_hp': 0, 'np_hc': 0, 'data': []}
+                if ok_hp:
+                    scm['users'][id_user]['np_hp'] += np_hp
+                if ok_hc:
+                    scm['users'][id_user]['np_hc'] += np_hc
+                scm['users'][id_user]['data'].append(pos)
+
+            donnees_list.append(donnee)
+            pos += 1
+
+        self.donnees = donnees_list
