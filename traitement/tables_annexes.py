@@ -20,9 +20,9 @@ class TablesAnnexes(object):
             legende = r'''Détail des pénalités - no show - par utilisateur'''
             contenu = r'''
                 \cline{2-3}
-                 & \multicolumn{2}{|c|}{Pénalités} \\
+                \multicolumn{1}{c|}{}  & \multicolumn{2}{c|}{Pénalités} \\
                 \cline{2-3}
-                 & HP & HC \\
+                \multicolumn{1}{c|}{} & HP & HC \\
                 \hline
                 '''
 
