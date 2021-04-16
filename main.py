@@ -25,7 +25,6 @@ from importes import (Client,
                       Livraison,
                       Machine,
                       Prestation,
-                      Reservation,
                       Categorie,
                       User,
                       NoShow,
@@ -160,7 +159,6 @@ if pe_present:
     livraisons = Livraison(dossier_source)
     machines = Machine(dossier_source)
     prestations = Prestation(dossier_source)
-    reservations = Reservation(dossier_source)
     categories = Categorie(dossier_source)
     users = User(dossier_source)
     noshows = NoShow(dossier_source)
@@ -168,21 +166,20 @@ if pe_present:
     verification = Verification()
 
     if verification.verification_date(edition, acces, clients, comptes, users, livraisons, machines, prestations,
-                                      reservations, noshows) > 0:
+                                      noshows) > 0:
         sys.exit("Erreur dans les dates")
 
     if verification.verification_coherence(generaux, edition, acces, clients, emoluments, coefprests, comptes, users,
-                                           livraisons, machines, prestations, reservations, categories, categprix,
+                                           livraisons, machines, prestations, categories, categprix,
                                            docpdf, noshows) > 0:
         sys.exit("Erreur dans la cohérence")
 
     livraisons.calcul_montants(prestations, coefprests, clients, verification, comptes)
     acces.calcul_montants(machines, categprix, clients, verification, comptes)
-    reservations.calcul_montants(machines, categprix, clients, comptes, verification)
     noshows.calcul_montants(machines, categprix, clients, comptes, verification)
 
     sommes = Sommes(verification, generaux)
-    sommes.calculer_toutes(livraisons, reservations, acces, clients, machines, noshows)
+    sommes.calculer_toutes(livraisons, acces, clients, noshows)
 
     for donnee in paramannexe.donnees:
         donnee['chemin'] = Outils.chemin([dossier_enregistrement, donnee['dossier']], generaux)
@@ -192,7 +189,7 @@ if pe_present:
 
     # faire les annexes avant la facture, que le ticket puisse vérifier leur existence
     if Latex.possibles():
-        Annexes.annexes(sommes, clients, edition, livraisons, acces, machines, reservations, comptes, paramannexe,
+        Annexes.annexes(sommes, clients, edition, livraisons, acces, machines, comptes, paramannexe,
                         generaux, users, categories, noshows, docpdf)
 
     Outils.copier_dossier("./reveal.js/", "js", dossier_enregistrement)
@@ -207,8 +204,7 @@ if pe_present:
         generaux_qual = Generaux(dossier_source, prod2qual)
         facture_qual.factures(sommes, dossier_destination, edition, generaux_qual, clients, comptes, paramannexe)
 
-    bm_lignes = BilanMensuel.creation_lignes(edition, sommes, clients, generaux, acces, livraisons, comptes,
-                                             reservations)
+    bm_lignes = BilanMensuel.creation_lignes(edition, sommes, clients, generaux, acces, livraisons, comptes)
     BilanMensuel.bilan(dossier_destination, edition, generaux, bm_lignes)
     bc_lignes = BilanComptes.creation_lignes(edition, sommes, clients, generaux, comptes)
     BilanComptes.bilan(dossier_destination, edition, generaux, bc_lignes)
@@ -220,14 +216,12 @@ if pe_present:
     Recapitulatifs.cae(dossier_destination, edition, cae_lignes)
     lvr_lignes = Recapitulatifs.lvr_lignes(edition, livraisons, comptes, clients, users, prestations)
     Recapitulatifs.lvr(dossier_destination, edition, lvr_lignes)
-    res_lignes = Recapitulatifs.res_lignes(edition, reservations, comptes, clients, users, machines)
-    Recapitulatifs.res(dossier_destination, edition, res_lignes)
     nos_lignes = Recapitulatifs.nos_lignes(edition, noshows, comptes, clients, users, machines, categories)
     Recapitulatifs.nos(dossier_destination, edition, nos_lignes)
 
     for fichier in [acces.nom_fichier, clients.nom_fichier, emoluments.nom_fichier, coefprests.nom_fichier,
                     comptes.nom_fichier, livraisons.nom_fichier, machines.nom_fichier, prestations.nom_fichier,
-                    reservations.nom_fichier, categories.nom_fichier, users.nom_fichier, generaux.nom_fichier,
+                    categories.nom_fichier, users.nom_fichier, generaux.nom_fichier,
                     edition.nom_fichier, categprix.nom_fichier, paramannexe.nom_fichier, noshows.nom_fichier]:
         dossier_destination.ecrire(fichier, dossier_source.lire(fichier))
     if docpdf is not None:
@@ -239,7 +233,7 @@ if pe_present:
             Resumes.supprimmer(generaux.code_cfact_centre, edition.mois, edition.annee,
                                DossierSource(dossier_enregistrement), DossierDestination(dossier_enregistrement))
         elif Outils.existe(Outils.chemin([dossier_enregistrement, "csv_0"])):
-            maj = [bm_lignes, bc_lignes, det_lignes, cae_lignes, lvr_lignes, res_lignes, nos_lignes]
+            maj = [bm_lignes, bc_lignes, det_lignes, cae_lignes, lvr_lignes, nos_lignes]
             Resumes.mise_a_jour(edition, clients, DossierSource(dossier_enregistrement),
                                 DossierDestination(dossier_enregistrement), maj, f_html_sections)
 

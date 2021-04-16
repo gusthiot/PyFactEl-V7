@@ -101,25 +101,26 @@ class NoShow(Fichier):
             id_machine = donnee['id_machine']
             id_user = donnee['id_user']
 
-            machine = machines.donnees[id_machine]
             client = clients.donnees[code_client]
-            prix_mach = categprix.donnees[client['nature'] + machine['id_cat_mach']]['prix_unit']
-            pu_hp = round(prix_mach * machine['tx_penalite_hp'] / 100, 2)
-            pu_hc = round(prix_mach * machine['tx_penalite_hc'] / 100 * (1 - machine['tx_rabais_hc'] / 100), 2)
+            machine = machines.donnees[id_machine]
 
-            tx_hp = machine['tx_occ_eff_hp']
-            tx_hc = machine['tx_occ_eff_hc']
+            nat = client['nature']
+            cat_hp = machine['id_cat_hp']
+            cat_hc = machine['id_cat_hc']
+            pu_hp = round(categprix.donnees[nat + cat_hp]['prix_unit'],2)
+            pu_hc = round(categprix.donnees[nat + cat_hc]['prix_unit'],2)
+
             if donnee['type'] == "HP":
                 np_hp = round(donnee['penalite'], 1)
                 np_hc = 0
             else:
-                np_hc = round(donnee['penalite'], 1)
                 np_hp = 0
+                np_hc = round(donnee['penalite'], 1)
             ok_hp = False
             ok_hc = False
-            if np_hp > 0 and pu_hp > 0 and tx_hp > 0:
+            if np_hp > 0 and pu_hp > 0:
                 ok_hp = True
-            if np_hc > 0 and pu_hc > 0 and tx_hc > 0:
+            if np_hc > 0 and pu_hc > 0:
                 ok_hc = True
 
             if ok_hp or ok_hc:

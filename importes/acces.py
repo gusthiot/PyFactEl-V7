@@ -151,11 +151,8 @@ class Acces(Fichier):
 
             scma = self.sommes[code_client]['machines']
             if id_machine not in scma:
-                pur_hp = round(prix_mach * machine['tx_penalite_hp'] / 100, 2)
-                pur_hc = round(prix_mach * machine['tx_penalite_hc'] / 100 *
-                               (1 - machine['tx_rabais_hc'] / 100), 2)
                 du_hc = round(prix_mach * machine['tx_rabais_hc'] / 100, 2)
-                scma[id_machine] = {'duree_hp': 0, 'duree_hc': 0, 'pur_hp': pur_hp, 'pur_hc': pur_hc, 'du_hc': du_hc,
+                scma[id_machine] = {'duree_hp': 0, 'duree_hc': 0, 'du_hc': du_hc,
                                     'dhm': 0, 'users': {}}
             scma[id_machine]['duree_hp'] += donnee['duree_machine_hp']
             scma[id_machine]['duree_hc'] += donnee['duree_machine_hc']
@@ -196,7 +193,7 @@ class Acces(Fichier):
                     sco[id_machine]['dhi'] = round(sco[id_machine]['duree_hc'] / 60 * sco[id_machine]['du_hc'], 2)
                     cat_mach = machine['id_cat_mach']
                     cat_mo = machine['id_cat_mo']
-                    cat_plat = machine['îd_cat_plat']
+                    cat_plat = machine['id_cat_plat']
                     cat_cher = machine['id_cat_cher']
                     nat = client['nature']
 

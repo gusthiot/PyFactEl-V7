@@ -7,8 +7,8 @@ class Machine(Fichier):
     Classe pour l'importation des données de Machines Cmi
     """
 
-    cles = ['annee', 'mois', 'id_machine', 'nom', 'id_cat_mach', 'tx_rabais_hc', 'tx_occ_eff_hp', 'tx_penalite_hp',
-            'tx_occ_eff_hc', 'tx_penalite_hc', 'delai_sans_frais', 'id_cat_mo', 'îd_cat_plat', 'id_cat_cher']
+    cles = ['annee', 'mois', 'id_machine', 'nom', 'id_cat_mach', 'tx_rabais_hc', 'id_cat_mo', 'id_cat_plat',
+            'id_cat_cher', 'id_cat_hp', 'id_cat_hc']
     nom_fichier = "machine.csv"
     libelle = "Machines"
 
@@ -69,10 +69,10 @@ class Machine(Fichier):
                 msg += "l'id catégorie opérateur '" + donnee['id_cat_mo'] + "' de la ligne " + str(ligne) \
                        + " n'est pas référencé\n"
 
-            if donnee['îd_cat_plat'] == "":
+            if donnee['id_cat_plat'] == "":
                 msg += "l'id catégorie plateforme de la ligne " + str(ligne) + " ne peut être vide\n"
-            elif categories.contient_id(donnee['îd_cat_plat']) == 0:
-                msg += "l'id catégorie plateforme '" + donnee['îd_cat_plat'] + "' de la ligne " + str(ligne) \
+            elif categories.contient_id(donnee['id_cat_plat']) == 0:
+                msg += "l'id catégorie plateforme '" + donnee['id_cat_plat'] + "' de la ligne " + str(ligne) \
                        + " n'est pas référencé\n"
 
             if donnee['id_cat_cher'] == "":
@@ -81,42 +81,24 @@ class Machine(Fichier):
                 msg += "l'id catégorie onéreux '" + donnee['id_cat_cher'] + "' de la ligne " + str(ligne) \
                        + " n'est pas référencé\n"
 
+            if donnee['id_cat_hp'] == "":
+                msg += "l'id catégorie hp de la ligne " + str(ligne) + " ne peut être vide\n"
+            elif categories.contient_id(donnee['id_cat_hp']) == 0:
+                msg += "l'id catégorie hp '" + donnee['id_cat_hp'] + "' de la ligne " + str(ligne) \
+                       + " n'est pas référencé\n"
+
+            if donnee['id_cat_hc'] == "":
+                msg += "l'id catégorie hc de la ligne " + str(ligne) + " ne peut être vide\n"
+            elif categories.contient_id(donnee['id_cat_hc']) == 0:
+                msg += "l'id catégorie hc '" + donnee['id_cat_hc'] + "' de la ligne " + str(ligne) \
+                       + " n'est pas référencé\n"
+
             donnee['tx_rabais_hc'], info = Outils.est_un_nombre(donnee['tx_rabais_hc'],
                                                                 "le rabais heures creuses", ligne)
             msg += info
             if donnee['tx_rabais_hc'] < 0 or donnee['tx_rabais_hc'] > 100:
                 msg += "le rabais heures creuse '" + str(donnee['tx_rabais_hc']) + "' de la ligne " + str(ligne) \
                        + " doit être entre 0 et 100\n"
-
-            donnee['tx_occ_eff_hp'], info = Outils.est_un_nombre(donnee['tx_occ_eff_hp'],
-                                                                 "le taux effectif d'occupation HP", ligne)
-            msg += info
-            if donnee['tx_occ_eff_hp'] < 0 or donnee['tx_occ_eff_hp'] > 100:
-                msg += "le taux effectif d'occupation HP '" + str(donnee['tx_occ_eff_hp']) + "' de la ligne " \
-                       + str(ligne) + " doit être entre 0 et 100\n"
-
-            donnee['tx_penalite_hp'], info = Outils.est_un_nombre(donnee['tx_penalite_hp'], "la pénalité HP", ligne)
-            msg += info
-            if donnee['tx_penalite_hp'] < 0 or donnee['tx_penalite_hp'] > 100:
-                msg += "la pénalité HP '" + str(donnee['tx_penalite_hp']) + "' de la ligne " + str(ligne) \
-                       + " doit être entre 0 et 100\n"
-
-            donnee['tx_occ_eff_hc'], info = Outils.est_un_nombre(donnee['tx_occ_eff_hc'],
-                                                                 "le taux effectif d'occupation HC", ligne)
-            msg += info
-            if donnee['tx_occ_eff_hc'] < 0 or donnee['tx_occ_eff_hc'] > 100:
-                msg += "le taux d'occupation HC '" + str(donnee['tx_occ_eff_hc']) + "' de la ligne " + str(ligne) \
-                       + " doit être entre 0 et 100\n"
-
-            donnee['tx_penalite_hc'], info = Outils.est_un_nombre(donnee['tx_penalite_hc'], "la pénalité HC", ligne)
-            msg += info
-            if donnee['tx_penalite_hc'] < 0 or donnee['tx_penalite_hc'] > 100:
-                msg += "la pénalité HC '" + str(donnee['tx_penalite_hc']) + "' de la ligne " + str(ligne) \
-                       + " doit être entre 0 et 100\n"
-
-            donnee['delai_sans_frais'], info = Outils.est_un_nombre(donnee['delai_sans_frais'], "le délai sans frais",
-                                                                    ligne)
-            msg += info
 
             del donnee['annee']
             del donnee['mois']

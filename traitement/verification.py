@@ -13,8 +13,7 @@ class Verification(object):
         """
         self.a_verifier = 2
 
-    def verification_date(self, edition, acces, clients, comptes, users, livraisons, machines, prestations,
-                          reservations, noshows):
+    def verification_date(self, edition, acces, clients, comptes, users, livraisons, machines, prestations, noshows):
         """
         vérifie les dates de toutes les données importées
         :param edition: paramètres d'édition
@@ -25,7 +24,6 @@ class Verification(object):
         :param livraisons: livraisons importées
         :param machines: machines importées
         :param prestations: prestations importées
-        :param reservations: réservations importées
         :param noshows: no show importés
         :return: 0 si ok, sinon le nombre d'échecs à la vérification
         """
@@ -36,14 +34,13 @@ class Verification(object):
         verif += livraisons.verification_date(edition.annee, edition.mois)
         verif += machines.verification_date(edition.annee, edition.mois)
         verif += prestations.verification_date(edition.annee, edition.mois)
-        verif += reservations.verification_date(edition.annee, edition.mois)
         verif += users.verification_date(edition.annee, edition.mois)
         verif += noshows.verification_date(edition.annee, edition.mois)
         self.a_verifier = 1
         return verif
 
     def verification_coherence(self, generaux, edition, acces, clients, emoluments, coefprests, comptes, users,
-                               livraisons, machines, prestations, reservations, categories, categprix, docpdf, noshows):
+                               livraisons, machines, prestations, categories, categprix, docpdf, noshows):
         """
         vérifie la cohérence des données importées
         :param generaux: paramètres généraux
@@ -57,7 +54,6 @@ class Verification(object):
         :param livraisons: livraisons importées
         :param machines: machines importées
         :param prestations: prestations importées
-        :param reservations: réservations importées
         :param categories: catégories importées
         :param categprix: catégories prix importées
         :param docpdf: paramètres d'ajout de document pdf
@@ -75,7 +71,6 @@ class Verification(object):
         verif += categprix.est_coherent(generaux, categories)
         verif += coefprests.est_coherent(generaux)
         verif += clients.est_coherent(emoluments, generaux)
-        verif += reservations.est_coherent(comptes, machines, users)
         verif += noshows.est_coherent(comptes, machines, users)
         verif += docpdf.est_coherent(generaux, clients)
         verif += comptes.est_coherent(clients, generaux)

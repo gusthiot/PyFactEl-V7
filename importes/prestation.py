@@ -8,7 +8,7 @@ class Prestation(Fichier):
     """
 
     cles = ['annee', 'mois', 'id_prestation', 'no_prestation', 'designation', 'categorie', 'unite_prest', 'prix_unit',
-            'categ_stock', 'affiliation', 'prix_rev_unit']
+            'categ_stock', 'affiliation']
     nom_fichier = "prestation.csv"
     libelle = "Prestations"
 
@@ -90,10 +90,6 @@ class Prestation(Fichier):
             msg += info
             num, info = Outils.est_un_nombre(donnee['no_prestation'], "le numéro prestation", ligne)
             donnee['no_prestation'] = int(num)
-            msg += info
-            donnee['prix_rev_unit'], info = Outils.est_un_nombre(donnee['prix_rev_unit'], "le prix de revient unitaire",
-                                                                 ligne)
-
             msg += info
 
             del donnee['annee']

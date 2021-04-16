@@ -118,57 +118,6 @@ class Recapitulatifs(object):
         return lignes
 
     @staticmethod
-    def res(dossier_destination, edition, lignes):
-        """
-        création du récapitulatif des réservations
-        :param dossier_destination: Une instance de la classe dossier.DossierDestination
-        :param edition: paramètres d'édition
-        :param lignes: lignes de données du récapitulatif
-        """
-        nom = "res_" + str(edition.annee) + "_" + Outils.mois_string(edition.mois) + "_" + str(edition.version)
-        if edition.version > 0:
-            nom += "_" + str(edition.client_unique)
-        nom += ".csv"
-
-        with dossier_destination.writer(nom) as fichier_writer:
-
-            ligne = [edition.annee, edition.mois, "Id-Compte", "Numéro de compte", "Intitulé compte",
-                     "Code Type Compte", "Code Type Subsides", "Code Client Facture", "Abrev. Labo", "Id-User",
-                     "Nom User", "Prénom User", "Id-Machine", "Nom Machine", "Date et Heure début de slot",
-                     "Durée du slot réservé HP", "Durée du slot réservé HC", "Durée ouvrée",
-                     "Date et Heure de réservation", "Date et Heure de suppression"]
-            fichier_writer.writerow(ligne)
-
-            for ligne in lignes:
-                fichier_writer.writerow(ligne)
-
-    @staticmethod
-    def res_lignes(edition, reservations, comptes, clients, users, machines):
-        """
-        génération des lignes de données du récapitulatif des réservations
-        :param edition: paramètres d'édition
-        :param reservations: réservations importées
-        :param comptes: comptes importés
-        :param clients: clients importés
-        :param users: users importés
-        :param machines: machines importées
-        :return: lignes de données du récapitulatif
-        """
-        lignes = []
-        for donnee in reservations.donnees:
-            compte = comptes.donnees[donnee['id_compte']]
-            client = clients.donnees[compte['code_client']]
-            user = users.donnees[donnee['id_user']]
-            machine = machines.donnees[donnee['id_machine']]
-            ligne = [edition.annee, edition.mois, donnee['id_compte'], compte['numero'], compte['intitule'],
-                     compte['type_tarif'], compte['type_subside'], compte['code_client'], client['abrev_labo'],
-                     donnee['id_user'], user['nom'], user['prenom'], donnee['id_machine'], machine['nom'],
-                     donnee['date_debut'], donnee['duree_hp'], donnee['duree_hc'],
-                     donnee['duree_ouvree'], donnee['date_reservation'], donnee['date_suppression']]
-            lignes.append(ligne)
-        return lignes
-
-    @staticmethod
     def nos(dossier_destination, edition, lignes):
         """
         création du récapitulatif des no show

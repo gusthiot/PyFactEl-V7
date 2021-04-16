@@ -6,24 +6,6 @@ class Rabais(object):
     """
 
     @staticmethod
-    def rabais_reservation(drsf, supp, shp, shc):
-        """
-        calcule le rabais de réservation
-        :param drsf: délai sans frais pour une machine donnée
-        :param supp: durée ouvrée
-        :param shp: durée du slot réservée en heures pleines
-        :param shc: durée du slot réservée en heures creuses
-        :return: durée facturée en heures pleines, durée facturée en heures creuses
-        """
-        if drsf == 0:
-            return 0, 0
-        else:
-            k = max(0, min(1, (1-supp / drsf)))
-            fhp = round(k * shp, 0)
-            fhc = round(k * shc, 0)
-            return fhp, fhc
-
-    @staticmethod
     def rabais_emolument(mt, emb):
         """
         calcule le rabais sur émolument

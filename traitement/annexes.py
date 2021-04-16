@@ -10,7 +10,7 @@ class Annexes(object):
     Classe pour la création des annexes
     """
     @staticmethod
-    def annexes(sommes, clients, edition, livraisons, acces, machines, reservations, comptes, paramannexe, generaux,
+    def annexes(sommes, clients, edition, livraisons, acces, machines, comptes, paramannexe, generaux,
                 users, categories, noshows, docpdf):
         """
         création des annexes
@@ -20,7 +20,6 @@ class Annexes(object):
         :param livraisons: livraisons importées
         :param acces: accès importés
         :param machines: machines importées
-        :param reservations: réservations importées
         :param comptes: comptes importés
         :param paramannexe: paramètres d'annexe
         :param generaux: paramètres généraux

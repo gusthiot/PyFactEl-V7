@@ -1,5 +1,4 @@
 from outils import Outils
-import math
 
 
 class BilanMensuel(object):
@@ -36,7 +35,7 @@ class BilanMensuel(object):
                 fichier_writer.writerow(ligne)
 
     @staticmethod
-    def creation_lignes(edition, sommes, clients, generaux, acces, livraisons, comptes, reservations):
+    def creation_lignes(edition, sommes, clients, generaux, acces, livraisons, comptes):
         """
         génération des lignes de données du bilan
         :param edition: paramètres d'édition
@@ -46,7 +45,6 @@ class BilanMensuel(object):
         :param acces: accès importés
         :param livraisons: livraisons importées
         :param comptes: comptes importés
-        :param reservations: réservations importées
         :return: lignes de données du bilan
         """
         if sommes.calculees == 0:
@@ -63,8 +61,7 @@ class BilanMensuel(object):
             reference = nature + str(edition.annee)[2:] + Outils.mois_string(edition.mois) + "." + code_client
             if edition.version > 0:
                 reference += "-" + str(edition.version)
-            users, cptes = BilanMensuel.utilisateurs_et_comptes(acces, livraisons, code_client, comptes,
-                                                                reservations)
+            users, cptes = BilanMensuel.utilisateurs_et_comptes(acces, livraisons, code_client, comptes)
             nb_u = len(users)
             nb_c = len(cptes)
 
@@ -81,7 +78,7 @@ class BilanMensuel(object):
         return lignes
 
     @staticmethod
-    def utilisateurs_et_comptes(acces, livraisons, code_client, comptes, reservations):
+    def utilisateurs_et_comptes(acces, livraisons, code_client, comptes):
         """
         retourne la liste de tous les comptes et utilisateurs concernés pour les accès, les réservations et les 
         livraisons pour un client donné
@@ -89,7 +86,6 @@ class BilanMensuel(object):
         :param livraisons: livraisons importées
         :param code_client: client donné
         :param comptes: comptes importés
-        :param reservations: réservations importées
         :return: liste des comptes
         """
         cptes = []
@@ -108,12 +104,5 @@ class BilanMensuel(object):
                     cptes.append(lvr['id_compte'])
                 if lvr['id_user'] not in users:
                     users.append(lvr['id_user'])
-        for res in reservations.donnees:
-            cc = comptes.donnees[res['id_compte']]['code_client']
-            if cc == code_client:
-                if res['id_compte'] not in cptes:
-                    cptes.append(res['id_compte'])
-                if res['id_user'] not in users:
-                    users.append(res['id_user'])
 
         return users, cptes

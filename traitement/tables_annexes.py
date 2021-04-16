@@ -61,8 +61,8 @@ class TablesAnnexes(object):
                                         hp = nos['penalite']
                                         hc = 0
                                     else:
-                                        hc = nos['penalite']
                                         hp = 0
+                                        hc = nos['penalite']
                                     dico_pos = {'date': nos['date_debut'],
                                                 'hp': hp,
                                                 'hc': hc}

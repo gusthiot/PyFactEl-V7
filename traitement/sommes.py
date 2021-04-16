@@ -11,7 +11,7 @@ class Sommes(object):
     cles_somme_compte = ['somme_j_mk', 'somme_j_dhi', 'somme_j_dhi_d', 'somme_j_mm', 'somme_j_mr',
                          'somme_j_mb', 'c1', 'c2']
 
-    cles_somme_client = ['dht', 'somme_t_mm', 'somme_t_mr', 'somme_t_mb', 'mt', 'somme_t', 'em', 'er', 'e', 'res', 'rm',
+    cles_somme_client = ['dht', 'somme_t_mm', 'somme_t_mr', 'somme_t_mb', 'mt', 'somme_t', 'em', 'er', 'e', 'nos', 'rm',
                          'rm_d', 'rr', 'r']
 
     def __init__(self, verification, generaux):
@@ -29,18 +29,16 @@ class Sommes(object):
         self.categories = generaux.codes_d3()
         self.min_fact_rese = generaux.min_fact_rese
 
-    def calculer_toutes(self, livraisons, reservations, acces, clients, machines, noshows):
+    def calculer_toutes(self, livraisons, acces, clients, noshows):
         """
         calculer toutes les sommes, par compte et par client
         :param livraisons: livraisons importées et vérifiées
-        :param reservations: réservations importées et vérifiées
         :param acces: accès machines importés et vérifiés
         :param clients: clients importés et vérifiés
-        :param machines: machines importées et vérifiées
         :param noshows: no show importés et vérifiés
         """
         self.somme_par_compte(livraisons, acces, clients)
-        self.somme_par_client(clients, reservations, machines, acces, noshows)
+        self.somme_par_client(clients, acces, noshows)
 
     def nouveau_somme(self, cles):
         """
@@ -146,12 +144,10 @@ class Sommes(object):
         self.sco = 1
         self.sommes_comptes = spco
 
-    def somme_par_client(self, clients, reservations, machines, acces, noshows):
+    def somme_par_client(self, clients, acces, noshows):
         """
         calcule les sommes par clients sous forme de dictionnaire : client->clés_sommes
         :param clients: clients importés et vérifiés
-        :param reservations: réservations importées et vérifiées
-        :param machines: machines importées et vérifiées
         :param noshows: no show importés et vérifiés
         :param acces: accès machines importés et vérifiés
         """
@@ -166,7 +162,6 @@ class Sommes(object):
             for code_client, spco_cl in self.sommes_comptes.items():
                 spcl[code_client] = self.nouveau_somme(Sommes.cles_somme_client)
                 somme = spcl[code_client]
-                somme['res'] = {}
                 somme['nos'] = {}
                 somme['rm'] = 0
                 somme['rr'] = 0
@@ -181,64 +176,6 @@ class Sommes(object):
                         somme['sommes_cat_m'][categorie] += som_co['sommes_cat_m'][categorie]
                         somme['sommes_cat_r'][categorie] += som_co['sommes_cat_r'][categorie]
                         somme['tot_cat'][categorie] += som_co['tot_cat'][categorie]
-
-            # réservations
-            for code_client in reservations.sommes:
-                if code_client not in spcl:
-                    spcl[code_client] = self.nouveau_somme(Sommes.cles_somme_client)
-                    spcl[code_client]['res'] = {}
-                somme = spcl[code_client]
-                somme_res = reservations.sommes[code_client]
-
-                somme_cae = {}
-                if code_client in acces.sommes:
-                    somme_cae = acces.sommes[code_client]['machines']
-
-                for id_machine in somme_res.keys():
-                    re_hp = somme_res[id_machine]['res_hp']
-                    re_hc = somme_res[id_machine]['res_hc']
-                    pu_hp = somme_res[id_machine]['pu_hp']
-                    pu_hc = somme_res[id_machine]['pu_hc']
-                    tx_hp = machines.donnees[id_machine]['tx_occ_eff_hp']
-                    tx_hc = machines.donnees[id_machine]['tx_occ_eff_hc']
-
-                    if re_hp > 0 or re_hc > 0:
-                        somme['res'][id_machine] = {'tot_hp': 0, 'tot_hc': 0, 'users': {}, 'mont_hp': 0, 'mont_hc': 0}
-
-                        users = somme['res'][id_machine]['users']
-                        for id_user, s_u in somme_res[id_machine]['users'].items():
-                            if id_user not in users:
-                                mini_hp = round(s_u['res_hp'] * tx_hp / 100)
-                                mini_hc = round(s_u['res_hc'] * tx_hc / 100)
-                                users[id_user] = {'ac_hp': 0, 'ac_hc': 0, 're_hp': s_u['res_hp'],
-                                                  're_hc': s_u['res_hc'], 'mini_hp': mini_hp, 'mini_hc': mini_hc,
-                                                  'tot_hp': 0, 'tot_hc': 0}
-
-                        if id_machine in somme_cae:
-                            for id_user, s_u in somme_cae[id_machine]['users'].items():
-                                if id_user not in users:
-                                    users[id_user] = {'ac_hp': s_u['duree_hp'], 'ac_hc': s_u['duree_hc'], 're_hp': 0,
-                                                      're_hc': 0, 'mini_hp': 0, 'mini_hc': 0, 'tot_hp': 0, 'tot_hc': 0}
-                                else:
-                                    users[id_user]['ac_hp'] = s_u['duree_hp']
-                                    users[id_user]['ac_hc'] = s_u['duree_hc']
-                        for id_user, s_u in users.items():
-                            s_u['tot_hp'] = s_u['mini_hp'] - s_u['ac_hp']
-                            somme['res'][id_machine]['tot_hp'] += s_u['tot_hp']
-                            s_u['tot_hc'] = s_u['mini_hc'] - s_u['ac_hc']
-                            somme['res'][id_machine]['tot_hc'] += s_u['tot_hc']
-                        somme['res'][id_machine]['tot_hp'] = max(0, somme['res'][id_machine]['tot_hp'])
-                        somme['res'][id_machine]['tot_hc'] = max(0, somme['res'][id_machine]['tot_hc'])
-
-                        somme['res'][id_machine]['mont_hp'] = round(somme['res'][id_machine]['tot_hp'] * pu_hp / 60, 2)
-                        somme['res'][id_machine]['mont_hc'] = round(somme['res'][id_machine]['tot_hc'] * pu_hc / 60, 2)
-                #        somme['rm'] += somme['res'][id_machine]['mont_hp'] + somme['res'][id_machine]['mont_hc']
-
-                # rm = math.floor(somme['rm'])
-                # somme['rm_d'] = rm - somme['rm']
-                # somme['rm'] = rm
-                # somme['rr'] = Rabais.rabais_reservation_petit_montant(somme['rm'], self.min_fact_rese)
-                # somme['r'] = somme['rm'] - somme['rr']
 
             # no show
             for code_client in noshows.sommes:
