@@ -13,7 +13,19 @@ class NoShow(Fichier):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.comptes = []
         self.sommes = {}
+
+    def obtenir_comptes(self):
+        """
+        retourne la liste de tous les comptes clients
+        :return: liste des comptes clients présents dans les données noshow importées
+        """
+        if self.verifie_coherence == 0:
+            info = self.libelle + ". vous devez vérifier la cohérence avant de pouvoir obtenir les comptes"
+            Outils.affiche_message(info)
+            return []
+        return self.comptes
 
     def est_coherent(self, comptes, machines, users):
         """
@@ -42,6 +54,8 @@ class NoShow(Fichier):
                 msg += "le id compte de la ligne " + str(ligne) + " ne peut être vide\n"
             elif comptes.contient_id(donnee['id_compte']) == 0:
                 msg += "le id compte '" + donnee['id_compte'] + "' de la ligne " + str(ligne) + " n'est pas référencé\n"
+            elif donnee['id_compte'] not in self.comptes:
+                self.comptes.append(donnee['id_compte'])
 
             if donnee['id_machine'] == "":
                 msg += "le machine id de la ligne " + str(ligne) + " ne peut être vide\n"

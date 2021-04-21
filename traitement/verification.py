@@ -78,7 +78,7 @@ class Verification(object):
         if verif > 0:
             return verif
 
-        comptes_actifs = Verification.obtenir_comptes_actifs(acces, livraisons)
+        comptes_actifs = Verification.obtenir_comptes_actifs(acces, livraisons, noshows)
         clients_actifs = Verification.obtenir_clients_actifs(comptes_actifs, comptes)
 
         if edition.version > 0 and len(clients_actifs) > 0:
@@ -93,11 +93,12 @@ class Verification(object):
         return verif
 
     @staticmethod
-    def obtenir_comptes_actifs(acces, livraisons):
+    def obtenir_comptes_actifs(acces, livraisons, noshows):
         """
         retourne la liste des comptes utilisés, pour les accès et les livraisons
         :param acces: accès importés
         :param livraisons: livraisons importées
+        :param noshows: noshows importés
         :return: comptes utilisés mappés par clients
         """
         comptes_actifs = []
@@ -105,6 +106,9 @@ class Verification(object):
             if id_compte not in comptes_actifs:
                 comptes_actifs.append(id_compte)
         for id_compte in acces.obtenir_comptes():
+            if id_compte not in comptes_actifs:
+                comptes_actifs.append(id_compte)
+        for id_compte in noshows.obtenir_comptes():
             if id_compte not in comptes_actifs:
                 comptes_actifs.append(id_compte)
 
