@@ -67,13 +67,12 @@ class CoefPrest(Fichier):
             elif donnee['categorie'] not in categories:
                 categories.append(donnee['categorie'])
 
-            if (donnee['categorie'] != "") and (donnee['nature'] != ""):
-                couple = [donnee['categorie'], donnee['nature']]
-                if couple not in couples:
-                    couples.append(couple)
-                else:
-                    msg += "Couple categorie '" + donnee['categorie'] + "' et nature '" + \
-                           donnee['nature'] + "' de la ligne " + str(ligne) + " pas unique\n"
+            couple = [donnee['categorie'], donnee['nature']]
+            if couple not in couples:
+                couples.append(couple)
+            else:
+                msg += "Couple categorie '" + donnee['categorie'] + "' et nature '" + \
+                       donnee['nature'] + "' de la ligne " + str(ligne) + " pas unique\n"
 
             donnee['coefficient'], info = Outils.est_un_nombre(donnee['coefficient'], "le coefficient", ligne)
             msg += info

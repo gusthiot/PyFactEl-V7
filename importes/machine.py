@@ -8,9 +8,12 @@ class Machine(Fichier):
     """
 
     cles = ['annee', 'mois', 'id_machine', 'nom', 'id_cat_mach', 'tx_rabais_hc', 'id_cat_mo', 'id_cat_plat',
-            'id_cat_cher', 'id_cat_hp', 'id_cat_hc']
+            'id_cat_cher', 'id_cat_hp', 'id_cat_hc', 'id_plateforme']
     nom_fichier = "machine.csv"
     libelle = "Machines"
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
     def contient_id(self, id_machine):
         """
@@ -20,18 +23,18 @@ class Machine(Fichier):
         """
         if self.verifie_coherence == 1:
             if id_machine in self.donnees.keys():
-                    return 1
+                return 1
         else:
             for machine in self.donnees:
                 if machine['id_machine'] == id_machine:
                     return 1
         return 0
 
-    def est_coherent(self, categories):
+    def est_coherent(self, categories, plateformes):
         """
-        vérifie que les données du fichier importé sont cohérentes (id machine unique, id catégorie cout référencé,
-        catégorie machine référencé dans les coefficients machines), et efface les colonnes mois et année
+        vérifie que les données du fichier importé sont cohérentes, et efface les colonnes mois et année
         :param categories: catégories importées
+        :param plateformes: plateformes importées
         :return: 1 s'il y a une erreur, 0 sinon
         """
         if self.verifie_date == 0:
@@ -91,6 +94,12 @@ class Machine(Fichier):
                 msg += "l'id catégorie hc de la ligne " + str(ligne) + " ne peut être vide\n"
             elif categories.contient_id(donnee['id_cat_hc']) == 0:
                 msg += "l'id catégorie hc '" + donnee['id_cat_hc'] + "' de la ligne " + str(ligne) \
+                       + " n'est pas référencé\n"
+
+            if donnee['id_plateforme'] == "":
+                msg += "l'id plateforme de la ligne " + str(ligne) + " ne peut être vide\n"
+            elif plateformes.contient_id(donnee['id_plateforme']) == 0:
+                msg += "l'id plateforme '" + donnee['id_plateforme'] + "' de la ligne " + str(ligne) \
                        + " n'est pas référencé\n"
 
             donnee['tx_rabais_hc'], info = Outils.est_un_nombre(donnee['tx_rabais_hc'],

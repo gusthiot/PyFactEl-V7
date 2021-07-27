@@ -7,7 +7,7 @@ class User(Fichier):
     Classe pour l'importation des données de Users
     """
 
-    cles = ['annee', 'mois', 'id_user', 'nom', 'prenom']
+    cles = ['annee', 'mois', 'id_user', 'sciper', 'nom', 'prenom']
     nom_fichier = "user.csv"
     libelle = "Users"
 
@@ -52,9 +52,9 @@ class User(Fichier):
         ligne = 1
         donnees_dict = {}
         ids = []
+        scipers = []
 
         for donnee in self.donnees:
-
             if donnee['id_user'] == "":
                 msg += "l'id user de la ligne " + str(ligne) + " ne peut être vide\n"
             elif donnee['id_user'] not in ids:
@@ -62,6 +62,14 @@ class User(Fichier):
             else:
                 msg += "l'id user '" + donnee['id_user'] + "' de la ligne " + str(ligne) +\
                        " n'est pas unique\n"
+
+            # if donnee['sciper'] == "":
+            #     msg += "le sciper de la ligne " + str(ligne) + " ne peut être vide\n"
+            # elif donnee['sciper'] not in scipers:
+            #     scipers.append(donnee['sciper'])
+            # else:
+            #     msg += "le sciper '" + donnee['sciper'] + "' de la ligne " + str(ligne) +\
+            #            " n'est pas unique\n"
 
             del donnee['annee']
             del donnee['mois']

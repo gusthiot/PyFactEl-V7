@@ -13,18 +13,20 @@ class Verification(object):
         """
         self.a_verifier = 2
 
-    def verification_date(self, edition, acces, clients, comptes, users, livraisons, machines, prestations, noshows):
+    def verification_date(self, edition, acces, clients, comptes, droits, livraisons, machines, noshows, prestations,
+                          users):
         """
         vérifie les dates de toutes les données importées
         :param edition: paramètres d'édition
         :param acces: accès importés
         :param clients: clients importés
         :param comptes: comptes importés
-        :param users: users importés
+        :param droits: droits importés
         :param livraisons: livraisons importées
         :param machines: machines importées
-        :param prestations: prestations importées
         :param noshows: no show importés
+        :param prestations: prestations importées
+        :param users: users importés
         :return: 0 si ok, sinon le nombre d'échecs à la vérification
         """
         verif = 0
@@ -36,44 +38,54 @@ class Verification(object):
         verif += prestations.verification_date(edition.annee, edition.mois)
         verif += users.verification_date(edition.annee, edition.mois)
         verif += noshows.verification_date(edition.annee, edition.mois)
+        verif += droits.verification_date(edition.annee, edition.mois)
         self.a_verifier = 1
         return verif
 
-    def verification_coherence(self, generaux, edition, acces, clients, emoluments, coefprests, comptes, users,
-                               livraisons, machines, prestations, categories, categprix, docpdf, noshows):
+    def verification_coherence(self, generaux, edition, acces, categories, categprix, clients, coefprests, comptes,
+                               droits, grants, livraisons, machines, noshows, plafonds, plateformes, prestations,
+                               subsides, users, docpdf):
         """
         vérifie la cohérence des données importées
         :param generaux: paramètres généraux
         :param edition: paramètres d'édition
         :param acces: accès importés
-        :param clients: clients importés
-        :param emoluments: émoluments importés
-        :param coefprests: coefficients prestations importés
-        :param comptes: comptes importés
-        :param users: users importés
-        :param livraisons: livraisons importées
-        :param machines: machines importées
-        :param prestations: prestations importées
         :param categories: catégories importées
         :param categprix: catégories prix importées
-        :param docpdf: paramètres d'ajout de document pdf
+        :param clients: clients importés
+        :param coefprests: coefficients prestations importés
+        :param comptes: comptes importés
+        :param droits: droits importés
+        :param grants: subsides comptabilisés importés
+        :param livraisons: livraisons importées
+        :param machines: machines importées
         :param noshows: no show importés
+        :param plafonds: plafonds de subsides importés
+        :param plateformes: plateformes importées
+        :param prestations: prestations importées
+        :param subsides: subsides importés
+        :param users: users importés
+        :param docpdf: paramètres d'ajout de document pdf
         :return: 0 si ok, sinon le nombre d'échecs à la vérification
         """
         verif = 0
         verif += acces.est_coherent(comptes, machines, users)
         verif += livraisons.est_coherent(comptes, prestations, users)
-        verif += categories.est_coherent()
+        verif += categories.est_coherent(generaux)
         verif += users.est_coherent()
-        verif += machines.est_coherent(categories)
-        verif += prestations.est_coherent(generaux, coefprests)
-        verif += emoluments.est_coherent(generaux)
+        verif += machines.est_coherent(categories, plateformes)
+        verif += prestations.est_coherent(generaux, coefprests, plateformes, machines)
         verif += categprix.est_coherent(generaux, categories)
         verif += coefprests.est_coherent(generaux)
-        verif += clients.est_coherent(emoluments, generaux)
+        verif += clients.est_coherent(generaux)
         verif += noshows.est_coherent(comptes, machines, users)
         verif += docpdf.est_coherent(generaux, clients)
         verif += comptes.est_coherent(clients, generaux)
+        verif += droits.est_coherent(comptes, users)
+        verif += grants.est_coherent(comptes, generaux)
+        verif += plateformes.est_coherent(clients)
+        verif += subsides.est_coherent(plateformes, generaux)
+        verif += plafonds.est_coherent(subsides, generaux)
 
         if verif > 0:
             return verif

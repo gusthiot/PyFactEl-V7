@@ -15,10 +15,11 @@ class Generaux(object):
     nom_fichier = "paramgen.csv"
     libelle = "Paramètres Généraux"
     cles_obligatoires = ['centre', 'code_cfact_centre', 'origine', 'code_int', 'code_ext', 'commerciale', 'canal',
-                         'secteur', 'devise', 'financier', 'fonds', 'entete', 'poste_emolument', 'poste_reservation',
-                         'lien', 'chemin', 'chemin_propre', 'chemin_filigrane', 'code_t', 'code_n', 'code_ref_fact',
-                         'avantage_HC', 'filtrer_article_nul', 'code_d', 'code_sap', 'quantite', 'unite', 'type_prix',
-                         'type_rabais', 'texte_sap', 'intitule_long', 'intitule_court', 'modes', 'min_fact_rese']
+                         'secteur', 'devise', 'financier', 'fonds', 'entete', 'poste_reservation', 'lien', 'chemin',
+                         'chemin_propre', 'chemin_filigrane', 'code_t', 'code_n', 'intitule_n', 'code_ref_fact',
+                         'avantage_HC', 'subsides', 'rabais_excep', 'filtrer_article_nul', 'code_d', 'code_sap',
+                         'quantite', 'unite', 'type_prix', 'type_rabais', 'texte_sap', 'intitule_long',
+                         'intitule_court', 'modes', 'min_fact_rese']
     cles_autorisees = cles_obligatoires + ['code_sap_qas']
 
     def __init__(self, dossier_source, prod2qual=None):
@@ -42,7 +43,7 @@ class Generaux(object):
                         del ligne[-1]
                 self._donnees[cle] = ligne
         except IOError as e:
-            Outils.fatal(e, "impossible d'ouvrir le fichier : "+Generaux.nom_fichier)
+            Outils.fatal(e, "impossible d'ouvrir le fichier : "+self.nom_fichier)
         if prod2qual and 'code_sap_qas' in self._donnees:
             self._donnees['code_sap'] = self._donnees['code_sap_qas']
 
@@ -75,17 +76,39 @@ class Generaux(object):
             else:
                 erreurs += "le code D '" + dd + "' n'est pas unique\n"
 
-        if len(self._donnees['code_n']) != len(self._donnees['code_ref_fact']):
-            erreurs += "le nombre de colonees doit être le même pour le code N et pour le code référence du client\n"
+        len_ok = True
+        if len(self._donnees['code_n']) != len(self._donnees['intitule_n']) or \
+                len(self._donnees['code_n']) != len(self._donnees['code_ref_fact']) or \
+                len(self._donnees['code_n']) != len(self._donnees['avantage_HC']) or \
+                len(self._donnees['code_n']) != len(self._donnees['subsides']) or \
+                len(self._donnees['code_n']) != len(self._donnees['rabais_excep']) or \
+                len(self._donnees['code_n']) != len(self._donnees['filtrer_article_nul']):
+            len_ok = False
+            erreurs += "le nombre de colonees doit être le même pour le code N, l'intitulé N, " \
+                       "le code référence du client, l'avantage HC, le mode subsides, le mode rabais exceptionnel et " \
+                       "le filtre articles nuls\n"
 
-        if (len(self._donnees['code_d']) != len(self._donnees['code_sap'])) or \
-                (len(self._donnees['code_d']) != len(self._donnees['quantite'])) or \
-                (len(self._donnees['code_d']) != len(self._donnees['unite'])) or \
-                (len(self._donnees['code_d']) != len(self._donnees['type_prix'])) or \
-                (len(self._donnees['code_d']) != len(self._donnees['intitule_long'])) or \
-                (len(self._donnees['code_d']) != len(self._donnees['intitule_court'])) or \
-                (len(self._donnees['code_d']) != len(self._donnees['type_rabais'])) or \
-                (len(self._donnees['code_d']) != len(self._donnees['texte_sap'])):
+        if len_ok:
+            for i in range(1, len(self._donnees['code_n'])):
+                if self._donnees['code_ref_fact'][i] != 'INT' and self._donnees['code_ref_fact'][i] != 'EXT':
+                    erreurs += "le code référence client doit être INT ou EXT\n"
+                if self._donnees['avantage_HC'][i] != 'BONUS' and self._donnees['avantage_HC'][i] != 'RABAIS':
+                    erreurs += "l'avantage HC doit être BONUS ou RABAIS\n"
+                if self._donnees['subsides'][i] != 'BONUS' and self._donnees['subsides'][i] != 'RABAIS':
+                    erreurs += "le mode subsides doit être BONUS ou RABAIS\n"
+                if self._donnees['rabais_excep'][i] != 'BONUS' and self._donnees['rabais_excep'][i] != 'RABAIS':
+                    erreurs += "le mode rabais exceptionnel doit être BONUS ou RABAIS\n"
+                if self._donnees['filtrer_article_nul'][i] != 'OUI' and self._donnees['filtrer_article_nul'][i] != 'NON':
+                    erreurs += "le filtre articles nuls doit être OUI ou NON\n"
+
+        if len(self._donnees['code_d']) != len(self._donnees['code_sap']) or \
+                len(self._donnees['code_d']) != len(self._donnees['quantite']) or \
+                len(self._donnees['code_d']) != len(self._donnees['unite']) or \
+                len(self._donnees['code_d']) != len(self._donnees['type_prix']) or \
+                len(self._donnees['code_d']) != len(self._donnees['intitule_long']) or \
+                len(self._donnees['code_d']) != len(self._donnees['intitule_court']) or \
+                len(self._donnees['code_d']) != len(self._donnees['type_rabais']) or \
+                len(self._donnees['code_d']) != len(self._donnees['texte_sap']):
             erreurs += "le nombre de colonnes doit être le même pour le code D, le code SAP, la quantité, l'unité, " \
                        "le type de prix, le type de rabais, le texte SAP, l'intitulé long et l'intitulé court\n"
 
@@ -101,6 +124,13 @@ class Generaux(object):
         :return: codes N
         """
         return self._donnees['code_n'][1:]
+
+    def obtenir_code_d(self):
+        """
+        retourne les codes D
+        :return: codes D
+        """
+        return self._donnees['code_d'][1:]
 
     def obtenir_modes_envoi(self):
         """
@@ -132,7 +162,7 @@ class Generaux(object):
 
         :return: une liste ordonnée d'objets Article
         """
-        return self.articles[3:]
+        return self.articles[2:]
 
     def codes_d3(self):
         return [a.code_d for a in self.articles_d3]
@@ -161,7 +191,7 @@ def ajoute_accesseur_pour_valeur_unique(cls, nom, cle_csv=None):
 
 ajoute_accesseur_pour_valeur_unique(Generaux, "centre_financier", "financier")
 
-for champ_valeur_unique in ('fonds', 'entete', 'chemin', 'lien', 'min_fact_rese', 'poste_emolument', 'devise', 'canal',
-                            'secteur', 'origine', 'commerciale', 'poste_reservation', 'code_int', 'code_ext', 'code_t',
+for champ_valeur_unique in ('fonds', 'entete', 'chemin', 'lien', 'min_fact_rese', 'devise', 'canal', 'secteur',
+                            'origine', 'commerciale', 'poste_reservation', 'code_int', 'code_ext', 'code_t',
                             'centre', 'code_cfact_centre', 'chemin_propre', 'chemin_filigrane'):
     ajoute_accesseur_pour_valeur_unique(Generaux, champ_valeur_unique)

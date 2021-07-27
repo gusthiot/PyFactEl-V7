@@ -7,7 +7,7 @@ class Categorie(Fichier):
     Classe pour l'importation des données de Catégories
     """
 
-    cles = ['id_categorie', 'intitule', 'unite']
+    cles = ['id_categorie', 'code_d', 'intitule', 'unite']
     nom_fichier = "categorie.csv"
     libelle = "Catégories"
 
@@ -22,17 +22,17 @@ class Categorie(Fichier):
         """
         if self.verifie_coherence == 1:
             if id_cat in self.donnees.keys():
-                    return 1
+                return 1
         else:
             for cat in self.donnees:
                 if cat['id_categorie'] == id_cat:
                     return 1
         return 0
 
-    def est_coherent(self):
+    def est_coherent(self, generaux):
         """
-        vérifie que les données du fichier importé sont cohérentes (si id catégorie est unique),
-        et efface les colonnes mois et année
+        vérifie que les données du fichier importé sont cohérentes
+        :param generaux: paramètres généraux
         :return: 1 s'il y a une erreur, 0 sinon
         """
 
@@ -47,7 +47,6 @@ class Categorie(Fichier):
 
         del self.donnees[0]
         for donnee in self.donnees:
-
             if donnee['id_categorie'] == "":
                 msg += "l'id catégorie de la ligne " + str(ligne) + " ne peut être vide\n"
             elif donnee['id_categorie'] not in ids:
@@ -55,6 +54,11 @@ class Categorie(Fichier):
             else:
                 msg += "l'id catégorie '" + donnee['id_categorie'] + "' de la ligne " + str(ligne) +\
                        " n'est pas unique\n"
+
+            if donnee['code_d'] == "":
+                msg += "le code D de la ligne " + str(ligne) + " ne peut être vide\n"
+            elif donnee['code_d'] not in generaux.obtenir_code_d():
+                msg += "le code D de la ligne " + str(ligne) + " n'existe pas dans les codes D\n"
 
             donnees_dict[donnee['id_categorie']] = donnee
             ligne += 1

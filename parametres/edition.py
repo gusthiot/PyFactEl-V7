@@ -21,12 +21,12 @@ class Edition(object):
             for ligne in dossier_source.reader(self.nom_fichier):
                 donnees_csv.append(ligne)
         except IOError as e:
-            Outils.fatal(e, "impossible d'ouvrir le fichier : "+Edition.nom_fichier)
+            Outils.fatal(e, "impossible d'ouvrir le fichier : "+self.nom_fichier)
 
         num = 5
         if len(donnees_csv) != num:
             Outils.fatal(ErreurConsistance(),
-                         Edition.libelle + ": nombre de lignes incorrect : " +
+                         self.libelle + ": nombre de lignes incorrect : " +
                          str(len(donnees_csv)) + ", attendu : " + str(num))
         try:
             self.annee = int(donnees_csv[0][1])

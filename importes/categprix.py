@@ -16,8 +16,7 @@ class CategPrix(Fichier):
 
     def est_coherent(self, generaux, categories):
         """
-        vérifie que les données du fichier importé sont cohérentes,
-        et efface les colonnes mois et année
+        vérifie que les données du fichier importé sont cohérentes
         :param generaux: paramètres généraux
         :param categories: catégories importées
         :return: 1 s'il y a une erreur, 0 sinon
@@ -50,7 +49,7 @@ class CategPrix(Fichier):
             if donnee['id_categorie'] == "":
                 msg += "l'id catégorie " + str(ligne) + " ne peut être vide\n"
             elif categories.contient_id(donnee['id_categorie']) == 0:
-                msg += "l'id catégori de la ligne " + str(ligne) + " n'existe pas dans les catégories \n"
+                msg += "l'id catégorie de la ligne " + str(ligne) + " n'existe pas dans les catégories \n"
             elif donnee['id_categorie'] not in ids:
                 ids.append(donnee['id_categorie'])
 

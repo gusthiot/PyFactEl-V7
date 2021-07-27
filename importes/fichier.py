@@ -1,5 +1,5 @@
-import sys
 from outils import Outils
+from erreurs import ErreurConsistance
 
 
 class Fichier(object):
@@ -40,9 +40,9 @@ class Fichier(object):
         """
         num = len(self.cles)
         if len(ligne) != num:
-            info = self.libelle + ": nombre de colonnes incorrect : " + str(len(ligne)) + ", attendu : " + str(num)
-            Outils.affiche_message(info)
-            sys.exit("Erreur de consistance")
+            Outils.fatal(ErreurConsistance(),
+                         self.libelle + ": nombre de lignes incorrect : " +
+                         str(len(ligne)) + ", attendu : " + str(num))
         donnees_ligne = {}
         for xx in range(0, num):
             donnees_ligne[self.cles[xx]] = ligne[xx]

@@ -24,8 +24,7 @@ class BilanMensuel(object):
         with dossier_destination.writer(nom) as fichier_writer:
 
             ligne = ["année", "mois", "référence", "code client", "code client sap", "abrév. labo", "nom labo",
-                     "type client", "nature client", "Em base", "rabais Em", "nb utilisateurs",
-                     "nb comptes", "-", "-", "DHt", "Et", "Rt", "Mt"]
+                     "type client", "nature client", "", "", "", "", "-", "-", "DHt", "", "Rt", "Mt"]
             for categorie in generaux.codes_d3():
                 ligne.append(categorie + "t")
             ligne += ["total facturé HT", "Bonus Ht"]
@@ -35,16 +34,13 @@ class BilanMensuel(object):
                 fichier_writer.writerow(ligne)
 
     @staticmethod
-    def creation_lignes(edition, sommes, clients, generaux, acces, livraisons, comptes):
+    def creation_lignes(edition, sommes, clients, generaux):
         """
         génération des lignes de données du bilan
         :param edition: paramètres d'édition
         :param sommes: sommes calculées
         :param clients: clients importés
         :param generaux: paramètres généraux
-        :param acces: accès importés
-        :param livraisons: livraisons importées
-        :param comptes: comptes importés
         :return: lignes de données du bilan
         """
         if sommes.calculees == 0:
@@ -61,48 +57,13 @@ class BilanMensuel(object):
             reference = nature + str(edition.annee)[2:] + Outils.mois_string(edition.mois) + "." + code_client
             if edition.version > 0:
                 reference += "-" + str(edition.version)
-            users, cptes = BilanMensuel.utilisateurs_et_comptes(acces, livraisons, code_client, comptes)
-            nb_u = len(users)
-            nb_c = len(cptes)
-
             rht = client['rh'] * scl['dht']
 
             ligne = [edition.annee, edition.mois, reference, code_client, client['code_sap'], client['abrev_labo'],
-                     client['nom_labo'], 'U', client['nature'], scl['em'], scl['er'], nb_u, nb_c, 0, 0,
-                     Outils.format_2_dec(rht), scl['e'], Outils.format_2_dec(scl['r']),
-                     Outils.format_2_dec(scl['mt'])]
+                     client['nom_labo'], 'U', client['nature'], 0, 0, 0, 0, 0, 0, Outils.format_2_dec(rht), 0,
+                     Outils.format_2_dec(scl['r']), Outils.format_2_dec(scl['mt'])]
             for categorie in generaux.codes_d3():
                 ligne.append(Outils.format_2_dec(scl['tot_cat'][categorie]))
             ligne += [Outils.format_2_dec(scl['somme_t']), Outils.format_2_dec(scl['somme_t_mb'])]
             lignes.append(ligne)
         return lignes
-
-    @staticmethod
-    def utilisateurs_et_comptes(acces, livraisons, code_client, comptes):
-        """
-        retourne la liste de tous les comptes et utilisateurs concernés pour les accès, les réservations et les 
-        livraisons pour un client donné
-        :param acces: accès importés
-        :param livraisons: livraisons importées
-        :param code_client: client donné
-        :param comptes: comptes importés
-        :return: liste des comptes
-        """
-        cptes = []
-        users = []
-        for cae in acces.donnees:
-            cc = comptes.donnees[cae['id_compte']]['code_client']
-            if cc == code_client:
-                if cae['id_compte'] not in cptes:
-                    cptes.append(cae['id_compte'])
-                if cae['id_user'] not in users:
-                    users.append(cae['id_user'])
-        for lvr in livraisons.donnees:
-            cc = comptes.donnees[lvr['id_compte']]['code_client']
-            if cc == code_client:
-                if lvr['id_compte'] not in cptes:
-                    cptes.append(lvr['id_compte'])
-                if lvr['id_user'] not in users:
-                    users.append(lvr['id_user'])
-
-        return users, cptes

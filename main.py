@@ -18,7 +18,6 @@ from docopt import docopt
 
 from importes import (Client,
                       Acces,
-                      Emolument,
                       CoefPrest,
                       CategPrix,
                       Compte,
@@ -28,12 +27,18 @@ from importes import (Client,
                       Categorie,
                       User,
                       NoShow,
+                      DroitCompte,
+                      Granted,
+                      PlafSubside,
+                      Plateforme,
+                      Subside,
                       DossierSource,
                       DossierDestination)
 from outils import Outils
 from parametres import (Edition,
                         DocPdf,
                         Paramannexe,
+                        Paramtexte,
                         SuppressionFacture,
                         AnnulationVersion,
                         AnnulationSuppression,
@@ -107,6 +112,7 @@ generaux = Generaux(dossier_source)
 if pe_present:
     edition = Edition(dossier_source)
     paramannexe = Paramannexe(dossier_source)
+    paramtexte = Paramtexte(dossier_source)
 
     if edition.version > 0 and edition.client_unique == generaux.code_cfact_centre:
         chemin = generaux.chemin_propre
@@ -151,27 +157,31 @@ if pe_present:
         docpdf = None
 
     acces = Acces(dossier_source)
-    clients = Client(dossier_source)
-    emoluments = Emolument(dossier_source)
+    categories = Categorie(dossier_source)
     categprix = CategPrix(dossier_source)
+    clients = Client(dossier_source)
     coefprests = CoefPrest(dossier_source)
     comptes = Compte(dossier_source)
+    droits = DroitCompte(dossier_source)
+    grants = Granted(dossier_source, edition)
     livraisons = Livraison(dossier_source)
     machines = Machine(dossier_source)
-    prestations = Prestation(dossier_source)
-    categories = Categorie(dossier_source)
-    users = User(dossier_source)
     noshows = NoShow(dossier_source)
+    plafonds = PlafSubside(dossier_source)
+    plateformes = Plateforme(dossier_source)
+    prestations = Prestation(dossier_source)
+    subsides = Subside(dossier_source)
+    users = User(dossier_source)
 
     verification = Verification()
 
-    if verification.verification_date(edition, acces, clients, comptes, users, livraisons, machines, prestations,
-                                      noshows) > 0:
+    if verification.verification_date(edition, acces, clients, comptes, droits, livraisons, machines, noshows,
+                                      prestations, users) > 0:
         sys.exit("Erreur dans les dates")
 
-    if verification.verification_coherence(generaux, edition, acces, clients, emoluments, coefprests, comptes, users,
-                                           livraisons, machines, prestations, categories, categprix,
-                                           docpdf, noshows) > 0:
+    if verification.verification_coherence(generaux, edition, acces, categories, categprix, clients, coefprests,
+                                           comptes, droits, grants, livraisons, machines, noshows, plafonds,
+                                           plateformes, prestations, subsides, users, docpdf) > 0:
         sys.exit("Erreur dans la cohérence")
 
     livraisons.calcul_montants(prestations, coefprests, clients, verification, comptes)
@@ -204,13 +214,14 @@ if pe_present:
         generaux_qual = Generaux(dossier_source, prod2qual)
         facture_qual.factures(sommes, dossier_destination, edition, generaux_qual, clients, comptes, paramannexe)
 
-    bm_lignes = BilanMensuel.creation_lignes(edition, sommes, clients, generaux, acces, livraisons, comptes)
+    bm_lignes = BilanMensuel.creation_lignes(edition, sommes, clients, generaux)
     BilanMensuel.bilan(dossier_destination, edition, generaux, bm_lignes)
     bc_lignes = BilanComptes.creation_lignes(edition, sommes, clients, generaux, comptes)
     BilanComptes.bilan(dossier_destination, edition, generaux, bc_lignes)
     det_lignes = Detail.creation_lignes(edition, sommes, clients, generaux, acces, livraisons, comptes, categories,
                                         prestations)
     Detail.detail(dossier_destination, edition, det_lignes)
+
 
     cae_lignes = Recapitulatifs.cae_lignes(edition, acces, comptes, clients, users, machines, categories)
     Recapitulatifs.cae(dossier_destination, edition, cae_lignes)
@@ -219,10 +230,11 @@ if pe_present:
     nos_lignes = Recapitulatifs.nos_lignes(edition, noshows, comptes, clients, users, machines, categories)
     Recapitulatifs.nos(dossier_destination, edition, nos_lignes)
 
-    for fichier in [acces.nom_fichier, clients.nom_fichier, emoluments.nom_fichier, coefprests.nom_fichier,
+    for fichier in [acces.nom_fichier, clients.nom_fichier, coefprests.nom_fichier, droits.nom_fichier,
                     comptes.nom_fichier, livraisons.nom_fichier, machines.nom_fichier, prestations.nom_fichier,
-                    categories.nom_fichier, users.nom_fichier, generaux.nom_fichier,
-                    edition.nom_fichier, categprix.nom_fichier, paramannexe.nom_fichier, noshows.nom_fichier]:
+                    categories.nom_fichier, users.nom_fichier, generaux.nom_fichier, grants.nom_fichier,
+                    edition.nom_fichier, categprix.nom_fichier, paramannexe.nom_fichier, noshows.nom_fichier,
+                    plafonds.nom_fichier, plateformes.nom_fichier, subsides.nom_fichier, paramtexte.nom_fichier]:
         dossier_destination.ecrire(fichier, dossier_source.lire(fichier))
     if docpdf is not None:
         dossier_destination.ecrire(docpdf.nom_fichier, dossier_source.lire(docpdf.nom_fichier))

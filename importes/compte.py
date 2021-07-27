@@ -7,10 +7,13 @@ class Compte(Fichier):
     Classe pour l'importation des données de Comptes Cmi
     """
 
-    cles = ['annee', 'mois', 'id_compte', 'numero', 'intitule', 'type_tarif', 'code_client', 'type_subside']
+    cles = ['annee', 'mois', 'id_compte', 'numero', 'intitule', 'type_tarif', 'exploitation', 'code_client', 'type_subside']
     nom_fichier = "compte.csv"
     libelle = "Comptes"
-    
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
     def contient_id(self, id_compte):
         """
         vérifie si un compte contient l'id donné
@@ -64,6 +67,8 @@ class Compte(Fichier):
                        " n'est pas unique\n"
             if donnee['type_tarif'] != generaux.code_t:
                 msg += "le type de tarif de la ligne " + str(ligne) + " n'est pas correct\n"
+            if donnee['exploitation'] != 'TRUE' and donnee['exploitation'] != 'FALSE':
+                msg += "l'exploitation de la ligne " + str(ligne) + " doit être 'TRUE' ou 'FALSE'\n"
 
             del donnee['annee']
             del donnee['mois']

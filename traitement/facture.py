@@ -131,12 +131,6 @@ class Facture(object):
     
                 op_centre = client['nature'] + str(edition.annee)[2:] + Outils.mois_string(edition.mois)
 
-                if scl['em'] > 0 and not (filtre == "OUI" and scl['e'] == 0):
-                    poste = generaux.poste_emolument
-                    fichier_writer.writerow(self.ligne_facture(generaux, generaux.articles[0], poste, scl['em'],
-                                                               scl['er'], op_centre, "", edition))
-                    contenu_client += self.ligne_tableau(generaux.articles[0], poste, scl['em'], scl['er'], "", edition)
-
                 if scl['rm'] > 0 and not (filtre == "OUI" and scl['r'] == 0):
                     poste = generaux.poste_reservation
                     fichier_writer.writerow(self.ligne_facture(generaux, generaux.articles[1], poste, scl['rm'],

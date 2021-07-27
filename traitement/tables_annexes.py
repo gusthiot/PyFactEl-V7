@@ -105,7 +105,7 @@ class TablesAnnexes(object):
         contenu += contenu_prix_xaj
 
         dico = {'procedes': Outils.format_2_dec(scl['mt']),
-                'total': Outils.format_2_dec((scl['somme_t']-scl['r']-scl['e']))}
+                'total': Outils.format_2_dec((scl['somme_t']-scl['r']))}
 
         contenu += r'''Total article & & %(procedes)s''' % dico
 
@@ -129,29 +129,22 @@ class TablesAnnexes(object):
         :return: table au format latex
         """
 
-        brut = scl['rm'] + scl['somme_t_mm'] + scl['em']
+        brut = scl['rm'] + scl['somme_t_mm']
         for cat, tt in scl['sommes_cat_m'].items():
             brut += tt
         if scl['somme_t'] > 0 or (filtre == "NON" and brut > 0):
             structure = r'''{|c|l|r|r|r|}'''
             legende = r'''Récapitulatif des postes de la facture'''
 
-            dico = {'emom': Outils.format_2_dec(scl['em']), 'emor': Outils.format_2_dec(scl['er']),
-                    'emo': Outils.format_2_dec(scl['e']), 'resm': Outils.format_2_dec(scl['rm']),
-                    'resr': Outils.format_2_dec(scl['rr']), 'res': Outils.format_2_dec(scl['r']),
-                    'int_emo': Latex.echappe_caracteres(generaux.articles[0].intitule_long),
-                    'int_res': Latex.echappe_caracteres(generaux.articles[1].intitule_long),
-                    'p_emo': generaux.poste_emolument, 'p_res': generaux.poste_reservation}
+            dico = {'resm': Outils.format_2_dec(scl['rm']), 'resr': Outils.format_2_dec(scl['rr']),
+                    'res': Outils.format_2_dec(scl['r']), 'p_res': generaux.poste_reservation,
+                    'int_res': Latex.echappe_caracteres(generaux.articles[1].intitule_long)}
 
             contenu = r'''
                 \hline
                 N. Poste & Poste & \multicolumn{1}{c|}{Montant} & \multicolumn{1}{c|}{Rabais}
                 & \multicolumn{1}{c|}{Total} \\
                 \hline'''
-            if scl['em'] > 0 and not (filtre == "OUI" and scl['e'] == 0):
-                contenu += r'''
-                    %(p_emo)s & %(int_emo)s & %(emom)s & %(emor)s & %(emo)s \\
-                    \hline''' % dico
             if scl['rm'] > 0 and not (filtre == "OUI" and scl['r'] == 0):
                 contenu += r'''
                     %(p_res)s & %(int_res)s & %(resm)s & %(resr)s & %(res)s \\

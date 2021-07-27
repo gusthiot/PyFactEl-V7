@@ -11,8 +11,8 @@ class Sommes(object):
     cles_somme_compte = ['somme_j_mk', 'somme_j_dhi', 'somme_j_dhi_d', 'somme_j_mm', 'somme_j_mr',
                          'somme_j_mb', 'c1', 'c2']
 
-    cles_somme_client = ['dht', 'somme_t_mm', 'somme_t_mr', 'somme_t_mb', 'mt', 'somme_t', 'em', 'er', 'e', 'nos', 'rm',
-                         'rm_d', 'rr', 'r']
+    cles_somme_client = ['dht', 'somme_t_mm', 'somme_t_mr', 'somme_t_mb', 'mt', 'somme_t', 'nos', 'rm', 'rm_d', 'rr',
+                         'r']
 
     def __init__(self, verification, generaux):
         """
@@ -86,7 +86,7 @@ class Sommes(object):
                         somme['somme_j_dhi'] += som['dhi']
                 ac_cat_som = acces.sommes[code_client]['categories']
                 if id_compte in ac_cat_som:
-                    for type, type_som in ac_cat_som[id_compte].items():
+                    for t, type_som in ac_cat_som[id_compte].items():
                         for id_categorie, cat_som in type_som.items():
                             somme['somme_j_mk'] += cat_som['mk']
 
@@ -226,11 +226,7 @@ class Sommes(object):
                         somme['somme_t_mb'] += scm['dhm']
                     somme['somme_t_mb'] *= client['bh']
 
-                # somme['somme_t_mb'] += math.ceil(client['bh'] * somme['dht'])
-                somme['em'], somme['er'] = Rabais.rabais_emolument(somme['mt'], client['emb'])
-                somme['e'] = somme['em'] - somme['er']
-
-                somme['somme_t'] = somme['r'] + somme['mt'] + somme['e']
+                somme['somme_t'] = somme['r'] + somme['mt']
                 for cat, tt in somme['tot_cat'].items():
                     somme['somme_t'] += tt
 

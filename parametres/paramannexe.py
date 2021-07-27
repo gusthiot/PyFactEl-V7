@@ -1,5 +1,5 @@
-import sys
 from outils import Outils
+from erreurs import ErreurConsistance
 
 
 class Paramannexe(object):
@@ -39,9 +39,8 @@ class Paramannexe(object):
             if donnee['nom'] in self.dossiers_annexes:
                 donnee['dossier'] = self.dossiers_annexes[donnee['nom']]
             else:
-                info = self.libelle + ": nom non-attendu : " + donnee['nom'] + ", pas de nom de dossier "
-                Outils.affiche_message(info)
-                sys.exit("Erreur de consistance")
+                Outils.fatal(ErreurConsistance(),
+                             self.libelle + ": nom non-attendu : " + donnee['nom'] + ", pas de nom de dossier ")
 
     def extraction_ligne(self, ligne):
         """
@@ -51,13 +50,10 @@ class Paramannexe(object):
         """
         num = len(self.cles)
         if len(ligne) != num:
-            info = self.libelle + ": nombre de colonnes incorrect : " + str(len(ligne)) + ", attendu : " + str(
-                num)
-            Outils.affiche_message(info)
-            sys.exit("Erreur de consistance")
+            Outils.fatal(ErreurConsistance(),
+                         self.libelle + ": nombre de lignes incorrect : " + str(len(ligne)) + ", attendu : " + str(num))
         donnees_ligne = {}
         for xx in range(0, num):
             donnees_ligne[self.cles[xx]] = ligne[xx]
 
         return donnees_ligne
-
