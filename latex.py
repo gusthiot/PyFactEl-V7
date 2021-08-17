@@ -55,8 +55,6 @@ class Latex(object):
             os.unlink(nom_fichier + '.log')
             os.unlink(nom_fichier + '.aux')
 
-        except OSError as err:
-            Outils.affiche_message("OSError: {0}".format(err))
         except IOError as err:
             Outils.affiche_message("IOError: {0}".format(err))
 
@@ -72,8 +70,6 @@ class Latex(object):
             if chemin_dossier != '':
                 shutil.copy(fichier, chemin_dossier)
                 os.unlink(fichier)
-        except OSError as err:
-            Outils.affiche_message("OSError: {0}".format(err))
         except IOError as err:
             Outils.affiche_message("IOError: {0}".format(err))
 
@@ -98,8 +94,6 @@ class Latex(object):
                     f.close()
                 shutil.copy('concatene.pdf', fichier)
                 os.unlink('concatene.pdf')
-        except OSError as err:
-            Outils.affiche_message("OSError: {0}".format(err))
         except IOError as err:
             Outils.affiche_message("IOError: {0}".format(err))
 

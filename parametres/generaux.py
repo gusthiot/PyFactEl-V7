@@ -167,18 +167,37 @@ class Generaux(object):
     def codes_d3(self):
         return [a.code_d for a in self.articles_d3]
 
-    def code_ref_par_code_n(self, code_ref):
+    def code_ref_par_code_n(self, code_n):
         return self._donnees['code_ref_fact'][
-            self._donnees['code_n'].index(code_ref)]
+            self._donnees['code_n'].index(code_n)]
 
-    def avantage_hc_par_code_n(self, avantage_hc):
+    def avantage_hc_par_code_n(self, code_n):
         return self._donnees['avantage_HC'][
-            self._donnees['code_n'].index(avantage_hc)]
+            self._donnees['code_n'].index(code_n)]
 
-    def filtrer_article_nul_par_code_n(self, filtrer_article_nul):
+    def subsides_par_code_n(self, code_n):
+        return self._donnees['subsides'][
+            self._donnees['code_n'].index(code_n)]
+
+    def rabais_excep_par_code_n(self, code_n):
+        return self._donnees['rabais_excep'][
+            self._donnees['code_n'].index(code_n)]
+
+    def intitule_n_par_code_n(self, code_n):
+        return self._donnees['intitule_n'][
+            self._donnees['code_n'].index(code_n)]
+
+    def filtrer_article_nul_par_code_n(self, code_n):
         return self._donnees['filtrer_article_nul'][
-            self._donnees['code_n'].index(filtrer_article_nul)]
+            self._donnees['code_n'].index(code_n)]
 
+    def intitule_long_par_code_d(self, code_d):
+        return self._donnees['intitule_long'][
+            self._donnees['code_d'].index(code_d)]
+
+    def code_sap_par_code_d(self, code_d):
+        return self._donnees['code_sap'][
+            self._donnees['code_d'].index(code_d)]
 
 def ajoute_accesseur_pour_valeur_unique(cls, nom, cle_csv=None):
     if cle_csv is None:

@@ -55,7 +55,7 @@ class Granted(Fichier):
             if donnee['montant'] < 0:
                 msg += "le montant comptabilisé de la ligne " + str(ligne) + " doit être positif\n"
 
-            donnees_dict[donnee['type']] = donnee
+            donnees_dict[donnee['id_compte']+donnee['code_d']] = donnee
             ligne += 1
 
         self.donnees = donnees_dict

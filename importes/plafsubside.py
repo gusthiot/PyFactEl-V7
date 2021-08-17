@@ -60,7 +60,7 @@ class PlafSubside(Fichier):
             if donnee['max_compte'] < 0:
                 msg += "le max compte de la ligne " + str(ligne) + " doit être positif\n"
 
-            donnees_dict[donnee['type']] = donnee
+            donnees_dict[donnee['type'] + donnee['code_d']] = donnee
             ligne += 1
 
         self.donnees = donnees_dict

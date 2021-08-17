@@ -30,8 +30,7 @@ class Livraison(Fichier):
 
     def est_coherent(self, comptes, prestations, users):
         """
-        vérifie que les données du fichier importé sont cohérentes (id compte parmi comptes,
-        id prestation parmi prestations), et efface les colonnes mois et année
+        vérifie que les données du fichier importé sont cohérentes, et efface les colonnes mois et année
         :param comptes: comptes importés
         :param prestations: prestations importées
         :param users: users importés
@@ -74,6 +73,10 @@ class Livraison(Fichier):
             msg += info
             donnee['rabais'], info = Outils.est_un_nombre(donnee['rabais'], "le rabais", ligne)
             msg += info
+
+            donnee['date_livraison'] = donnee['date_livraison'].replace('"', '')
+            donnee['date_commande'] = donnee['date_commande'].replace('"', '')
+            donnee['date_prise'] = donnee['date_prise'].replace('"', '')
 
             del donnee['annee']
             del donnee['mois']

@@ -71,16 +71,16 @@ class Verification(object):
         verif = 0
         verif += acces.est_coherent(comptes, machines, users)
         verif += livraisons.est_coherent(comptes, prestations, users)
-        verif += categories.est_coherent(generaux)
+        verif += categories.est_coherent(generaux, plateformes)
         verif += users.est_coherent()
-        verif += machines.est_coherent(categories, plateformes)
+        verif += machines.est_coherent(categories)
         verif += prestations.est_coherent(generaux, coefprests, plateformes, machines)
         verif += categprix.est_coherent(generaux, categories)
         verif += coefprests.est_coherent(generaux)
         verif += clients.est_coherent(generaux)
         verif += noshows.est_coherent(comptes, machines, users)
         verif += docpdf.est_coherent(generaux, clients)
-        verif += comptes.est_coherent(clients, generaux)
+        verif += comptes.est_coherent(clients)
         verif += droits.est_coherent(comptes, users)
         verif += grants.est_coherent(comptes, generaux)
         verif += plateformes.est_coherent(clients)
@@ -98,8 +98,8 @@ class Verification(object):
                 Outils.affiche_message("Si version différente de 0, un seul client autorisé")
                 sys.exit("Trop de clients pour version > 0")
             if edition.client_unique != clients_actifs[0]:
-                Outils.affiche_message("Le client unique des paramètres d'édition n'est pas le même que celui présent dans "
-                                   "les transactions")
+                Outils.affiche_message("Le client unique des paramètres d'édition n'est pas le même que "
+                                       "celui présent dans les transactions")
                 sys.exit("clients non-correspondants pour version > 0")
         self.a_verifier = 0
         return verif

@@ -35,8 +35,7 @@ class User(Fichier):
 
     def est_coherent(self):
         """
-        vérifie que les données du fichier importé sont cohérentes (si id user est unique),
-        et efface les colonnes mois et année
+        vérifie que les données du fichier importé sont cohérentes, et efface les colonnes mois et année
         :return: 1 s'il y a une erreur, 0 sinon
         """
         if self.verifie_date == 0:
@@ -52,7 +51,7 @@ class User(Fichier):
         ligne = 1
         donnees_dict = {}
         ids = []
-        scipers = []
+        # scipers = []
 
         for donnee in self.donnees:
             if donnee['id_user'] == "":

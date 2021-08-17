@@ -8,7 +8,7 @@ class Machine(Fichier):
     """
 
     cles = ['annee', 'mois', 'id_machine', 'nom', 'id_cat_mach', 'tx_rabais_hc', 'id_cat_mo', 'id_cat_plat',
-            'id_cat_cher', 'id_cat_hp', 'id_cat_hc', 'id_plateforme']
+            'id_cat_cher', 'id_cat_hp', 'id_cat_hc']
     nom_fichier = "machine.csv"
     libelle = "Machines"
 
@@ -30,11 +30,10 @@ class Machine(Fichier):
                     return 1
         return 0
 
-    def est_coherent(self, categories, plateformes):
+    def est_coherent(self, categories):
         """
         vérifie que les données du fichier importé sont cohérentes, et efface les colonnes mois et année
         :param categories: catégories importées
-        :param plateformes: plateformes importées
         :return: 1 s'il y a une erreur, 0 sinon
         """
         if self.verifie_date == 0:
@@ -94,12 +93,6 @@ class Machine(Fichier):
                 msg += "l'id catégorie hc de la ligne " + str(ligne) + " ne peut être vide\n"
             elif categories.contient_id(donnee['id_cat_hc']) == 0:
                 msg += "l'id catégorie hc '" + donnee['id_cat_hc'] + "' de la ligne " + str(ligne) \
-                       + " n'est pas référencé\n"
-
-            if donnee['id_plateforme'] == "":
-                msg += "l'id plateforme de la ligne " + str(ligne) + " ne peut être vide\n"
-            elif plateformes.contient_id(donnee['id_plateforme']) == 0:
-                msg += "l'id plateforme '" + donnee['id_plateforme'] + "' de la ligne " + str(ligne) \
                        + " n'est pas référencé\n"
 
             donnee['tx_rabais_hc'], info = Outils.est_un_nombre(donnee['tx_rabais_hc'],

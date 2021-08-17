@@ -17,8 +17,7 @@ class DroitCompte(Fichier):
 
     def est_coherent(self, comptes, users):
         """
-        vérifie que les données du fichier importé sont cohérentes (id compte dans comptes,
-        id user dans users), et efface les colonnes mois et année
+        vérifie que les données du fichier importé sont cohérentes, et efface les colonnes mois et année
         :param comptes: comptes importés
         :param users: users importés
         :return: 1 s'il y a une erreur, 0 sinon
@@ -56,6 +55,9 @@ class DroitCompte(Fichier):
                 msg += "Couple user id '" + donnee['id_user'] + "' et compte id '" + \
                        donnee['id_compte'] + "' de la ligne " + str(ligne) + " pas unique\n"
 
+            donnee['debut'] = donnee['debut'].replace('"', '')
+            donnee['fin'] = donnee['fin'].replace('"', '')
+
             if donnee['debut'] != 'NULL':
                 try:
                     parse(donnee['debut'])
@@ -69,7 +71,7 @@ class DroitCompte(Fichier):
 
             del donnee['annee']
             del donnee['mois']
-            donnees_dict[donnee['id_compte']] = donnee
+            donnees_dict[donnee['id_user'] + donnee['id_compte']] = donnee
             ligne += 1
 
         self.donnees = donnees_dict

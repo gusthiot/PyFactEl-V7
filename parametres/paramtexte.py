@@ -17,7 +17,7 @@ class Paramtexte(object):
         :param dossier_source: Une instance de la classe dossier.DossierSource
         """
         fichier_reader = dossier_source.reader(self.nom_fichier)
-        self._donnees = {}
+        self.donnees = {}
         labels = []
         try:
             for ligne in fichier_reader:
@@ -27,6 +27,6 @@ class Paramtexte(object):
                 if ligne[0] in labels:
                     Outils.fatal(ErreurConsistance(),self.libelle + "le label '" + ligne[0] + " n'est pas unique\n")
                 labels.append(ligne[0])
-                self._donnees[ligne[0]] = ligne[1]
+                self.donnees[ligne[0]] = ligne[1]
         except IOError as e:
             Outils.fatal(e, "impossible d'ouvrir le fichier : "+self.nom_fichier)

@@ -29,8 +29,7 @@ class NoShow(Fichier):
 
     def est_coherent(self, comptes, machines, users):
         """
-        vérifie que les données du fichier importé sont cohérentes (id compte parmi comptes,
-        id machine parmi machines, id user parmi user), et efface les colonnes mois et année
+        vérifie que les données du fichier importé sont cohérentes, et efface les colonnes mois et année
         :param comptes: comptes importés
         :param machines: machines importées
         :param users: users importés
@@ -77,6 +76,8 @@ class NoShow(Fichier):
             donnee['penalite'], info = Outils.est_un_nombre(donnee['penalite'], "la pénalité", ligne)
             msg += info
 
+            donnee['date_debut'] = donnee['date_debut'].replace('"', '')
+
             del donnee['annee']
             del donnee['mois']
             donnees_list.append(donnee)
@@ -121,8 +122,8 @@ class NoShow(Fichier):
             nat = client['nature']
             cat_hp = machine['id_cat_hp']
             cat_hc = machine['id_cat_hc']
-            pu_hp = round(categprix.donnees[nat + cat_hp]['prix_unit'],2)
-            pu_hc = round(categprix.donnees[nat + cat_hc]['prix_unit'],2)
+            pu_hp = round(categprix.donnees[nat + cat_hp]['prix_unit'], 2)
+            pu_hc = round(categprix.donnees[nat + cat_hc]['prix_unit'], 2)
 
             if donnee['type'] == "HP":
                 np_hp = round(donnee['penalite'], 1)

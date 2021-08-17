@@ -33,7 +33,7 @@ class Detail(object):
                 fichier_writer.writerow(ligne)
 
     @staticmethod
-    def creation_lignes(edition, sommes, clients, generaux, acces, livraisons, comptes, categories, prestations):
+    def creation_lignes(edition, sommes, clients, generaux, acces, livraisons, comptes, categories):
         """
         génération des lignes de données du détail
         :param edition: paramètres d'édition
@@ -44,7 +44,6 @@ class Detail(object):
         :param livraisons: livraisons importées
         :param comptes: comptes importés
         :param categories: catégories importées
-        :param prestations: prestations importées
         :return: lignes de données du détail
         """
         if sommes.calculees == 0:
@@ -71,8 +70,8 @@ class Detail(object):
                         som_cats = acces.sommes[code_client]['categories'][id_compte]['machine']
                         for id_categorie, som_cat in sorted(som_cats.items()):
                             duree = som_cat['duree_hp'] + som_cat['duree_hc']
-                            ligne = base_compte + ['M', id_categorie, categories.donnees[id_categorie]['intitule'], duree,
-                                                   som_cat['mo'], 0, 0, 0, 0, "", "", "", "", "", "", ""]
+                            ligne = base_compte + ['M', id_categorie, categories.donnees[id_categorie]['intitule'],
+                                                   duree, som_cat['mo'], 0, 0, 0, 0, "", "", "", "", "", "", ""]
                             lignes.append(ligne)
 
                     if code_client in livraisons.sommes and id_compte in livraisons.sommes[code_client]:
@@ -81,11 +80,10 @@ class Detail(object):
                         for article in generaux.articles_d3:
                             if article.code_d in somme:
                                 for no_prestation, sip in sorted(somme[article.code_d].items()):
-                                    prestation = prestations.prestation_de_num(no_prestation)
                                     ligne = base_compte + [article.code_d, "", "", "", "", "", "", "", "",
                                                            article.intitule_court, no_prestation, sip['nom'],
                                                            Outils.format_2_dec(sip['montantx']),
-                                                           Outils.format_2_dec(sip['rabais']), prestation['categ_stock'], prestation['affiliation']]
+                                                           Outils.format_2_dec(sip['rabais']), "-", "-"]
                                     lignes.append(ligne)
 
         return lignes

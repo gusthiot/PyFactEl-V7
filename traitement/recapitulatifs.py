@@ -54,7 +54,7 @@ class Recapitulatifs(object):
             machine = machines.donnees[donnee['id_machine']]
             id_categorie = machine['id_cat_mach']
             ligne = [edition.annee, edition.mois, donnee['id_compte'], compte['numero'], compte['intitule'],
-                     compte['type_tarif'], compte['type_subside'], compte['code_client'], client['abrev_labo'],
+                     "U", compte['type_subside'], compte['code_client'], client['abrev_labo'],
                      donnee['id_user'], user['nom'], user['prenom'], donnee['id_machine'], machine['nom'],
                      id_categorie, categories.donnees[id_categorie]['intitule'], donnee['date_login'],
                      donnee['duree_machine_hp'], donnee['duree_machine_hc'], donnee['duree_operateur'], donnee['id_op'],
@@ -108,7 +108,7 @@ class Recapitulatifs(object):
             op = users.donnees[donnee['id_operateur']]
             prestation = prestations.donnees[donnee['id_prestation']]
             ligne = [edition.annee, edition.mois, donnee['id_compte'], compte['numero'], compte['intitule'],
-                     compte['type_tarif'], compte['type_subside'], compte['code_client'], client['abrev_labo'],
+                     "U", compte['type_subside'], compte['code_client'], client['abrev_labo'],
                      donnee['id_user'], user['nom'], user['prenom'], donnee['id_prestation'],
                      prestation['no_prestation'], prestation['designation'], donnee['date_livraison'],
                      donnee['quantite'], prestation['unite_prest'], donnee['rabais'], donnee['id_operateur'],
@@ -166,4 +166,3 @@ class Recapitulatifs(object):
                      compte['code_client'], client['abrev_labo'], donnee['penalite']]
             lignes.append(ligne)
         return lignes
-

@@ -7,7 +7,7 @@ class Compte(Fichier):
     Classe pour l'importation des données de Comptes Cmi
     """
 
-    cles = ['annee', 'mois', 'id_compte', 'numero', 'intitule', 'type_tarif', 'exploitation', 'code_client', 'type_subside']
+    cles = ['annee', 'mois', 'id_compte', 'numero', 'intitule', 'exploitation', 'code_client', 'type_subside']
     nom_fichier = "compte.csv"
     libelle = "Comptes"
 
@@ -29,12 +29,10 @@ class Compte(Fichier):
                     return 1
         return 0
 
-    def est_coherent(self, clients, generaux):
+    def est_coherent(self, clients):
         """
-        vérifie que les données du fichier importé sont cohérentes (code client dans clients,
-        id compte unique), et efface les colonnes mois et année
+        vérifie que les données du fichier importé sont cohérentes, et efface les colonnes mois et année
         :param clients: clients importés
-        :param generaux: paramètres généraux
         :return: 1 s'il y a une erreur, 0 sinon
         """
         if self.verifie_date == 0:
@@ -65,8 +63,6 @@ class Compte(Fichier):
             else:
                 msg += "l'id compte '" + donnee['id_compte'] + "' de la ligne " + str(ligne) +\
                        " n'est pas unique\n"
-            if donnee['type_tarif'] != generaux.code_t:
-                msg += "le type de tarif de la ligne " + str(ligne) + " n'est pas correct\n"
             if donnee['exploitation'] != 'TRUE' and donnee['exploitation'] != 'FALSE':
                 msg += "l'exploitation de la ligne " + str(ligne) + " doit être 'TRUE' ou 'FALSE'\n"
 

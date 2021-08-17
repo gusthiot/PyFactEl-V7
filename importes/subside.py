@@ -13,19 +13,20 @@ class Subside(Fichier):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.__types = []
 
-    def contient_type(self, type):
+    def contient_type(self, ty):
         """
         vérifie si un subside contient le type donné
-        :param type: type à vérifier
+        :param ty: type à vérifier
         :return: 1 si id contenu, 0 sinon
         """
         if self.verifie_coherence == 1:
-            if type in self.donnees.keys():
+            if ty in self.__types:
                 return 1
         else:
             for subside in self.donnees:
-                if subside['type'] == type:
+                if subside['type'] == ty:
                     return 1
         return 0
 
@@ -57,7 +58,8 @@ class Subside(Fichier):
             elif donnee['code_n'] not in generaux.obtenir_code_n():
                 msg += "la code N de la ligne " + str(ligne) + " n'existe pas dans les codes N\n"
 
-            donnees_dict[donnee['type']] = donnee
+            self.__types.append(donnee['type'])
+            donnees_dict[donnee['type']+donnee['id_plateforme']+donnee['code_n']] = donnee
             ligne += 1
 
         self.donnees = donnees_dict

@@ -4,7 +4,7 @@ from erreurs import ErreurConsistance
 
 class AnnulationVersion(object):
     """
-    Classe pour la annuler la modification d'une facture
+    Classe pour annuler la modification d'une facture
     """
 
     nom_fichier = "annulversion.csv"

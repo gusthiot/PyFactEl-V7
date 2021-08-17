@@ -7,7 +7,7 @@ class Categorie(Fichier):
     Classe pour l'importation des données de Catégories
     """
 
-    cles = ['id_categorie', 'code_d', 'intitule', 'unite']
+    cles = ['id_categorie', 'code_d', 'no_categorie', 'intitule', 'unite', 'id_plateforme']
     nom_fichier = "categorie.csv"
     libelle = "Catégories"
 
@@ -29,10 +29,11 @@ class Categorie(Fichier):
                     return 1
         return 0
 
-    def est_coherent(self, generaux):
+    def est_coherent(self, generaux, plateformes):
         """
         vérifie que les données du fichier importé sont cohérentes
         :param generaux: paramètres généraux
+        :param plateformes: plateformes importées
         :return: 1 s'il y a une erreur, 0 sinon
         """
 
@@ -59,6 +60,12 @@ class Categorie(Fichier):
                 msg += "le code D de la ligne " + str(ligne) + " ne peut être vide\n"
             elif donnee['code_d'] not in generaux.obtenir_code_d():
                 msg += "le code D de la ligne " + str(ligne) + " n'existe pas dans les codes D\n"
+
+            if donnee['id_plateforme'] == "":
+                msg += "l'id plateforme de la ligne " + str(ligne) + " ne peut être vide\n"
+            elif plateformes.contient_id(donnee['id_plateforme']) == 0:
+                msg += "l'id plateforme '" + donnee['id_plateforme'] + "' de la ligne " + str(ligne) \
+                       + " n'est pas référencé\n"
 
             donnees_dict[donnee['id_categorie']] = donnee
             ligne += 1

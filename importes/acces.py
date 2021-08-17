@@ -31,8 +31,7 @@ class Acces(Fichier):
 
     def est_coherent(self, comptes, machines, users):
         """
-        vérifie que les données du fichier importé sont cohérentes (id compte parmi comptes,
-        id machine parmi machines), et efface les colonnes mois et année
+        vérifie que les données du fichier importé sont cohérentes, et efface les colonnes mois et année
         :param comptes: comptes importés
         :param machines: machines importées
         :param users: users importés
@@ -80,6 +79,8 @@ class Acces(Fichier):
             donnee['duree_operateur'], info = Outils.est_un_nombre(donnee['duree_operateur'],
                                                                    "la durée opérateur", ligne)
             msg += info
+
+            donnee['date_login'] = donnee['date_login'].replace('"', '')
 
             del donnee['annee']
             del donnee['mois']

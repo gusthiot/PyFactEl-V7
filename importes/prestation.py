@@ -8,7 +8,7 @@ class Prestation(Fichier):
     """
 
     cles = ['annee', 'mois', 'id_prestation', 'no_prestation', 'designation', 'categorie', 'unite_prest', 'prix_unit',
-            'categ_stock', 'affiliation', 'id_plateforme', 'id_machine']
+            'id_plateforme', 'id_machine']
     nom_fichier = "prestation.csv"
     libelle = "Prestations"
 
@@ -23,7 +23,7 @@ class Prestation(Fichier):
         """
         if self.verifie_coherence == 1:
             if id_prestation in self.donnees.keys():
-                    return 1
+                return 1
         else:
             for prestation in self.donnees:
                 if prestation['id_prestation'] == id_prestation:
