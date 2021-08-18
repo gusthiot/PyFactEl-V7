@@ -1,10 +1,10 @@
 # PyFactEl-V7
 
-- installer Python 3 (https://www.python.org/downloads/)
+- installer Python 3 ( < 3.9) (https://www.python.org/downloads/)
     si l'option "rajouter Python au PATH" se présente, la cocher
 - installer TeX Live (https://www.tug.org/texlive/)
-- dans une fenêtre de commande ou un terminal, taper<pre>
-  pip install -r requirements.txt</pre>
+- dans une fenêtre de commande ou un terminal, taper<pre>py -m pip install -r requirements.txt</pre>
+
 - lancer main.py et choisir un dossier de travail qui contient des csv de données brutes
 
 - si la fabrication de pdf avec tex live ne fonctionne pas, ouvrir une console de commande et taper 'fmtutil --sys --all'
