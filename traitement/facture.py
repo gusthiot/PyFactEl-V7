@@ -133,9 +133,9 @@ class Facture(object):
 
                 if scl['rm'] > 0 and not (filtre == "OUI" and scl['r'] == 0):
                     poste = generaux.poste_reservation
-                    fichier_writer.writerow(self.ligne_facture(generaux, generaux.articles[1], poste, scl['rm'],
+                    fichier_writer.writerow(self.ligne_facture(generaux, generaux.article_d1, poste, scl['rm'],
                                                                scl['rr'], op_centre, "", edition))
-                    contenu_client += self.ligne_tableau(generaux.articles[1], poste, scl['rm'], scl['rr'], "",
+                    contenu_client += self.ligne_tableau(generaux.article_d1, poste, scl['rm'], scl['rr'], "",
                                                          edition)
     
                 inc = 1
@@ -151,12 +151,12 @@ class Facture(object):
                             poste = inc*10
                             if sco['somme_j_mm'] > 0 and not (filtre == "OUI" and sco['mj'] == 0):
                                 fichier_writer.writerow(
-                                    self.ligne_facture(generaux, generaux.articles[2], poste,
+                                    self.ligne_facture(generaux, generaux.article_d2, poste,
                                                        sco['somme_j_mm'], sco['somme_j_mr'], op_centre,
                                                        compte['numero'] + " - " + compte['intitule'], edition)
                                 )
                                 contenu_client += self.ligne_tableau(
-                                    generaux.articles[2], poste, sco['somme_j_mm'], sco['somme_j_mr'],
+                                    generaux.article_d2, poste, sco['somme_j_mm'], sco['somme_j_mr'],
                                     compte['numero'] + " - " + compte['intitule'], edition
                                 )
                                 poste += 1

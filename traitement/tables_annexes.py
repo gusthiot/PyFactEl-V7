@@ -138,7 +138,7 @@ class TablesAnnexes(object):
 
             dico = {'resm': Outils.format_2_dec(scl['rm']), 'resr': Outils.format_2_dec(scl['rr']),
                     'res': Outils.format_2_dec(scl['r']), 'p_res': generaux.poste_reservation,
-                    'int_res': Latex.echappe_caracteres(generaux.articles[1].intitule_long)}
+                    'int_res': Latex.echappe_caracteres(generaux.article_d1.intitule_long)}
 
             contenu = r'''
                 \hline
@@ -492,7 +492,7 @@ class TablesAnnexes(object):
         if sco['somme_j_mm'] > 0:
             dico = {'mm': Outils.format_2_dec(sco['somme_j_mm']), 'mr': Outils.format_2_dec(sco['somme_j_mr']),
                     'mj': Outils.format_2_dec(sco['mj']),
-                    'int_proc': Latex.echappe_caracteres(generaux.articles[2].intitule_long)}
+                    'int_proc': Latex.echappe_caracteres(generaux.article_d2.intitule_long)}
             contenu += r'''
                 %(int_proc)s & %(mm)s & %(mr)s & %(mj)s \\
                 \hline

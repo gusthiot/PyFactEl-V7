@@ -143,7 +143,7 @@ class Generaux(object):
     def articles(self):
         """renvoie la liste des articles de facturation.
 
-        Les deux premiers (émolument / frais de réservation) s'appelle "D1"; le second (coûts procédés machines)
+        Le premier (frais de réservation) s'appelle "D1"; le second (coûts procédés machines)
         s'appellent "D2"; les suivants (en nombre variable) s'appellent "D3".
 
         :return: une liste ordonnée d'objets Article
@@ -154,6 +154,24 @@ class Generaux(object):
                 kw = dict((k, self._donnees[k][i]) for k in _champs_article)
                 self._articles.append(Article(**kw))
         return self._articles
+
+    @property
+    def article_d1(self):
+        """
+        retourne uniquement l'article D1
+
+        :return: un objet Article
+        """
+        return self.articles[0]
+
+    @property
+    def article_d2(self):
+        """
+        retourne uniquement l'article D2
+
+        :return: un objet Article
+        """
+        return self.articles[1]
 
     @property
     def articles_d3(self):
