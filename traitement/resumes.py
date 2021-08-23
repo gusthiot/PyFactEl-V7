@@ -20,21 +20,27 @@ class Resumes(object):
         for fichier in Resumes.fichiers:
             fichier_complet = fichier + "_" + str(edition.annee) + "_" + Outils.mois_string(edition.mois)
             dossier_destination.ecrire(fichier_complet + ".csv", dossier_source.lire(fichier_complet + "_0.csv"))
+        fichier_trans = "Transaction_" + str(edition.annee) + "_" + Outils.mois_string(edition.mois)
+        dossier_destination.ecrire(fichier_trans + ".csv", dossier_source.lire(fichier_trans + "_0.csv"))
         ticket_complet = "ticket_" + str(edition.annee) + "_" + Outils.mois_string(edition.mois)
         ticket_texte = dossier_source.string_lire(ticket_complet + "_0.html")
         ticket_texte = ticket_texte.replace("..", ".")
         dossier_destination.string_ecrire(ticket_complet + ".html", ticket_texte)
 
     @staticmethod
-    def mise_a_jour(edition, clients, dossier_source, dossier_destination, maj, f_html_sections):
+    def mise_a_jour(edition, clients, comptes, maj_grants, dossier_source, dossier_destination, maj, f_html_sections,
+                    maj_trans):
         """
         modification des résumés mensuels au niveau du client dont la facture est modifiée 
         :param edition: paramètres d'édition
         :param clients: clients importés
+        :param comptes: comptes importés
+        :param maj_grants: données modifiées pour le client pour les grants
         :param dossier_source: Une instance de la classe dossier.DossierSource
         :param dossier_destination: Une instance de la classe dossier.DossierDestination
         :param maj: données modifiées pour le client pour les différents fichiers
         :param f_html_sections: section html modifiée pour le client
+        :param maj_trans: données modifiées pour le client pour les transactions
         """
         if len(maj) != len(Resumes.fichiers):
             info = "Résumés : erreur taille tableau"
@@ -51,6 +57,25 @@ class Resumes(object):
                     fichier_writer.writerow(ligne)
                 for ligne in maj[i]:
                     fichier_writer.writerow(ligne)
+
+        fichier_trans = "Transaction_" + str(edition.annee) + "_" + Outils.mois_string(edition.mois) + ".csv"
+        donnees_csv = Resumes.ouvrir_csv_sans_client(dossier_source, fichier_trans, edition.client_unique, 3)
+        with dossier_destination.writer(fichier_trans) as fichier_writer:
+            for ligne in donnees_csv:
+                fichier_writer.writerow(ligne)
+            for key in maj_trans.valeurs.keys():
+                ligne = maj_trans.valeurs[key]
+                fichier_writer.writerow(ligne)
+
+        fichier_grant = "granted" + str(edition.annee) + "_" + Outils.mois_string(edition.mois) + ".csv"
+        donnees_csv = Resumes.ouvrir_csv_sans_comptes_client(dossier_source, fichier_grant, edition.client_unique,
+                                                             comptes)
+        with dossier_destination.writer(fichier_grant) as fichier_writer:
+            for ligne in donnees_csv:
+                fichier_writer.writerow(ligne)
+            for key in maj_grants.valeurs.keys():
+                ligne = maj_grants.valeurs[key]
+                fichier_writer.writerow(ligne)
 
         ticket_complet = "ticket_" + str(edition.annee) + "_" + Outils.mois_string(edition.mois) + ".html"
         section = list(f_html_sections.values())[0]
@@ -119,11 +144,11 @@ class Resumes(object):
         :param dossier_destination: Une instance de la classe dossier.DossierDestination
         """
 
-        Resumes.supprimmer(suppression.client_unique, suppression.mois, suppression.annee, dossier_source,
-                           dossier_destination)
+        Resumes.supprimer(suppression.client_unique, suppression.mois, suppression.annee, dossier_source,
+                          dossier_destination)
 
     @staticmethod
-    def supprimmer(client_unique, mois, annee, dossier_source, dossier_destination):
+    def supprimer(client_unique, mois, annee, dossier_source, dossier_destination):
         """
         suppression des résumés mensuels au niveau du client
         :param client_unique: client concerné
@@ -242,6 +267,29 @@ class Resumes(object):
         ticket_complet = "ticket_" + str(annee) + "_" + Outils.mois_string(mois) + ".html"
 
         Resumes.maj_ticket(dossier_source, dossier_destination, ticket_complet, section, client_unique, nom_client)
+
+    @staticmethod
+    def ouvrir_csv_sans_comptes_client(dossier_source, fichier, code_client, comptes, position_id=0):
+        """
+        ouverture d'un csv comme string sans les données des comptes d'un client donné
+        :param dossier_source: Une instance de la classe dossier.DossierSource
+        :param fichier: nom du fichier csv
+        :param code_client: code du client à ignorer
+        :param comptes: comptes importés
+        :param position_id: position colonne du compte id dans le csv
+        :return: donnees du csv modifiées en tant que string
+        """
+        donnees_csv = []
+        try:
+            fichier_reader = dossier_source.reader(fichier)
+            for ligne in fichier_reader:
+                if ligne == -1:
+                    continue
+                if comptes.donnees[ligne[position_id]]['code_client'] != code_client:
+                    donnees_csv.append(ligne)
+        except IOError as e:
+            Outils.fatal(e, "impossible d'ouvrir le fichier : " + fichier)
+        return donnees_csv
 
     @staticmethod
     def ouvrir_csv_sans_client(dossier_source, fichier, code_client, position_code):

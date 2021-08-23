@@ -28,10 +28,10 @@ class AnnexeDetails(Recap):
         if edition.version > 0:
             self.prefixe += "_" + str(edition.client_unique)
 
-    def generer(self, transactions, paramtexte, paramannexe, par_client):
+    def generer(self, trans_vals, paramtexte, paramannexe, par_client):
         """
         génération des fichiers d'annexes détails à partir des transactions
-        :param transactions: transactions générées
+        :param trans_vals: valeurs des transactions générées
         :param paramtexte: paramètres textuels
         :param paramannexe: paramètres d'annexe
         :param par_client: tri des transactions par client
@@ -44,12 +44,12 @@ class AnnexeDetails(Recap):
 
         for code in par_client.keys():
             tbtr = par_client[code]['transactions']
-            base = transactions.valeurs[tbtr[0]]
+            base = trans_vals[tbtr[0]]
             self.nom = self.prefixe + "_" + code + "_" + base['client-name'] + ".csv"
             self.valeurs = {}
             ii = 0
             for indice in tbtr:
-                val = transactions.valeurs[indice]
+                val = trans_vals[indice]
                 donnee = []
                 for cle in range(2, len(self.cles)):
                     donnee.append(val[self.cles[cle]])

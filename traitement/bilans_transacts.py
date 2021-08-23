@@ -24,10 +24,10 @@ class BilansTransacts(object):
         self.bil_conso = BilanConsos(edition)
         self.usr_lab = UserLabo(edition)
 
-    def generer(self, transactions, grants, plafonds, paramtexte, paramannexe, dossier_destination):
+    def generer(self, trans_vals, grants, plafonds, paramtexte, paramannexe, dossier_destination):
         """
         tri des transactions et génération des bilans
-        :param transactions: transactions générées
+        :param trans_vals: valeurs des transactions générées
         :param grants: grants importés
         :param plafonds: plafonds importés
         :param paramtexte: paramètres textuels
@@ -36,8 +36,8 @@ class BilansTransacts(object):
         """
         par_client = {}
         par_plate = {}
-        for key in transactions.valeurs.keys():
-            transaction = transactions.valeurs[key]
+        for key in trans_vals.keys():
+            transaction = trans_vals[key]
             code_client = transaction['client-code']
             id_compte = transaction['proj-id']
             id_plateforme = transaction['platf-code']
@@ -88,9 +88,9 @@ class BilansTransacts(object):
             if day not in ppuc.keys():
                 ppuc[day] = key
 
-        self.ann_dets.generer(transactions, paramtexte, paramannexe, par_client)
-        self.ann_subs.generer(transactions, grants, plafonds, paramtexte, paramannexe, par_client)
-        self.bil_plat.generer(transactions, paramtexte, dossier_destination, par_plate)
-        self.bil_use.generer(transactions, paramtexte, dossier_destination, par_plate)
-        self.bil_conso.generer(transactions, paramtexte, dossier_destination, par_plate)
-        self.usr_lab.generer(transactions, paramtexte, dossier_destination, par_plate)
+        self.ann_dets.generer(trans_vals, paramtexte, paramannexe, par_client)
+        self.ann_subs.generer(trans_vals, grants, plafonds, paramtexte, paramannexe, par_client)
+        self.bil_plat.generer(trans_vals, paramtexte, dossier_destination, par_plate)
+        self.bil_use.generer(trans_vals, paramtexte, dossier_destination, par_plate)
+        self.bil_conso.generer(trans_vals, paramtexte, dossier_destination, par_plate)
+        self.usr_lab.generer(trans_vals, paramtexte, dossier_destination, par_plate)

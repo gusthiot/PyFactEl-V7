@@ -145,12 +145,12 @@ try:
             dossier_w = Outils.chemin([dossier_enregistrement, "suppr_" + str(w) + "_" + edition.client_unique])
             if Outils.existe(dossier_w) and not Outils.existe(Outils.chemin([dossier_w, "copernic.csv"])):
                 msg = "La suppression de la version " + str(w) + " du client " + edition.client_unique + \
-                      " n'a pas été confirmée !"
+                      " n'a pas été confirmée !"
                 Outils.affiche_message(msg)
                 sys.exit("Erreur sur le répértoire")
 
             if Outils.existe(dossier_csv, True):
-                msg = "La version " + str(edition.version) + " du client " + edition.client_unique + " existe déjà !"
+                msg = "La version " + str(edition.version) + " du client " + edition.client_unique + " existe déjà !"
                 Outils.affiche_message(msg)
                 sys.exit("Erreur sur le répértoire")
 
@@ -206,20 +206,16 @@ try:
         transactions.generer(acces, noshows, livraisons, prestations, machines, categprix, comptes, clients, users,
                              droits, plateformes, generaux, articles, tarifs, subsides, plafonds, grants, paramtexte)
         transactions.csv(dossier_destination, paramtexte)
+
         new_grants = GrantedNew(edition)
         new_grants.generer(grants, transactions)
-        new_grants.csv(dossier_destination)
+        new_grants.csv(DossierDestination(dossier_enregistrement))
 
         for donnee in paramannexe.donnees:
             donnee['chemin'] = Outils.chemin([dossier_enregistrement, donnee['dossier']], generaux)
             Outils.existe(donnee['chemin'], True)
             donnee['dossier_pdf'] = DossierDestination(donnee['chemin'])
             donnee['lien'] = Outils.lien_dossier([dossier_lien, donnee['dossier']], generaux)
-
-        bilan_trs = BilansTransacts(edition)
-        bilan_trs.generer(transactions, grants, plafonds, paramtexte, paramannexe, dossier_destination)
-
-        # sys.exit("For now")
 
         # faire les annexes avant la facture, que le ticket puisse vérifier leur existence
         if Latex.possibles():
@@ -261,15 +257,23 @@ try:
         if docpdf is not None:
             dossier_destination.ecrire(docpdf.nom_fichier, dossier_source.lire(docpdf.nom_fichier))
 
+        trans_vals = transactions.valeurs
         if edition.filigrane == "":
             if edition.version == 0:
                 Resumes.base(edition, DossierSource(dossier_csv), DossierDestination(dossier_enregistrement))
-                Resumes.supprimmer(generaux.code_cfact_centre, edition.mois, edition.annee,
+                Resumes.supprimer(generaux.code_cfact_centre, edition.mois, edition.annee,
                                    DossierSource(dossier_enregistrement), DossierDestination(dossier_enregistrement))
             elif Outils.existe(Outils.chemin([dossier_enregistrement, "csv_0"])):
                 maj = [bm_lignes, bc_lignes, det_lignes, cae_lignes, lvr_lignes, nos_lignes]
-                Resumes.mise_a_jour(edition, clients, DossierSource(dossier_enregistrement),
-                                    DossierDestination(dossier_enregistrement), maj, f_html_sections)
+                Resumes.mise_a_jour(edition, clients, comptes, new_grants, DossierSource(dossier_enregistrement),
+                                    DossierDestination(dossier_enregistrement), maj, f_html_sections, transactions)
+                trans_fichier = "Transaction_" + str(edition.annee) + "_" + Outils.mois_string(edition.mois) + ".csv"
+                trans_vals = transactions.recuperer_valeurs_de_fichier(DossierSource(dossier_enregistrement),
+                                                                       trans_fichier)
+
+        bilan_trs = BilansTransacts(edition)
+        bilan_trs.generer(trans_vals, grants, plafonds, paramtexte, paramannexe,
+                          DossierDestination(dossier_enregistrement))
 
     if sup_present:
         suppression = SuppressionFacture(dossier_source)
@@ -321,13 +325,13 @@ try:
         dossier_suppr = Outils.chemin([dossier_enregistrement, "suppr_" + suffixe])
 
         if not Outils.existe(dossier_suppr):
-            msg = "Annulation de suppression impossible !"
+            msg = "Annulation de suppression impossible!"
             Outils.affiche_message(msg)
             sys.exit("Erreur sur la version")
 
         if Outils.existe(Outils.chemin([dossier_suppr, "copernic.csv"])):
             msg = "Impossible d’annuler l’opération de suppression de la version " + str(annsupp.version) + \
-                  " car l’opération a été confirmée !"
+                  " car l’opération a été confirmée!"
             Outils.affiche_message(msg)
             sys.exit("Erreur sur la version")
 

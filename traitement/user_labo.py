@@ -20,10 +20,10 @@ class UserLabo(Recap):
         self.version = edition.version
         self.nom = "User-labo" + str(edition.annee) + "_" + Outils.mois_string(edition.mois) + ".csv"
 
-    def generer(self, transactions, paramtexte, dossier_destination, par_plate):
+    def generer(self, trans_vals, paramtexte, dossier_destination, par_plate):
         """
         génération du fichier des usages de labos à partir des transactions
-        :param transactions: transactions générées
+        :param trans_vals: valeurs des transactions générées
         :param paramtexte: paramètres textuels
         :param dossier_destination: Une instance de la classe dossier.DossierDestination
         :param par_plate: tri des transactions par plateforme, par utilisateur, par client, par jour
@@ -37,7 +37,7 @@ class UserLabo(Recap):
                     par_jour = par_client[code]
                     for jour in par_jour.keys():
                         key = par_jour[jour]
-                        trans = transactions.valeurs[key]
+                        trans = trans_vals[key]
                         date = datetime.strptime(trans['transac-date'], '%Y-%m-%d %H:%M:%S')
                         donnee = []
                         for cle in range(2, len(self.cles)):

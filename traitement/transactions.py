@@ -389,3 +389,33 @@ class Transactions(Recap):
             transacts[date] = []
         transacts[date].append({'rc': ref_client, 'ope': ope, 'up': util_proj, 'art': art, 'trans': trans, 'val': val,
                                 'remb': remb})
+
+    @staticmethod
+    def ouvrir_csv(dossier_source, fichier):
+        """
+        ouverture d'un csv comme string
+        :param dossier_source: Une instance de la classe dossier.DossierSource
+        :param fichier: nom du fichier csv
+        :return: donnees du csv modifiées en tant que string
+        """
+        donnees_csv = []
+        try:
+            fichier_reader = dossier_source.reader(fichier)
+            for ligne in fichier_reader:
+                if ligne == -1:
+                    continue
+                donnees_csv.append(ligne)
+        except IOError as e:
+            Outils.fatal(e, "impossible d'ouvrir le fichier : " + fichier)
+        return donnees_csv
+
+    def recuperer_valeurs_de_fichier(self, dossier_source, fichier):
+        valeurs = {}
+        trans_tab = self.ouvrir_csv(dossier_source, fichier)
+        valeur = {}
+        for j in range(0, len(trans_tab)):
+            ligne = trans_tab[j]
+            for i in range(0, len(ligne)):
+                valeur[self.cles[i]] = ligne[i]
+            valeurs[j] = valeur
+        return valeurs

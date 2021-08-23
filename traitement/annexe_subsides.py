@@ -25,10 +25,10 @@ class AnnexeSubsides(Recap):
         if edition.version > 0:
             self.prefixe += "_" + str(edition.client_unique)
 
-    def generer(self, transactions, grants, plafonds, paramtexte, paramannexe, par_client):
+    def generer(self, trans_vals, grants, plafonds, paramtexte, paramannexe, par_client):
         """
         génération des fichiers d'annexes subsides à partir des transactions
-        :param transactions: transactions générées
+        :param trans_vals: valeurs des transactions générées
         :param grants: grants importés
         :param plafonds: plafonds importés
         :param paramtexte: paramètres textuels
@@ -50,7 +50,7 @@ class AnnexeSubsides(Recap):
                 par_code = par_compte[id_compte]
                 for code_d in par_code.keys():
                     tbtr = par_code[code_d]
-                    base = transactions.valeurs[tbtr[0]]
+                    base = trans_vals[tbtr[0]]
                     if self.nom == "":
                         self.nom = self.prefixe + "_" + code + "_" + base['client-name'] + ".csv"
                     donnee = []
@@ -61,7 +61,7 @@ class AnnexeSubsides(Recap):
                     discount = 0
                     bonus = 0
                     for indice in tbtr:
-                        val = transactions.valeurs[indice]
+                        val = trans_vals[indice]
                         subside += val['subsid-CHF']
                         deduit += val['subsid-deduct']
                         discount += val['discount-bonus']

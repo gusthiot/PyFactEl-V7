@@ -24,10 +24,10 @@ class BilanConsos(Recap):
             self.nom += "_" + str(edition.client_unique)
         self.nom += ".csv"
 
-    def generer(self, transactions, paramtexte, dossier_destination, par_plate):
+    def generer(self, trans_vals, paramtexte, dossier_destination, par_plate):
         """
         génération du fichier de bilan des consommations à partir des transactions
-        :param transactions: transactions générées
+        :param trans_vals: valeurs des transactions générées
         :param paramtexte: paramètres textuels
         :param dossier_destination: Une instance de la classe dossier.DossierDestination
         :param par_plate: tri des transactions par plateforme, par item
@@ -37,7 +37,7 @@ class BilanConsos(Recap):
             par_item = par_plate[id_plate]['items']
             for item in par_item.keys():
                 tbtr = par_item[item]
-                base = transactions.valeurs[tbtr[0]]
+                base = trans_vals[tbtr[0]]
                 donnee = []
                 for cle in range(2, len(self.cles) - 4):
                     donnee.append(base[self.cles[cle]])
@@ -46,7 +46,7 @@ class BilanConsos(Recap):
                 goint = 0
                 extrint = 0
                 for indice in tbtr:
-                    val = transactions.valeurs[indice]
+                    val = trans_vals[indice]
                     if val['item-type'] == paramtexte.donnees['item-good'] and val['client-code'] == val['platf-code']:
                         if val['item-extra'] == "TRUE":
                             if val['proj-expl'] == "TRUE":
