@@ -112,9 +112,9 @@ class Transactions(Recap):
                 trans = [entree['date_login'], duree_hc, usage]
                 tarif = tarifs.valeurs[code_n + machine['id_cat_mach']]
                 prix = round(duree_hc * tarif['valuation-price'], 2)
-                reduc = round(tarif['valuation-price'] * (1-machine['tx_rabais_hc']) * duree_hc / 100, 2)
+                reduc = round(tarif['valuation-price'] * (1-machine['tx_rabais_hc']/100) * duree_hc, 2)
                 if generaux.avantage_hc_par_code_n(code_n) == "RABAIS":
-                    deduit = - reduc
+                    deduit = reduc
                     remb = 0
                 else:
                     if generaux.avantage_hc_par_code_n(code_n) == "BONUS":
