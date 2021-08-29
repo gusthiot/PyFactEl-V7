@@ -45,20 +45,23 @@ class BilansTransacts(object):
             item = transaction['item-id']
             user_id = transaction['user-id']
             date = transaction['transac-date']
+            type_s = transaction['proj-subs']
+            subs = transaction['subsid-maxproj']
 
             if code_client not in par_client.keys():
                 par_client[code_client] = {'transactions': [], 'comptes': {}}
 
             par_client[code_client]['transactions'].append(key)
 
-            pcc = par_client[code_client]['comptes']
-            if id_compte not in pcc.keys():
-                pcc[id_compte] = {}
-            pcd = pcc[id_compte]
-            if code_d not in pcd.keys():
-                pcd[code_d] = [key]
-            else:
-                pcd[code_d].append(key)
+            if type_s != "" and subs > 0:
+                pcc = par_client[code_client]['comptes']
+                if id_compte not in pcc.keys():
+                    pcc[id_compte] = {}
+                pcd = pcc[id_compte]
+                if code_d not in pcd.keys():
+                    pcd[code_d] = [key]
+                else:
+                    pcd[code_d].append(key)
 
             if id_plateforme not in par_plate.keys():
                 par_plate[id_plateforme] = {'clients': {}, 'items': {}, 'users': {}}

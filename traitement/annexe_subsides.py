@@ -79,9 +79,7 @@ class AnnexeSubsides(Recap):
 
                         donnee += [round(grant, 2), round(subside, 2), round(deduit, 2), round(discount, 2),
                                    round(bonus, 2), round(reste, 2)]
-                    else:
-                        donnee += [0, 0, 0, 0, 0, 0]
-                    self.ajouter_valeur(donnee, ii)
-                    ii += 1
-
-            self.csv(dossier_destination, paramtexte)
+                        self.ajouter_valeur(donnee, ii)
+                        ii += 1
+            if len(self.valeurs) > 0:
+                self.csv(dossier_destination, paramtexte)
