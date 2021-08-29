@@ -37,16 +37,16 @@ class BilanUsages(Recap):
             for item in par_item.keys():
                 tbtr = par_item[item]
                 base = trans_vals[tbtr[0]]
-                donnee = []
-                for cle in range(2, len(self.cles)-1):
-                    donnee.append(base[self.cles[cle]])
-                usage = 0
-                for indice in tbtr:
-                    val = trans_vals[indice]
-                    if val['item-type'] == paramtexte.donnees['item-service']:
+                if base['item-type'] == paramtexte.donnees['item-service']:
+                    donnee = []
+                    for cle in range(2, len(self.cles)-1):
+                        donnee.append(base[self.cles[cle]])
+                    usage = 0
+                    for indice in tbtr:
+                        val = trans_vals[indice]
                         usage += val['transac-usage']
-                donnee += [round(usage, 2)]
-                self.ajouter_valeur(donnee, ii)
-                ii += 1
+                    donnee += [round(usage, 4)]
+                    self.ajouter_valeur(donnee, ii)
+                    ii += 1
 
         self.csv(dossier_destination, paramtexte)

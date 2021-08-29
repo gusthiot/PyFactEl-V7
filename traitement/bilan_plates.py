@@ -60,7 +60,8 @@ class BilanPlates(Recap):
                         remb += val['discount-bonus']
                         sub_remb += val['subsid-bonus']
                         fact += val['total-fact']
-                    op = base['platf-op'] + base['client-class'] + str(self.annee)[2:4] + str(self.mois) + code_d
+                    op = base['platf-op'] + base['client-class'] + str(self.annee)[2:4] + \
+                        Outils.mois_string(self.mois) + code_d
                     donnee += [round(avant, 2), round(deduit, 2), round(compris, 2), round(sub_ded, 2), round(remb, 2),
                                round(sub_remb, 2), round(fact, 2), op]
                     self.ajouter_valeur(donnee, ii)

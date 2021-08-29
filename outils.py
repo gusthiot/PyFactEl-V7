@@ -6,6 +6,7 @@ import errno
 import os
 import platform
 import sys
+import re
 
 from erreurs import ErreurConsistance
 
@@ -298,19 +299,100 @@ class Outils(object):
         return Outils.eliminer_double_separateur(Outils.separateur_lien(chemin, generaux))
 
     @staticmethod
-    def est_un_nombre(donnee, colonne, ligne):
+    def est_un_texte(donnee, colonne, ligne=-1, vide=True):
+        """
+        vérifie que la donnée est bien un texte
+        :param donnee: donnée à vérifier
+        :param colonne: colonne contenant la donnée (nom de la variable)
+        :param ligne: ligne contenant la donnée (-1 si pas de ligne)
+        :param vide: True si la variable peut être vide, False sinon
+        :return: la donnée formatée et un string vide si ok, "" et un message d'erreur sinon
+        """
+        if ligne > -1:
+            delaligne = " de la ligne " + str(ligne)
+        else:
+            delaligne = ""
+        try:
+            s_d = str(donnee)
+            if s_d.startswith('"') and s_d.endswith('"'):
+                s_d = s_d[1:-1]
+            if s_d == "" and not vide:
+                return "", colonne + delaligne + " ne peut être vide\n"
+            return s_d, ""
+        except:
+            return "", colonne + delaligne + " doit être un texte\n"
+
+    @staticmethod
+    def est_un_alphanumerique(donnee, colonne, ligne=-1, barres=False):
+        """
+        vérifie que la donnée est bien un texte
+        :param donnee: donnée à vérifier
+        :param colonne: colonne contenant la donnée (nom de la variable)
+        :param ligne: ligne contenant la donnée (-1 si pas de ligne)
+        :param barres: True si la variable peut contenir des barres obliques, False sinon
+        :return: la donnée formatée et un string vide si ok, "" et un message d'erreur sinon
+        """
+        if ligne > -1:
+            delaligne = " de la ligne " + str(ligne)
+        else:
+            delaligne = ""
+        try:
+            if barres:
+                pattern = '^[a-zA-Z0-9_\-/\\]+$'
+            else:
+                pattern = '^[a-zA-Z0-9_\-]+$'
+            s_d = str(donnee)
+            if s_d == "":
+                return "", colonne + delaligne + " ne peut être vide\n"
+            if not re.match(pattern, s_d):
+                return "", colonne + delaligne + " n'est pas un alphanumérique valide\n"
+            return s_d, ""
+        except:
+            return "", colonne + delaligne + " doit être un texte\n"
+
+    @staticmethod
+    def est_un_nombre(donnee, colonne, ligne=-1):
         """
         vérifie que la donnée est bien un nombre
         :param donnee: donnée à vérifier
-        :param colonne: colonne contenant la donnée
-        :param ligne: ligne contenant la donnée
+        :param colonne: colonne contenant la donnée (nom de la variable)
+        :param ligne: ligne contenant la donnée (-1 si pas de ligne)
         :return: la donnée formatée en nombre et un string vide si ok, 0 et un message d'erreur sinon
         """
+        if ligne > -1:
+            delaligne = " de la ligne " + str(ligne)
+        else:
+            delaligne = ""
         try:
             fl_d = float(donnee)
             return fl_d, ""
         except ValueError:
-            return 0, colonne + " de la ligne " + str(ligne) + " doit être un nombre\n"
+            return 0, colonne + delaligne + " doit être un nombre\n"
+
+    @staticmethod
+    def est_un_entier(donnee, colonne, ligne=-1, min=None, max=None):
+        """
+        vérifie que la donnée est bien un nombre entier dans les bornes éventuelles
+        :param donnee: donnée à vérifier
+        :param colonne: colonne contenant la donnée (nom de la variable)
+        :param ligne: ligne contenant la donnée (-1 si pas de ligne)
+        :param min: borne minimale facultative
+        :param max: borne maximale facultative
+        :return: la donnée formatée en nombre et un string vide si ok, 0 et un message d'erreur sinon
+        """
+        if ligne > -1:
+            delaligne = " de la ligne " + str(ligne)
+        else:
+            delaligne = ""
+        try:
+            entier = int(donnee)
+            if min is not None and entier < min:
+                return 0, colonne + delaligne + " doit être un nombre entier > " + str(min) + "\n"
+            if max is not None and entier > max:
+                return 0, colonne + delaligne + " doit être un nombre entier < " + str(max) + "\n"
+            return entier, ""
+        except ValueError:
+            return 0, colonne + delaligne + " doit être un nombre entier\n"
 
     @staticmethod
     def format_2_dec(nombre):

@@ -23,12 +23,15 @@ class GrantedNew(object):
         :param grants: grants importés
         :param transactions: transactions générées
         """
-        self.valeurs = grants.donnees.copy()
+
+        for key in grants.donnees.keys():
+            self.valeurs[key] = grants.donnees[key].copy()
+
         for key in transactions.comptabilises.keys():
             if key in self.valeurs.keys():
                 self.valeurs[key]['montant'] = self.valeurs[key]['montant'] + transactions.comptabilises[key]['montant']
             else:
-                self.valeurs[key] = transactions.comptabilises[key]
+                self.valeurs[key] = transactions.comptabilises[key].copy()
 
     def csv(self, dossier_destination):
         """

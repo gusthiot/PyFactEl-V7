@@ -38,29 +38,30 @@ class BilanConsos(Recap):
             for item in par_item.keys():
                 tbtr = par_item[item]
                 base = trans_vals[tbtr[0]]
-                donnee = []
-                for cle in range(2, len(self.cles) - 4):
-                    donnee.append(base[self.cles[cle]])
-                goops = 0
-                extrops = 0
-                goint = 0
-                extrint = 0
-                for indice in tbtr:
-                    val = trans_vals[indice]
-                    if val['item-type'] == paramtexte.donnees['item-good'] and val['client-code'] == val['platf-code']:
-                        if val['item-extra'] == "TRUE":
-                            if val['proj-expl'] == "TRUE":
-                                extrops += val['valuation-net']
+                if base['item-type'] == paramtexte.donnees['item-good']:
+                    donnee = []
+                    for cle in range(2, len(self.cles) - 4):
+                        donnee.append(base[self.cles[cle]])
+                    goops = 0
+                    extrops = 0
+                    goint = 0
+                    extrint = 0
+                    for indice in tbtr:
+                        val = trans_vals[indice]
+                        if val['client-code'] == val['platf-code']:
+                            if val['item-extra'] == "TRUE":
+                                if val['proj-expl'] == "TRUE":
+                                    extrops += val['valuation-net']
+                                else:
+                                    extrint += val['valuation-net']
                             else:
-                                extrint += val['valuation-net']
-                        else:
-                            if val['proj-expl'] == "TRUE":
-                                goops += val['valuation-net']
-                            else:
-                                goint += val['valuation-net']
+                                if val['proj-expl'] == "TRUE":
+                                    goops += val['valuation-net']
+                                else:
+                                    goint += val['valuation-net']
 
-                donnee += [round(goops, 2), round(extrops, 2), round(goint, 2), round(extrint, 2)]
-                self.ajouter_valeur(donnee, ii)
-                ii += 1
+                    donnee += [round(goops, 2), round(extrops, 2), round(goint, 2), round(extrint, 2)]
+                    self.ajouter_valeur(donnee, ii)
+                    ii += 1
 
         self.csv(dossier_destination, paramtexte)
