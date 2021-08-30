@@ -445,7 +445,7 @@ class TablesAnnexes(object):
                 for id_categorie, cats in sorted(som_cat.items()):
                     montant = cats['mk']
                     unite = categories.donnees[id_categorie]['unite']
-                    if unite == 'hh_mm':
+                    if unite == 'h':
                         quantite = Outils.format_heure(cats['quantite'])
                     else:
                         quantite = cats['quantite']

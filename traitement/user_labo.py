@@ -8,7 +8,7 @@ class UserLabo(Recap):
     Classe pour la création du csv des utilisations des plateformes
     """
 
-    cles = ['invoice-year', 'invoice-month', 'day', 'week-nbr', 'platf-code', 'platf-op', 'platf-name', 'client-name',
+    cles = ['year', 'month', 'day', 'week-nbr', 'platf-code', 'platf-op', 'platf-name', 'client-name',
             'client-class', 'user-id', 'user-sciper', 'user-name', 'user-first']
 
     def __init__(self, edition):

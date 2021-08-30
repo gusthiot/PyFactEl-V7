@@ -59,7 +59,7 @@ class RecaProjet(object):
                     for id_categorie, som_cat in sorted(som_cats.items()):
                         unite = categories.donnees[id_categorie]['unite']
                         montant = som_cat['mk']
-                        if unite == 'hh_mm':
+                        if unite == 'h':
                             quantite = som_cat['quantite']/1440
                         else:
                             quantite = som_cat['quantite']

@@ -246,7 +246,7 @@ class Facture(object):
         rabais = "%.2f" % rabais
         if rabais == 0:
             rabais = ""
-        code_op = generaux.code_t + op_centre + article.code_d
+        code_op = 'U' + op_centre + article.code_d
         date_livraison = str(edition.annee) + Outils.mois_string(edition.mois) + str(edition.dernier_jour)
 
         return [poste, "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",
