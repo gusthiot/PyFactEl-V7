@@ -445,10 +445,7 @@ class TablesAnnexes(object):
                 for id_categorie, cats in sorted(som_cat.items()):
                     montant = cats['mk']
                     unite = categories.donnees[id_categorie]['unite']
-                    if unite == 'h':
-                        quantite = Outils.format_heure(cats['quantite'])
-                    else:
-                        quantite = cats['quantite']
+                    quantite = Outils.format_heure(cats['quantite'])
                     if montant > 0:
                         dico_cat = {'intitule': Latex.echappe_caracteres(categories.donnees[id_categorie]['intitule']),
                                     'pk': Outils.format_2_dec(cats['pk']),
