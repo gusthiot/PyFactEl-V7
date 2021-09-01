@@ -1,6 +1,7 @@
 from tkinter.filedialog import *
 from tkinter.scrolledtext import *
 
+from datetime import datetime
 import shutil
 import errno
 import os
@@ -299,7 +300,7 @@ class Outils(object):
         return Outils.eliminer_double_separateur(Outils.separateur_lien(chemin, generaux))
 
     @staticmethod
-    def est_un_texte(donnee, colonne, ligne=-1, vide=True):
+    def est_un_texte(donnee, colonne, ligne=-1, vide=False):
         """
         vérifie que la donnée est bien un texte
         :param donnee: donnée à vérifier
@@ -319,17 +320,38 @@ class Outils(object):
             if s_d == "" and not vide:
                 return "", colonne + delaligne + " ne peut être vide\n"
             return s_d, ""
-        except:
+        except ValueError:
             return "", colonne + delaligne + " doit être un texte\n"
 
     @staticmethod
-    def est_un_alphanumerique(donnee, colonne, ligne=-1, barres=False):
+    def est_une_date(donnee, colonne, ligne=-1):
+        """
+        vérifie que la donnée est bien une date
+        :param donnee: donnée à vérifier
+        :param colonne: colonne contenant la donnée (nom de la variable)
+        :param ligne: ligne contenant la donnée (-1 si pas de ligne)
+        :return: la donnée formatée et un string vide si ok, "" et un message d'erreur sinon
+        """
+        if ligne > -1:
+            delaligne = " de la ligne " + str(ligne)
+        else:
+            delaligne = ""
+        try:
+            date = datetime.strptime(donnee, '%Y-%m-%d %H:%M:%S')
+            return date, ""
+        except ValueError:
+            return "", colonne + delaligne + " doit être une date du bon format : YYYY-MM-DD HH:MM:SS\n"
+
+    @staticmethod
+    def est_un_alphanumerique(donnee, colonne, ligne=-1, barres=False, chevrons=False, vide=False):
         """
         vérifie que la donnée est bien un texte
         :param donnee: donnée à vérifier
         :param colonne: colonne contenant la donnée (nom de la variable)
         :param ligne: ligne contenant la donnée (-1 si pas de ligne)
         :param barres: True si la variable peut contenir des barres obliques, False sinon
+        :param chevrons: True si la variable peut contenir des < >, False sinon
+        :param vide: True si la variable peut être vide, False sinon
         :return: la donnée formatée et un string vide si ok, "" et un message d'erreur sinon
         """
         if ligne > -1:
@@ -338,12 +360,21 @@ class Outils(object):
             delaligne = ""
         try:
             if barres:
-                pattern = '^[a-zA-Z0-9_\-/\\]+$'
+                if chevrons:
+                    pattern = '^[a-zA-Z0-9_<>\-./\\\\]+$'
+                else:
+                    pattern = '^[a-zA-Z0-9_\-./\\\\]+$'
             else:
-                pattern = '^[a-zA-Z0-9_\-]+$'
+                if chevrons:
+                    pattern = '^[a-zA-Z0-9_<>\-]+$'
+                else:
+                    pattern = '^[a-zA-Z0-9_\-]+$'
             s_d = str(donnee)
             if s_d == "":
-                return "", colonne + delaligne + " ne peut être vide\n"
+                if not vide:
+                    return "", colonne + delaligne + " ne peut être vide\n"
+                else:
+                    return "", ""
             if not re.match(pattern, s_d):
                 return "", colonne + delaligne + " n'est pas un alphanumérique valide\n"
             return s_d, ""
@@ -351,12 +382,15 @@ class Outils(object):
             return "", colonne + delaligne + " doit être un texte\n"
 
     @staticmethod
-    def est_un_nombre(donnee, colonne, ligne=-1):
+    def est_un_nombre(donnee, colonne, ligne=-1, arrondi=-1, min=None, max=None):
         """
         vérifie que la donnée est bien un nombre
         :param donnee: donnée à vérifier
         :param colonne: colonne contenant la donnée (nom de la variable)
         :param ligne: ligne contenant la donnée (-1 si pas de ligne)
+        :param arrondi: arrondi après la virgule (-1 si pas d'arrondi)
+        :param min: borne minimale facultative
+        :param max: borne maximale facultative
         :return: la donnée formatée en nombre et un string vide si ok, 0 et un message d'erreur sinon
         """
         if ligne > -1:
@@ -365,7 +399,14 @@ class Outils(object):
             delaligne = ""
         try:
             fl_d = float(donnee)
-            return fl_d, ""
+            if min is not None and fl_d < min:
+                return 0, colonne + delaligne + " doit être un nombre > " + str(min) + "\n"
+            if max is not None and fl_d > max:
+                return 0, colonne + delaligne + " doit être un nombre < " + str(max) + "\n"
+            if arrondi > -1:
+                return round(fl_d, arrondi), ""
+            else:
+                return fl_d, ""
         except ValueError:
             return 0, colonne + delaligne + " doit être un nombre\n"
 

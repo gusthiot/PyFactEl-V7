@@ -14,9 +14,9 @@ class Transactions(Recap):
             'proj-start', 'proj-end', 'item-id', 'item-type', 'item-nbr', 'item-name', 'item-unit', 'item-codeD',
             'item-labelcode', 'item-sap', 'item-extra', 'platf-code', 'platf-op', 'platf-sap', 'platf-name', 'platf-cf',
             'platf-fund', 'transac-date', 'transac-quantity', 'transac-usage', 'valuation-price', 'valuation-brut',
-            'discount-type', 'discount-CHF', 'deduct-CHF', 'valuation-net', 'subsid-code', 'subsid-name',
-            'subsid-maxproj', 'subsid-maxmois', 'subsid-reste', 'subsid-CHF', 'subsid-deduct', 'discount-bonus',
-            'subsid-bonus', 'total-fact']
+            'discount-type', 'discount-CHF', 'valuation-net', 'subsid-code', 'subsid-name', 'subsid-maxproj',
+            'subsid-maxmois', 'subsid-reste', 'subsid-CHF', 'deduct-CHF', 'subsid-deduct', 'total-fact',
+            'discount-bonus', 'subsid-bonus']
     
     def __init__(self, edition):
         """
@@ -82,8 +82,8 @@ class Transactions(Recap):
                 else:
                     usage = 1
                 trans = [entree['date_login'], 1, usage]
-                val = [tarif['valuation-price'], tarif['valuation-price'], "", 0, 0, tarif['valuation-price']]
-                self.put_in_transacts(transacts, date, ref_client, ope, util_proj, art, trans, val, 0)
+                val = [tarif['valuation-price'], tarif['valuation-price'], "", 0, tarif['valuation-price']]
+                self.put_in_transacts(transacts, date, ref_client, ope, util_proj, art, trans, val)
 
             # K1 CAE-HP #
             duree_hp = round(entree['duree_machine_hp']/60, 4)
@@ -97,8 +97,8 @@ class Transactions(Recap):
                 trans = [entree['date_login'], duree_hp, usage]
                 tarif = tarifs.valeurs[code_n + machine['id_cat_mach']]
                 prix = round(duree_hp * tarif['valuation-price'], 2)
-                val = [tarif['valuation-price'], prix, "", 0, 0, prix]
-                self.put_in_transacts(transacts, date, ref_client, ope, util_proj, art, trans, val, 0)
+                val = [tarif['valuation-price'], prix, "", 0, prix]
+                self.put_in_transacts(transacts, date, ref_client, ope, util_proj, art, trans, val)
 
             # K1 CAE-HC #
             duree_hc = round(entree['duree_machine_hc']/60, 4)
@@ -113,19 +113,9 @@ class Transactions(Recap):
                 tarif = tarifs.valeurs[code_n + machine['id_cat_mach']]
                 prix = round(duree_hc * tarif['valuation-price'], 2)
                 reduc = round(tarif['valuation-price'] * machine['tx_rabais_hc']/100 * duree_hc, 2)
-                if generaux.avantage_hc_par_code_n(code_n) == "RABAIS":
-                    deduit = reduc
-                    remb = 0
-                else:
-                    if generaux.avantage_hc_par_code_n(code_n) == "BONUS":
-                        deduit = 0
-                        remb = reduc
-                    else:
-                        deduit = 0
-                        remb = 0
                 val = [tarif['valuation-price'], prix, pt['discount-HC'] + " -" + str(machine['tx_rabais_hc']) + "%",
-                       reduc, deduit, prix-deduit]
-                self.put_in_transacts(transacts, date, ref_client, ope, util_proj, art, trans, val, remb)
+                       reduc, prix-reduc]
+                self.put_in_transacts(transacts, date, ref_client, ope, util_proj, art, trans, val)
 
             # K2 CAE-MO #
             duree_op = round(entree['duree_operateur']/60, 4)
@@ -139,8 +129,8 @@ class Transactions(Recap):
                 trans = [entree['date_login'], duree_op, usage]
                 tarif = tarifs.valeurs[code_n + machine['id_cat_mo']]
                 prix = round(duree_op * tarif['valuation-price'], 2)
-                val = [tarif['valuation-price'], prix, "", 0, 0, prix]
-                self.put_in_transacts(transacts, date, ref_client, ope, util_proj, art, trans, val, 0)
+                val = [tarif['valuation-price'], prix, "", 0, prix]
+                self.put_in_transacts(transacts, date, ref_client, ope, util_proj, art, trans, val)
 
             # K4 CAE-Extra #
             prix_extra = categprix.donnees[code_n + machine['id_cat_cher']]['prix_unit']
@@ -155,8 +145,8 @@ class Transactions(Recap):
                 art = self.art_plate(article, plateformes, clients)
                 tarif = tarifs.valeurs[code_n + machine['id_cat_cher']]
                 prix = round(duree * tarif['valuation-price'], 2)
-                val = [tarif['valuation-price'], prix, "", 0, 0, prix]
-                self.put_in_transacts(transacts, date, ref_client, ope, util_proj, art, trans, val, 0)
+                val = [tarif['valuation-price'], prix, "", 0, prix]
+                self.put_in_transacts(transacts, date, ref_client, ope, util_proj, art, trans, val)
 
         for entree in noshows.donnees:
             compte = comptes.donnees[entree['id_compte']]
@@ -178,9 +168,9 @@ class Transactions(Recap):
             util_proj = self.util_proj(entree['id_user'], users, compte, droits)
             trans = [entree['date_debut'], entree['penalite'], 0]
             prix = round(entree['penalite'] * tarif['valuation-price'], 2)
-            val = [tarif['valuation-price'], prix, "", 0, 0, prix]
+            val = [tarif['valuation-price'], prix, "", 0, prix]
             date = parse(entree['date_debut'])
-            self.put_in_transacts(transacts, date, ref_client, ope, util_proj, art, trans, val, 0)
+            self.put_in_transacts(transacts, date, ref_client, ope, util_proj, art, trans, val)
 
         for entree in livraisons.donnees:
             compte = comptes.donnees[entree['id_compte']]
@@ -211,20 +201,10 @@ class Transactions(Recap):
                 discount = pt['discount-LVR']
             else:
                 discount = ""
-            if generaux.rabais_excep_par_code_n(code_n) == "RABAIS":
-                rabais = - entree['rabais']
-                remb = 0
-            else:
-                if generaux.rabais_excep_par_code_n(code_n) == "BONUS":
-                    rabais = 0
-                    remb = entree['rabais']
-                else:
-                    rabais = 0
-                    remb = 0
             prix = round(entree['quantite'] * tarif['valuation-price'], 2)
-            val = [tarif['valuation-price'], prix, discount, - entree['rabais'], rabais, prix-rabais]
+            val = [tarif['valuation-price'], prix, discount, entree['rabais'], prix-entree['rabais']]
             date = parse(entree['date_livraison'])
-            self.put_in_transacts(transacts, date, ref_client, ope, util_proj, art, trans, val, remb)
+            self.put_in_transacts(transacts, date, ref_client, ope, util_proj, art, trans, val)
 
         i = 0
         for tr in sorted(transacts.keys()):
@@ -235,17 +215,22 @@ class Transactions(Recap):
                 article = articles.valeurs[transact['art'][0]]
                 code_n = transact['rc'][4]
                 dans = self.date_dans_projet(transact['trans'][0], transact['up'][0], compte, droits)
-                subs = self.subsides(subsides, plafonds, grants, compte, code_n, article, dans, transact['val'][5],
-                                     generaux)
+                subs = self.subsides(subsides, plafonds, grants, compte, code_n, article, dans, transact['val'][4])
                 if generaux.subsides_par_code_n(code_n) == "BONUS":
-                    remb = subs[5]
+                    ded_bon = transact['val'][3]
+                    ded_rab = 0
+                    sub_bon = subs[5]
+                    sub_rab = 0
                 else:
-                    remb = 0
+                    ded_bon = 0
+                    ded_rab = transact['val'][3]
+                    sub_bon = 0
+                    sub_rab = subs[5]
                 if article['platf-code'] == compte['code_client']:
                     tot = 0
                 else:
-                    tot = transact['val'][5] - subs[6]
-                mont = [transact['remb'], remb, tot]
+                    tot = transact['val'][1] - ded_rab - sub_rab
+                mont = [ded_rab, sub_rab, tot, ded_bon, sub_bon]
                 donnee = transact['rc'] + transact['ope'] + transact['up'] + transact['art'] + transact['trans'] + \
                     transact['val'] + subs + mont
                 self.ajouter_valeur(donnee, i)
@@ -303,7 +288,7 @@ class Transactions(Recap):
                 article['item-extra'], article['platf-code'], plateforme['code_p'], client['code_sap'],
                 plateforme['intitule'], plateforme['centre'], plateforme['fonds']]
 
-    def subsides(self, subsides, plafonds, grants, compte, code_n, article, dans, montant, generaux):
+    def subsides(self, subsides, plafonds, grants, compte, code_n, article, dans, montant):
         """
         ajout des valeurs issues des subsides
         :param subsides: subsides importés
@@ -314,7 +299,6 @@ class Transactions(Recap):
         :param article: article de la transaction
         :param dans: si la transaction est dans la période de subside
         :param montant: montant de la transaction
-        :param generaux: paramètres généraux
         :return tableau contenant les valeurs de subsides
         """
         type_s = compte['type_subside']
@@ -343,13 +327,8 @@ class Transactions(Recap):
                                                      'montant': mon}
                     else:
                         self.comptabilises[cg_id]['montant'] = self.comptabilises[cg_id]['montant'] + mon
-                    if generaux.subsides_par_code_n(code_n) == "RABAIS":
-                        ded = mon
-                    else:
-                        ded = 0
-                    return [subside['type'], subside['intitule'], plafond['max_compte'], plafond['max_mois'], res, mon,
-                            ded]
-        return ["", "", 0, 0, 0, 0, 0]
+                    return [subside['type'], subside['intitule'], plafond['max_compte'], plafond['max_mois'], res, mon]
+        return ["", "", 0, 0, 0, 0]
 
     @staticmethod
     def date_dans_projet(date, id_user, compte, droits):
@@ -365,14 +344,14 @@ class Transactions(Recap):
             return False
         debut = droits.donnees[id_droit]['debut']
         fin = droits.donnees[id_droit]['fin']
-        if debut != "NULL" and parse(date) < parse(debut):
+        if debut != "NULL" and parse(date) < debut:
             return False
-        if fin != "NULL" and parse(date) > parse(fin):
+        if fin != "NULL" and parse(date) > fin:
             return False
         return True
 
     @staticmethod
-    def put_in_transacts(transacts, date, ref_client, ope, util_proj, art, trans, val, remb):
+    def put_in_transacts(transacts, date, ref_client, ope, util_proj, art, trans, val):
         """
         rajoute une ligne de transaction (avant tri chronologique et traitement des subsides)
         :param transacts: tableau des transactions
@@ -383,12 +362,10 @@ class Transactions(Recap):
         :param art: valeurs issues de l'article et de la plateforme
         :param trans: valeurs de transaction
         :param val: valeurs d'évaluation
-        :param remb: valeurs de remboursement
         """
         if date not in transacts.keys():
             transacts[date] = []
-        transacts[date].append({'rc': ref_client, 'ope': ope, 'up': util_proj, 'art': art, 'trans': trans, 'val': val,
-                                'remb': remb})
+        transacts[date].append({'rc': ref_client, 'ope': ope, 'up': util_proj, 'art': art, 'trans': trans, 'val': val})
 
     @staticmethod
     def ouvrir_csv(dossier_source, fichier):
