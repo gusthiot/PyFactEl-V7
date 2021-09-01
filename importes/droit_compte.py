@@ -1,6 +1,5 @@
 from importes import Fichier
 from outils import Outils
-from dateutil.parser import parse
 
 
 class DroitCompte(Fichier):
@@ -59,15 +58,11 @@ class DroitCompte(Fichier):
             donnee['fin'] = donnee['fin'].replace('"', '')
 
             if donnee['debut'] != 'NULL':
-                try:
-                    parse(donnee['debut'])
-                except ValueError:
-                    msg += "Date de début '" + donnee['debut'] + "' invalide\n"
+                donnee['debut'], info = Outils.est_une_date(donnee['debut'], "la date de début", ligne)
+                msg += info
             if donnee['fin'] != 'NULL':
-                try:
-                    parse(donnee['fin'])
-                except ValueError:
-                    msg += "Date de fin '" + donnee['fin'] + "' invalide\n"
+                donnee['fin'], info = Outils.est_une_date(donnee['fin'], "la date de fin", ligne)
+                msg += info
 
             del donnee['annee']
             del donnee['mois']
