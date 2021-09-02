@@ -9,8 +9,8 @@ class BilanPlates(Recap):
 
     cles = ['invoice-year', 'invoice-month', 'invoice-ref', 'platf-code', 'platf-op', 'platf-sap', 'platf-name',
             'platf-cf', 'platf-fund', 'client-code', 'client-sap', 'client-name', 'client-class', 'client-labelclass',
-            'item-codeD', 'item-labelcode', 'item-sap', 'valuation-brut', 'deduct-CHF', 'valuation-net',
-            'subsid-deduct', 'discount-bonus', 'subsid-bonus', 'total-fact', 'OP-code']
+            'item-codeD', 'item-labelcode', 'item-sap', 'valuation-brut', 'valuation-net', 'deduct-CHF',
+            'subsid-deduct', 'total-fact', 'discount-bonus', 'subsid-bonus', 'OP-code']
 
     def __init__(self, edition):
         """
@@ -45,25 +45,25 @@ class BilanPlates(Recap):
                     for cle in range(2, len(self.cles)-8):
                         donnee.append(base[self.cles[cle]])
                     avant = 0
-                    deduit = 0
                     compris = 0
+                    deduit = 0
                     sub_ded = 0
+                    fact = 0
                     remb = 0
                     sub_remb = 0
-                    fact = 0
                     for indice in tbtr:
                         val = trans_vals[indice]
                         avant += val['valuation-brut']
-                        deduit += val['deduct-CHF']
                         compris += val['valuation-net']
+                        deduit += val['deduct-CHF']
                         sub_ded += val['subsid-deduct']
+                        fact += val['total-fact']
                         remb += val['discount-bonus']
                         sub_remb += val['subsid-bonus']
-                        fact += val['total-fact']
                     op = base['platf-op'] + base['client-class'] + str(self.annee)[2:4] + \
                         Outils.mois_string(self.mois) + code_d
-                    donnee += [round(avant, 2), round(deduit, 2), round(compris, 2), round(sub_ded, 2), round(remb, 2),
-                               round(sub_remb, 2), round(fact, 2), op]
+                    donnee += [round(avant, 2), round(compris, 2), round(deduit, 2), round(sub_ded, 2), round(fact, 2),
+                               round(remb, 2), round(sub_remb, 2), op]
                     self.ajouter_valeur(donnee, ii)
                     ii += 1
 
