@@ -50,15 +50,11 @@ class PlafSubside(Fichier):
                 msg += "Couple type '" + donnee['type'] + "' et code D '" + \
                        donnee['code_d'] + "' de la ligne " + str(ligne) + " pas unique\n"
 
-            donnee['max_mois'], info = Outils.est_un_nombre(donnee['max_mois'], "le max mensuel", ligne)
+            donnee['max_mois'], info = Outils.est_un_nombre(donnee['max_mois'], "le max mensuel", ligne, 2, 0)
             msg += info
-            if donnee['max_mois'] < 0:
-                msg += "le max mensuel de la ligne " + str(ligne) + " doit être positif\n"
 
-            donnee['max_compte'], info = Outils.est_un_nombre(donnee['max_compte'], "le max compte", ligne)
+            donnee['max_compte'], info = Outils.est_un_nombre(donnee['max_compte'], "le max compte", ligne, 2, 0)
             msg += info
-            if donnee['max_compte'] < 0:
-                msg += "le max compte de la ligne " + str(ligne) + " doit être positif\n"
 
             donnees_dict[donnee['type'] + donnee['code_d']] = donnee
             ligne += 1

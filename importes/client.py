@@ -47,9 +47,13 @@ class Client(Fichier):
         donnees_dict = {}
 
         for donnee in self.donnees:
+            donnee['code_sap'], info = Outils.est_un_alphanumerique(donnee['code_sap'], "le code client sap", ligne)
+            msg += info
             if donnee['code_sap'] == "":
                 msg += "le code sap de la ligne " + str(ligne) + " ne peut être vide\n"
 
+            donnee['code'], info = Outils.est_un_alphanumerique(donnee['code'], "le code client", ligne)
+            msg += info
             if donnee['code'] == "":
                 msg += "le code client de la ligne " + str(ligne) + " ne peut être vide\n"
             elif donnee['code'] not in self.codes:
@@ -57,6 +61,15 @@ class Client(Fichier):
             else:
                 msg += "le code client '" + donnee['code'] + "' de la ligne " + str(ligne) +\
                        " n'est pas unique\n"
+
+            donnee['abrev_labo'], info = Outils.est_un_alphanumerique(donnee['abrev_labo'], "l'abrev. labo", ligne)
+            msg += info
+            donnee['nom_labo'], info = Outils.est_un_texte(donnee['nom_labo'], "le nom labo", ligne)
+            msg += info
+            donnee['ref'], info = Outils.est_un_texte(donnee['ref'], "la référence", ligne, vide=True)
+            msg += info
+            donnee['dest'], info = Outils.est_un_texte(donnee['dest'], "le destinataire", ligne, True)
+            msg += info
 
             if donnee['nature'] == "":
                 msg += "le type de labo de la ligne " + str(ligne) + " ne peut être vide\n"

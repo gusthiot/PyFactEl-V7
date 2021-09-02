@@ -337,7 +337,10 @@ class Outils(object):
         else:
             delaligne = ""
         try:
-            date = datetime.strptime(donnee, '%Y-%m-%d %H:%M:%S')
+            s_d = str(donnee)
+            if s_d.startswith('"') and s_d.endswith('"'):
+                s_d = s_d[1:-1]
+            date = datetime.strptime(s_d, '%Y-%m-%d %H:%M:%S')
             return date, ""
         except ValueError:
             return "", colonne + delaligne + " doit être une date du bon format : YYYY-MM-DD HH:MM:SS\n"

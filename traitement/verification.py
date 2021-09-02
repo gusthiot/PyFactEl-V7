@@ -80,12 +80,14 @@ class Verification(object):
         verif += clients.est_coherent(generaux)
         verif += noshows.est_coherent(comptes, machines, users)
         verif += docpdf.est_coherent(generaux, clients)
-        verif += comptes.est_coherent(clients)
+        verif += comptes.est_coherent(clients, subsides)
         verif += droits.est_coherent(comptes, users)
         verif += grants.est_coherent(comptes, generaux)
         verif += plateformes.est_coherent(clients)
         verif += subsides.est_coherent(plateformes, generaux)
         verif += plafonds.est_coherent(subsides, generaux)
+        verif += edition.est_coherent(clients)
+        verif += generaux.est_coherent(clients)
 
         if verif > 0:
             return verif

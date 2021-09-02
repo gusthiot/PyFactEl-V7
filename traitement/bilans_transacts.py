@@ -4,7 +4,6 @@ from traitement import BilanPlates
 from traitement import BilanUsages
 from traitement import BilanConsos
 from traitement import UserLabo
-from datetime import datetime
 
 
 class BilansTransacts(object):
@@ -86,7 +85,7 @@ class BilansTransacts(object):
                 ppu[user_id] = {}
             if code_client not in ppu[user_id].keys():
                 ppu[user_id][code_client] = {}
-            day = datetime.strptime(date, '%Y-%m-%d %H:%M:%S').day
+            day = date.day
             ppuc = ppu[user_id][code_client]
             if day not in ppuc.keys():
                 ppuc[day] = key

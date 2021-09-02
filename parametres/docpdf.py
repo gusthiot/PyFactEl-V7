@@ -87,14 +87,14 @@ class DocPdf(object):
         donnees_list = []
 
         for donnee in self.donnees:
+            donnee['nom'], err = Outils.est_un_document(donnee['nom'], "le nom")
+            msg += err
+
             if donnee['position'] == "":
                 msg += "la position de la ligne " + str(ligne) + " ne peut être vide\n"
 
-            donnee['position'], info = Outils.est_un_nombre(donnee['position'], "la position", ligne)
+            donnee['position'], info = Outils.est_un_entier(donnee['position'], "la position", ligne, min=0)
             msg += info
-            donnee['position'] = int(donnee['position'])
-            if donnee['position'] < 1:
-                msg += " la position de la ligne " + str(ligne) + " doit être un entier > 0\n"
 
             if donnee['Annexe-pièces'] == "":
                 msg += "le annexe P.J. de la ligne " + str(ligne) + " ne peut être vide\n"

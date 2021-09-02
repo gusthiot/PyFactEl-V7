@@ -70,17 +70,30 @@ class Acces(Fichier):
                 msg += "le user id '" + donnee['id_user'] + "' de la ligne " + str(ligne) \
                        + " n'est pas référencé\n"
 
+            if donnee['id_op'] == "":
+                msg += "l'id opérateur de la ligne " + str(ligne) + " ne peut être vide\n"
+            elif users.contient_id(donnee['id_op']) == 0:
+                msg += "l'id opérateur '" + donnee['id_op'] + "' de la ligne " + str(ligne) \
+                       + " n'est pas référencé\n"
+
             donnee['duree_machine_hp'], info = Outils.est_un_nombre(donnee['duree_machine_hp'], "la durée machine hp",
-                                                                    ligne)
+                                                                    ligne, 4, 0)
             msg += info
             donnee['duree_machine_hc'], info = Outils.est_un_nombre(donnee['duree_machine_hc'], "la durée machine hc",
-                                                                    ligne)
+                                                                    ligne, 4, 0)
             msg += info
-            donnee['duree_operateur'], info = Outils.est_un_nombre(donnee['duree_operateur'],
-                                                                   "la durée opérateur", ligne)
+            donnee['duree_operateur'], info = Outils.est_un_nombre(donnee['duree_operateur'], "la durée opérateur",
+                                                                   ligne, 4, 0)
             msg += info
 
-            donnee['date_login'] = donnee['date_login'].replace('"', '')
+            donnee['date_login'], info = Outils.est_une_date(donnee['date_login'], "la date de login", ligne)
+            msg += info
+
+            donnee['remarque_op'], info = Outils.est_un_texte(donnee['remarque_op'], "la remarque opérateur", ligne, True)
+            msg += info
+
+            donnee['remarque_staff'], info = Outils.est_un_texte(donnee['remarque_staff'], "la remarque staff", ligne, True)
+            msg += info
 
             del donnee['annee']
             del donnee['mois']

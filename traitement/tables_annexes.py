@@ -229,7 +229,7 @@ class TablesAnnexes(object):
                                     if liv['remarque'] != "":
                                         rem = "; Remarque : " + liv['remarque']
                                     if liv['date_livraison'] != "":
-                                        dl = "Dt livraison: " + liv['date_livraison'] + ";"
+                                        dl = "Dt livraison: " + str(liv['date_livraison']) + ";"
                                     op = users.donnees[liv['id_operateur']]
                                     dico_pos = {'date_liv': Latex.echappe_caracteres(dl),
                                                 'quantite': "%.1f" % liv['quantite'],
@@ -237,7 +237,7 @@ class TablesAnnexes(object):
                                                 'id': Latex.echappe_caracteres(liv['id_livraison']),
                                                 'unite': Latex.echappe_caracteres(sip['unite']),
                                                 'responsable': Latex.echappe_caracteres(op['prenom'] + " " + op['nom']),
-                                                'commande': Latex.echappe_caracteres(liv['date_commande']),
+                                                'commande': liv['date_commande'],
                                                 'remarque': Latex.echappe_caracteres(rem)}
                                     contenu += r'''
                                         \hspace{10mm} %(date_liv)s N. livraison: %(id)s
@@ -321,15 +321,9 @@ class TablesAnnexes(object):
                                 ''' % dico_user
                                 for p1 in smu['data']:
                                     cae = acces.donnees[p1]
-                                    login = Latex.echappe_caracteres(cae['date_login']).split()
-                                    temps = login[0].split('-')
-                                    date = temps[0]
-                                    for p2 in range(1, len(temps)):
-                                        date = temps[p2] + '.' + date
-                                    if len(login) > 1:
-                                        heure = login[1]
-                                    else:
-                                        heure = ""
+                                    login = cae['date_login']
+                                    date = login.strftime("%d.%m.%y")
+                                    heure = login.strftime("%H:%M")
 
                                     rem = ""
                                     if id_user != cae['id_op']:

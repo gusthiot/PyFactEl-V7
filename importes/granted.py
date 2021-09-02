@@ -50,10 +50,8 @@ class Granted(Fichier):
                 msg += "Couple id compte '" + donnee['id_compte'] + "' et code D '" + \
                        donnee['code_d'] + "' de la ligne " + str(ligne) + " pas unique\n"
 
-            donnee['montant'], info = Outils.est_un_nombre(donnee['montant'], "le montant comptabilisé", ligne)
+            donnee['montant'], info = Outils.est_un_nombre(donnee['montant'], "le montant comptabilisé", ligne, 2, 0)
             msg += info
-            if donnee['montant'] < 0:
-                msg += "le montant comptabilisé de la ligne " + str(ligne) + " doit être positif\n"
 
             donnees_dict[donnee['id_compte']+donnee['code_d']] = donnee
             ligne += 1

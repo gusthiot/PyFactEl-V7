@@ -36,6 +36,13 @@ class Paramannexe(object):
         del self.donnees[0]
 
         for donnee in self.donnees:
+            if donnee['int'] != "" and donnee['int'] != 'X' and donnee['int'] != 'NO':
+                Outils.fatal(ErreurConsistance(), self.libelle + ": donnée INT doit être X, NO ou vide ")
+            if donnee['ext_postal'] != "" and donnee['ext_postal'] != 'X' and donnee['ext_postal'] != 'NO':
+                Outils.fatal(ErreurConsistance(), self.libelle + ": donnée EXT & POSTAL doit être X, NO ou vide ")
+            if donnee['ext_mail'] != "" and donnee['ext_mail'] != 'X' and donnee['ext_mail'] != 'NO':
+                Outils.fatal(ErreurConsistance(), self.libelle + ": donnée EXT & MAIL doit être X, NO ou vide ")
+
             if donnee['nom'] in self.dossiers_annexes:
                 donnee['dossier'] = self.dossiers_annexes[donnee['nom']]
             else:

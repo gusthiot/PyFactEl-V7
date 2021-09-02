@@ -51,6 +51,8 @@ class Machine(Fichier):
         donnees_dict = {}
 
         for donnee in self.donnees:
+            donnee['id_machine'], info = Outils.est_un_alphanumerique(donnee['id_machine'], "l'id machine", ligne)
+            msg += info
             if donnee['id_machine'] == "":
                 msg += "le machine id de la ligne " + str(ligne) + " ne peut être vide\n"
             elif donnee['id_machine'] not in ids:
@@ -95,12 +97,11 @@ class Machine(Fichier):
                 msg += "l'id catégorie hc '" + donnee['id_cat_hc'] + "' de la ligne " + str(ligne) \
                        + " n'est pas référencé\n"
 
-            donnee['tx_rabais_hc'], info = Outils.est_un_nombre(donnee['tx_rabais_hc'],
-                                                                "le rabais heures creuses", ligne)
+            donnee['tx_rabais_hc'], info = Outils.est_un_nombre(donnee['tx_rabais_hc'], "le rabais heures creuses",
+                                                                ligne, min=0, max=100)
             msg += info
-            if donnee['tx_rabais_hc'] < 0 or donnee['tx_rabais_hc'] > 100:
-                msg += "le rabais heures creuse '" + str(donnee['tx_rabais_hc']) + "' de la ligne " + str(ligne) \
-                       + " doit être entre 0 et 100\n"
+            donnee['nom'], info = Outils.est_un_texte(donnee['nom'], "le nom machine", ligne)
+            msg += info
 
             del donnee['annee']
             del donnee['mois']

@@ -62,11 +62,12 @@ class Fichier(object):
         msg = ""
         position = 1
         for donnee in self.donnees:
-            try:
-                if (int(donnee['mois']) != mois) or (int(donnee['annee']) != annee):
-                    msg += "date incorrect ligne " + str(position) + "\n"
-            except ValueError:
-                msg += "année ou mois n'est pas valable" + str(position) + "\n"
+            donnee['mois'], info = Outils.est_un_entier(donnee['mois'], "le mois ", position, 1, 12)
+            msg += info
+            donnee['annee'], info = Outils.est_un_entier(donnee['annee'], "l'annee ", position, 2000, 2099)
+            msg += info
+            if donnee['mois'] != mois or donnee['annee'] != annee:
+                msg += "date incorrect ligne " + str(position) + "\n"
             position += 1
 
         del self.donnees[0]

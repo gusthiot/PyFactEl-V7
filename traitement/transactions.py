@@ -1,6 +1,5 @@
 from outils import Outils
 from traitement import Recap
-from dateutil.parser import parse
 
 
 class Transactions(Recap):
@@ -70,7 +69,6 @@ class Transactions(Recap):
             ope = [entree['id_op'], operateur['prenom'] + " " + operateur['nom'], entree['remarque_op'],
                    entree['remarque_staff'], id_machine, machine['nom']]
             util_proj = self.util_proj(entree['id_user'], users, compte, droits)
-            date = parse(entree['date_login'])
 
             # K3 CAE-run #
             if entree['duree_machine_hp'] > 0 or entree['duree_machine_hc'] > 0:
@@ -83,7 +81,7 @@ class Transactions(Recap):
                     usage = 1
                 trans = [entree['date_login'], 1, usage]
                 val = [tarif['valuation-price'], tarif['valuation-price'], "", 0, tarif['valuation-price']]
-                self.put_in_transacts(transacts, date, ref_client, ope, util_proj, art, trans, val)
+                self.put_in_transacts(transacts, ref_client, ope, util_proj, art, trans, val)
 
             # K1 CAE-HP #
             duree_hp = round(entree['duree_machine_hp']/60, 4)
@@ -98,7 +96,7 @@ class Transactions(Recap):
                 tarif = tarifs.valeurs[code_n + machine['id_cat_mach']]
                 prix = round(duree_hp * tarif['valuation-price'], 2)
                 val = [tarif['valuation-price'], prix, "", 0, prix]
-                self.put_in_transacts(transacts, date, ref_client, ope, util_proj, art, trans, val)
+                self.put_in_transacts(transacts, ref_client, ope, util_proj, art, trans, val)
 
             # K1 CAE-HC #
             duree_hc = round(entree['duree_machine_hc']/60, 4)
@@ -115,7 +113,7 @@ class Transactions(Recap):
                 reduc = round(tarif['valuation-price'] * machine['tx_rabais_hc']/100 * duree_hc, 2)
                 val = [tarif['valuation-price'], prix, pt['discount-HC'] + " -" + str(machine['tx_rabais_hc']) + "%",
                        reduc, prix-reduc]
-                self.put_in_transacts(transacts, date, ref_client, ope, util_proj, art, trans, val)
+                self.put_in_transacts(transacts, ref_client, ope, util_proj, art, trans, val)
 
             # K2 CAE-MO #
             duree_op = round(entree['duree_operateur']/60, 4)
@@ -130,7 +128,7 @@ class Transactions(Recap):
                 tarif = tarifs.valeurs[code_n + machine['id_cat_mo']]
                 prix = round(duree_op * tarif['valuation-price'], 2)
                 val = [tarif['valuation-price'], prix, "", 0, prix]
-                self.put_in_transacts(transacts, date, ref_client, ope, util_proj, art, trans, val)
+                self.put_in_transacts(transacts, ref_client, ope, util_proj, art, trans, val)
 
             # K4 CAE-Extra #
             prix_extra = categprix.donnees[code_n + machine['id_cat_cher']]['prix_unit']
@@ -146,7 +144,7 @@ class Transactions(Recap):
                 tarif = tarifs.valeurs[code_n + machine['id_cat_cher']]
                 prix = round(duree * tarif['valuation-price'], 2)
                 val = [tarif['valuation-price'], prix, "", 0, prix]
-                self.put_in_transacts(transacts, date, ref_client, ope, util_proj, art, trans, val)
+                self.put_in_transacts(transacts, ref_client, ope, util_proj, art, trans, val)
 
         for entree in noshows.donnees:
             compte = comptes.donnees[entree['id_compte']]
@@ -169,8 +167,7 @@ class Transactions(Recap):
             trans = [entree['date_debut'], entree['penalite'], 0]
             prix = round(entree['penalite'] * tarif['valuation-price'], 2)
             val = [tarif['valuation-price'], prix, "", 0, prix]
-            date = parse(entree['date_debut'])
-            self.put_in_transacts(transacts, date, ref_client, ope, util_proj, art, trans, val)
+            self.put_in_transacts(transacts, ref_client, ope, util_proj, art, trans, val)
 
         for entree in livraisons.donnees:
             compte = comptes.donnees[entree['id_compte']]
@@ -193,7 +190,7 @@ class Transactions(Recap):
                 machine = machines.donnees[id_machine]
                 nm = machine['nom']
             ope = [entree['id_operateur'], operateur['prenom'] + " " + operateur['nom'],
-                   pt['oper-PO'] + " " + entree['date_commande'], entree['remarque'], idm, nm]
+                   pt['oper-PO'] + " " + str(entree['date_commande']), entree['remarque'], idm, nm]
             util_proj = self.util_proj(entree['id_user'], users, compte, droits)
             trans = [entree['date_livraison'], entree['quantite'], 0]
             tarif = tarifs.valeurs[code_n + id_prestation]
@@ -203,8 +200,7 @@ class Transactions(Recap):
                 discount = ""
             prix = round(entree['quantite'] * tarif['valuation-price'], 2)
             val = [tarif['valuation-price'], prix, discount, entree['rabais'], prix-entree['rabais']]
-            date = parse(entree['date_livraison'])
-            self.put_in_transacts(transacts, date, ref_client, ope, util_proj, art, trans, val)
+            self.put_in_transacts(transacts, ref_client, ope, util_proj, art, trans, val)
 
         i = 0
         for tr in sorted(transacts.keys()):
@@ -344,18 +340,17 @@ class Transactions(Recap):
             return False
         debut = droits.donnees[id_droit]['debut']
         fin = droits.donnees[id_droit]['fin']
-        if debut != "NULL" and parse(date) < debut:
+        if debut != "NULL" and date < debut:
             return False
-        if fin != "NULL" and parse(date) > fin:
+        if fin != "NULL" and date > fin:
             return False
         return True
 
     @staticmethod
-    def put_in_transacts(transacts, date, ref_client, ope, util_proj, art, trans, val):
+    def put_in_transacts(transacts, ref_client, ope, util_proj, art, trans, val):
         """
         rajoute une ligne de transaction (avant tri chronologique et traitement des subsides)
         :param transacts: tableau des transactions
-        :param date: date de la transaction
         :param ref_client: référence et valeurs issues du client
         :param ope: valeurs issues de l'opérateur
         :param util_proj: valeurs issues de l'utilisateur et du projet
@@ -363,9 +358,10 @@ class Transactions(Recap):
         :param trans: valeurs de transaction
         :param val: valeurs d'évaluation
         """
-        if date not in transacts.keys():
-            transacts[date] = []
-        transacts[date].append({'rc': ref_client, 'ope': ope, 'up': util_proj, 'art': art, 'trans': trans, 'val': val})
+        if trans[0] not in transacts.keys():
+            transacts[trans[0]] = []
+        transacts[trans[0]].append({'rc': ref_client, 'ope': ope, 'up': util_proj, 'art': art, 'trans': trans,
+                                    'val': val})
 
     @staticmethod
     def ouvrir_csv(dossier_source, fichier):

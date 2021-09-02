@@ -69,14 +69,28 @@ class Livraison(Fichier):
                 msg += "le user id '" + donnee['id_user'] + "' de la ligne " + str(ligne) \
                        + " n'est pas référencé\n"
 
-            donnee['quantite'], info = Outils.est_un_nombre(donnee['quantite'], "la quantité", ligne)
+            if donnee['id_operateur'] == "":
+                msg += "l'id opérateur de la ligne " + str(ligne) + " ne peut être vide\n"
+            elif users.contient_id(donnee['id_operateur']) == 0:
+                msg += "l'id opérateur '" + donnee['id_operateur'] + "' de la ligne " + str(ligne) \
+                       + " n'est pas référencé\n"
+
+            donnee['quantite'], info = Outils.est_un_nombre(donnee['quantite'], "la quantité", ligne, 1)
             msg += info
-            donnee['rabais'], info = Outils.est_un_nombre(donnee['rabais'], "le rabais", ligne)
+            donnee['rabais'], info = Outils.est_un_nombre(donnee['rabais'], "le rabais", ligne, 2)
             msg += info
 
-            donnee['date_livraison'] = donnee['date_livraison'].replace('"', '')
-            donnee['date_commande'] = donnee['date_commande'].replace('"', '')
-            donnee['date_prise'] = donnee['date_prise'].replace('"', '')
+            donnee['date_livraison'], info = Outils.est_une_date(donnee['date_livraison'], "la date de livraison", ligne)
+            msg += info
+            donnee['date_commande'], info = Outils.est_une_date(donnee['date_commande'], "la date de commande", ligne)
+            msg += info
+            donnee['date_prise'], info = Outils.est_une_date(donnee['date_prise'], "la date de prise", ligne)
+            msg += info
+
+            donnee['id_livraison'], info = Outils.est_un_texte(donnee['id_livraison'], "l'id livraison", ligne, True)
+            msg += info
+            donnee['remarque'], info = Outils.est_un_texte(donnee['remarque'], "la remarque", ligne, True)
+            msg += info
 
             del donnee['annee']
             del donnee['mois']

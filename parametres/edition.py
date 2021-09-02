@@ -17,6 +17,7 @@ class Edition(object):
         :param dossier_source: Une instance de la classe dossier.DossierSource
         """
         donnees_csv = []
+        self.verifie_coherence = 0
         try:
             for ligne in dossier_source.reader(self.nom_fichier):
                 donnees_csv.append(ligne)
@@ -28,20 +29,19 @@ class Edition(object):
             Outils.fatal(ErreurConsistance(),
                          self.libelle + ": nombre de lignes incorrect : " +
                          str(len(donnees_csv)) + ", attendu : " + str(num))
-        try:
-            self.annee = int(donnees_csv[0][1])
-            self.mois = int(donnees_csv[1][1])
-        except ValueError as e:
-            Outils.fatal(e, Edition.libelle +
-                         "\nle mois et l'année doivent être des nombres entiers")
-        try:
-            self.version = int(donnees_csv[2][1])
-        except ValueError as e:
-            Outils.fatal(e, Edition.libelle +
-                         "\nla version doit être un nombre entier")
-        if self.version < 0:
-            Outils.fatal(ErreurConsistance(),
-                         Edition.libelle + ": la version doit être positive ")
+
+        self.annee, err = Outils.est_un_entier(donnees_csv[0][1], "l'année", min=2000, max=2099)
+        if err != "":
+            Outils.affiche_message(Edition.libelle + "\n" + err)
+
+        self.mois, err = Outils.est_un_entier(donnees_csv[1][1], "le mois", min=1, max=12)
+        if err != "":
+            Outils.affiche_message(Edition.libelle + "\n" + err)
+
+        self.version, err = Outils.est_un_entier(donnees_csv[2][1], "la version", min=0)
+        if err != "":
+            Outils.affiche_message(Edition.libelle + "\n" + err)
+
         self.client_unique = donnees_csv[3][1]
         if self.version == 0 and self.client_unique != "":
             Outils.fatal(ErreurConsistance(),
@@ -49,7 +49,9 @@ class Edition(object):
         if self.version > 0 and self.client_unique == "":
             Outils.fatal(ErreurConsistance(),
                          Edition.libelle + ": il doit y avoir un client unique pour une version > 0")
-        self.filigrane = donnees_csv[4][1]
+        self.filigrane, err = Outils.est_un_texte(donnees_csv[4][1], "le filigrane", vide=True)
+        if err != "":
+            Outils.affiche_message(Edition.libelle + "\n" + err)
 
         jours = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
         if self.mois != 2:
@@ -70,3 +72,21 @@ class Edition(object):
         mois_fr = ["janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août", "septembre", "octobre",
                    "novembre", "décembre"]
         self.mois_txt = mois_fr[self.mois-1]
+
+    def est_coherent(self, clients):
+        """
+        vérifie que les données du fichier importé sont cohérentes
+        :param clients: clients importés
+        :return: 1 s'il y a une erreur, 0 sinon
+        """
+
+        if self.verifie_coherence == 1:
+            print(self.libelle + ": cohérence déjà vérifiée")
+            return 0
+
+        self.verifie_coherence = 1
+        if self.client_unique != "" and self.client_unique not in clients.donnees:
+            msg = self.libelle + "\n" + "le code client unique " + self.client_unique + " n'est pas référencé\n"
+            Outils.affiche_message(msg)
+            return 1
+        return 0

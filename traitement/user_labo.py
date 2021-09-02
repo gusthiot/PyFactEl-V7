@@ -1,6 +1,5 @@
 from outils import Outils
 from traitement import Recap
-from datetime import datetime
 
 
 class UserLabo(Recap):
@@ -38,7 +37,7 @@ class UserLabo(Recap):
                     for jour in par_jour.keys():
                         key = par_jour[jour]
                         trans = trans_vals[key]
-                        date = datetime.strptime(trans['transac-date'], '%Y-%m-%d %H:%M:%S')
+                        date = trans['transac-date']
                         donnee = []
                         for cle in range(2, len(self.cles)):
                             if self.cles[cle] == 'day':

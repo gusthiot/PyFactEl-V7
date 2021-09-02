@@ -48,6 +48,11 @@ class Subside(Fichier):
 
         del self.donnees[0]
         for donnee in self.donnees:
+            donnee['type'], info = Outils.est_un_alphanumerique(donnee['type'], "le type subside", ligne)
+            msg += info
+            donnee['intitule'], info = Outils.est_un_texte(donnee['intitule'], "l'intitulé", ligne)
+            msg += info
+
             if donnee['id_plateforme'] == "":
                 msg += "l'id plateforme de la ligne " + str(ligne) + " ne peut être vide\n"
             elif plateformes.contient_id(donnee['id_plateforme']) == 0:

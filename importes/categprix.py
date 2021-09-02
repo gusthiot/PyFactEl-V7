@@ -61,7 +61,7 @@ class CategPrix(Fichier):
                     msg += "Couple id catégorie '" + donnee['id_categorie'] + "' et nature '" + \
                            donnee['nature'] + "' de la ligne " + str(ligne) + " pas unique\n"
 
-            donnee['prix_unit'], info = Outils.est_un_nombre(donnee['prix_unit'], "le prix unitaire ", ligne)
+            donnee['prix_unit'], info = Outils.est_un_nombre(donnee['prix_unit'], "le prix unitaire ", ligne, 2)
             msg += info
 
             donnees_dict[donnee['nature'] + donnee['id_categorie']] = donnee

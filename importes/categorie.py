@@ -48,6 +48,8 @@ class Categorie(Fichier):
 
         del self.donnees[0]
         for donnee in self.donnees:
+            donnee['id_categorie'], info = Outils.est_un_alphanumerique(donnee['id_categorie'], "l'id catégorie", ligne)
+            msg += info
             if donnee['id_categorie'] == "":
                 msg += "l'id catégorie de la ligne " + str(ligne) + " ne peut être vide\n"
             elif donnee['id_categorie'] not in ids:
@@ -66,6 +68,13 @@ class Categorie(Fichier):
             elif plateformes.contient_id(donnee['id_plateforme']) == 0:
                 msg += "l'id plateforme '" + donnee['id_plateforme'] + "' de la ligne " + str(ligne) \
                        + " n'est pas référencé\n"
+
+            donnee['no_categorie'], info = Outils.est_un_alphanumerique(donnee['no_categorie'], "le no catégorie", ligne)
+            msg += info
+            donnee['intitule'], info = Outils.est_un_texte(donnee['intitule'], "l'intitulé", ligne)
+            msg += info
+            donnee['unite'], info = Outils.est_un_texte(donnee['unite'], "l'unité", ligne)
+            msg += info
 
             donnees_dict[donnee['id_categorie']] = donnee
             ligne += 1

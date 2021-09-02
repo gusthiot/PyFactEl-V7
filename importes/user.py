@@ -54,6 +54,8 @@ class User(Fichier):
         # scipers = []
 
         for donnee in self.donnees:
+            donnee['id_user'], info = Outils.est_un_alphanumerique(donnee['id_user'], "l'id user", ligne)
+            msg += info
             if donnee['id_user'] == "":
                 msg += "l'id user de la ligne " + str(ligne) + " ne peut être vide\n"
             elif donnee['id_user'] not in ids:
@@ -62,6 +64,8 @@ class User(Fichier):
                 msg += "l'id user '" + donnee['id_user'] + "' de la ligne " + str(ligne) +\
                        " n'est pas unique\n"
 
+            donnee['sciper'], info = Outils.est_un_alphanumerique(donnee['sciper'], "le sciper", ligne)
+            msg += info
             # if donnee['sciper'] == "":
             #     msg += "le sciper de la ligne " + str(ligne) + " ne peut être vide\n"
             # elif donnee['sciper'] not in scipers:
@@ -69,6 +73,11 @@ class User(Fichier):
             # else:
             #     msg += "le sciper '" + donnee['sciper'] + "' de la ligne " + str(ligne) +\
             #            " n'est pas unique\n"
+
+            donnee['nom'], info = Outils.est_un_texte(donnee['nom'], "le nom", ligne)
+            msg += info
+            donnee['nom'], info = Outils.est_un_texte(donnee['nom'], "le nom", ligne)
+            msg += info
 
             del donnee['annee']
             del donnee['mois']

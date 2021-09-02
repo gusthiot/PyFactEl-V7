@@ -70,6 +70,9 @@ class Prestation(Fichier):
         donnees_dict = {}
 
         for donnee in self.donnees:
+            donnee['id_prestation'], info = Outils.est_un_alphanumerique(donnee['id_prestation'], "l'id prestation",
+                                                                         ligne)
+            msg += info
             if donnee['id_prestation'] == "":
                 msg += "le prestation id de la ligne " + str(ligne) + " ne peut être vide\n"
             elif donnee['id_prestation'] not in ids:
@@ -78,8 +81,16 @@ class Prestation(Fichier):
                 msg += "l'id prestation '" + donnee['id_prestation'] + "' de la ligne " + str(ligne) +\
                        " n'est pas unique\n"
 
+            donnee['no_prestation'], info = Outils.est_un_alphanumerique(donnee['no_prestation'], "le no prestation",
+                                                                         ligne)
+            msg += info
             if donnee['no_prestation'] == "":
                 msg += "le numéro de prestation de la ligne " + str(ligne) + " ne peut être vide\n"
+
+            donnee['designation'], info = Outils.est_un_texte(donnee['designation'], "la désignation", ligne)
+            msg += info
+            donnee['unite_prest'], info = Outils.est_un_texte(donnee['unite_prest'], "l'unité prestation", ligne, True)
+            msg += info
 
             if donnee['categorie'] == "":
                 msg += "la catégorie  de la ligne " + str(ligne) + " ne peut être vide\n"
@@ -103,7 +114,7 @@ class Prestation(Fichier):
                     msg += "l'id machine '" + donnee['id_machine'] + "' de la ligne " + str(ligne) \
                            + " n'est pas référencé ni égal à 0\n"
 
-            donnee['prix_unit'], info = Outils.est_un_nombre(donnee['prix_unit'], "le prix unitaire", ligne)
+            donnee['prix_unit'], info = Outils.est_un_nombre(donnee['prix_unit'], "le prix unitaire", ligne, 2)
             msg += info
             num, info = Outils.est_un_nombre(donnee['no_prestation'], "le numéro prestation", ligne)
             donnee['no_prestation'] = int(num)

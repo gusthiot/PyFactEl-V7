@@ -32,6 +32,7 @@ class Generaux(object):
                           qualification
         """
         self._donnees = {}
+        self.verifie_coherence = 0
         try:
             for ligne in dossier_source.reader(self.nom_fichier):
                 cle = ligne.pop(0)
@@ -52,25 +53,90 @@ class Generaux(object):
             if cle not in self._donnees:
                 erreurs += "\nClé manquante dans %s: %s" % (self.nom_fichier, cle)
 
-        try:
-            for quantite in self._donnees['quantite'][1:]:
-                int(quantite)
-        except ValueError:
-            erreurs += "les quantités doivent être des nombres entiers\n"
-
-        try:
-            self._donnees['min_fact_rese'][1] = int(self._donnees['min_fact_rese'][1])
-        except ValueError:
-            erreurs += "le montant minimum pour des frais de facturation doit être un nombre\n"
+        self._donnees['centre'][1], err = Outils.est_un_texte(self._donnees['centre'][1], "le centre")
+        erreurs += err
+        self._donnees['origine'][1], err = Outils.est_un_alphanumerique(self._donnees['origine'][1], "l'origine")
+        erreurs += err
+        self._donnees['code_int'][1], err = Outils.est_un_alphanumerique(self._donnees['code_int'][1], "le code INT")
+        erreurs += err
+        self._donnees['code_ext'][1], err = Outils.est_un_alphanumerique(self._donnees['code_ext'][1], "le code EXT")
+        erreurs += err
+        self._donnees['commerciale'][1], err = Outils.est_un_alphanumerique(self._donnees['commerciale'][1], "le com.")
+        erreurs += err
+        self._donnees['canal'][1], err = Outils.est_un_alphanumerique(self._donnees['canal'][1], "le canal")
+        erreurs += err
+        self._donnees['secteur'][1], err = Outils.est_un_alphanumerique(self._donnees['secteur'][1], "le secteur")
+        erreurs += err
+        self._donnees['devise'][1], err = Outils.est_un_alphanumerique(self._donnees['devise'][1], "la devise")
+        erreurs += err
+        self._donnees['financier'][1], err = Outils.est_un_alphanumerique(self._donnees['financier'][1], "le financier")
+        erreurs += err
+        self._donnees['fonds'][1], err = Outils.est_un_alphanumerique(self._donnees['fonds'][1], "le fonds")
+        erreurs += err
+        self._donnees['entete'][1], err = Outils.est_un_texte(self._donnees['entete'][1], "l'entête", vide=True)
+        erreurs += err
+        self._donnees['poste_reservation'][1], err = Outils.est_un_entier(self._donnees['poste_reservation'][1],
+                                                                          "le poste réservation", min=1, max=9)
+        erreurs += err
+        self._donnees['lien'][1], err = Outils.est_un_chemin(self._donnees['lien'][1], "le lien")
+        erreurs += err
+        self._donnees['chemin'][1], err = Outils.est_un_chemin(self._donnees['chemin'][1], "le chemin")
+        erreurs += err
+        self._donnees['chemin_propre'][1], err = Outils.est_un_chemin(self._donnees['chemin_propre'][1],
+                                                                      "le chemin propre")
+        erreurs += err
+        self._donnees['chemin_filigrane'][1], err = Outils.est_un_chemin(self._donnees['chemin_filigrane'][1],
+                                                                         "le chemin filigrane")
+        erreurs += err
+        for intitule in self._donnees['intitule_n'][1:]:
+            intitule, err = Outils.est_un_texte(intitule, "l'intitulé N")
+            erreurs += err
+        for code_s in self._donnees['code_sap'][1:]:
+            code_s, err = Outils.est_un_entier(code_s, "le code sap", min=1)
+            erreurs += err
+        for code_sq in self._donnees['code_sap_qas'][1:]:
+            code_sq, err = Outils.est_un_entier(code_sq, "le code sap qas", min=1)
+            erreurs += err
+        for quantite in self._donnees['quantite'][1:]:
+            quantite, err = Outils.est_un_nombre(quantite, "la quantité", arrondi=3)
+            erreurs += err
+        for unite in self._donnees['unite'][1:]:
+            unite, err = Outils.est_un_texte(unite, "l'unité")
+            erreurs += err
+        for type_prix in self._donnees['type_prix'][1:]:
+            type_prix, err = Outils.est_un_alphanumerique(type_prix, "le type de prix")
+            erreurs += err
+        for type_rabais in self._donnees['type_rabais'][1:]:
+            type_rabais, err = Outils.est_un_alphanumerique(type_rabais, "le type de rabais")
+            erreurs += err
+        for texte_sap in self._donnees['texte_sap'][1:]:
+            texte_sap, err = Outils.est_un_texte(texte_sap, "le texte sap", vide=True)
+            erreurs += err
+        for intitule_long in self._donnees['intitule_long'][1:]:
+            intitule_long, err = Outils.est_un_texte(intitule_long, "l'intitulé long")
+            erreurs += err
+        for intitule_court in self._donnees['intitule_court'][1:]:
+            intitule_court, err = Outils.est_un_texte(intitule_court, "l'intitulé court")
+            erreurs += err
+        for modes in self._donnees['modes'][1:]:
+            modes, err = Outils.est_un_alphanumerique(modes, "le mode d'envoi")
+            erreurs += err
+        self._donnees['min_fact_rese'][1], err = Outils.est_un_nombre(
+            self._donnees['min_fact_rese'][1], "le montant minimum pour des frais de facturation", arrondi=2)
+        erreurs += err
 
         codes_n = []
         for nn in self._donnees['code_n'][1:]:
+            nn, err = Outils.est_un_alphanumerique(nn, "le code N")
+            erreurs += err
             if nn not in codes_n:
                 codes_n.append(nn)
             else:
                 erreurs += "le code N '" + nn + "' n'est pas unique\n"
         codes_d = []
         for dd in self._donnees['code_d'][1:]:
+            dd, err = Outils.est_un_alphanumerique(dd, "le code D")
+            erreurs += err
             if dd not in codes_d:
                 codes_d.append(dd)
             else:
@@ -117,6 +183,27 @@ class Generaux(object):
 
         if erreurs != "":
             Outils.fatal(ErreurConsistance(), self.libelle + "\n" + erreurs)
+
+    def est_coherent(self, clients):
+        """
+        vérifie que les données du fichier importé sont cohérentes
+        :param clients: clients importés
+        :return: 1 s'il y a une erreur, 0 sinon
+        """
+
+        if self.verifie_coherence == 1:
+            print(self.libelle + ": cohérence déjà vérifiée")
+            return 0
+
+        self.verifie_coherence = 1
+        if self._donnees['code_cfact_centre'][1] == "":
+            Outils.affiche_message(self.libelle + "\n" + "le code client du centre de facturation ne peut être vide\n")
+            return 1
+        elif self._donnees['code_cfact_centre'][1] not in clients.donnees:
+            Outils.affiche_message(self.libelle + "\n" + "le code client du centre de facturation " +
+                                   self._donnees['code_cfact_centre'][1] + " n'est pas référencé\n")
+            return 1
+        return 0
 
     def obtenir_code_n(self):
         """

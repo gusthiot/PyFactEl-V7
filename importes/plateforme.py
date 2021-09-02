@@ -55,6 +55,16 @@ class Plateforme(Fichier):
                 ids.append(donnee['id_plateforme'])
             else:
                 msg += "l'id plateforme de la ligne " + str(ligne) + " n'est pas unique \n"
+            donnee['code_p'], info = Outils.est_un_alphanumerique(donnee['code_p'], "le code P", ligne)
+            msg += info
+            donnee['centre'], info = Outils.est_un_alphanumerique(donnee['centre'], "le centre financier", ligne, vide=True)
+            msg += info
+            donnee['fonds'], info = Outils.est_un_alphanumerique(donnee['fonds'], "les fonds à créditer", ligne, vide=True)
+            msg += info
+            donnee['intitule'], info = Outils.est_un_texte(donnee['intitule'], "l'intitulé", ligne)
+            msg += info
+            donnee['grille'], info = Outils.est_un_document(donnee['grille'], "la grille tarifaire", ligne)
+            msg += info
 
             donnees_dict[donnee['id_plateforme']] = donnee
             ligne += 1

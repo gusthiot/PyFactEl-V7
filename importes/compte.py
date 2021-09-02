@@ -29,10 +29,11 @@ class Compte(Fichier):
                     return 1
         return 0
 
-    def est_coherent(self, clients):
+    def est_coherent(self, clients, subsides):
         """
         vérifie que les données du fichier importé sont cohérentes, et efface les colonnes mois et année
         :param clients: clients importés
+        :param subsides: subsides importés
         :return: 1 s'il y a une erreur, 0 sinon
         """
         if self.verifie_date == 0:
@@ -56,6 +57,12 @@ class Compte(Fichier):
                 msg += "le code client " + donnee['code_client'] + " de la ligne " + str(ligne) + \
                        " n'est pas référencé\n"
 
+            donnee['id_compte'], info = Outils.est_un_alphanumerique(donnee['id_compte'], "l'id compte", ligne)
+            msg += info
+            donnee['numero'], info = Outils.est_un_alphanumerique(donnee['numero'], "le numéro de compte", ligne)
+            msg += info
+            donnee['intitule'], info = Outils.est_un_texte(donnee['intitule'], "l'intitulé", ligne)
+            msg += info
             if donnee['id_compte'] == "":
                 msg += "le compte id de la ligne " + str(ligne) + " ne peut être vide\n"
             elif donnee['id_compte'] not in ids:
@@ -65,6 +72,12 @@ class Compte(Fichier):
                        " n'est pas unique\n"
             if donnee['exploitation'] != 'TRUE' and donnee['exploitation'] != 'FALSE':
                 msg += "l'exploitation de la ligne " + str(ligne) + " doit être 'TRUE' ou 'FALSE'\n"
+
+            if donnee['type_subside'] == "":
+                msg += "le type subside de la ligne " + str(ligne) + " ne peut être vide\n"
+            elif donnee['type_subside'] != "STD" and not subsides.contient_type(donnee['type_subside']):
+                msg += "le type subside " + donnee['type_subside'] + " de la ligne " + str(ligne) + \
+                       " n'est pas référencé\n"
 
             del donnee['annee']
             del donnee['mois']
