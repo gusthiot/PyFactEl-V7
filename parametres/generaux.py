@@ -119,7 +119,7 @@ class Generaux(object):
             intitule_court, err = Outils.est_un_texte(intitule_court, "l'intitulé court")
             erreurs += err
         for modes in self._donnees['modes'][1:]:
-            modes, err = Outils.est_un_alphanumerique(modes, "le mode d'envoi")
+            modes, err = Outils.est_un_alphanumerique(modes, "le mode d'envoi", vide=True)
             erreurs += err
         self._donnees['min_fact_rese'][1], err = Outils.est_un_nombre(
             self._donnees['min_fact_rese'][1], "le montant minimum pour des frais de facturation", arrondi=2)
@@ -303,6 +303,7 @@ class Generaux(object):
     def code_sap_par_code_d(self, code_d):
         return self._donnees['code_sap'][
             self._donnees['code_d'].index(code_d)]
+
 
 def ajoute_accesseur_pour_valeur_unique(cls, nom, cle_csv=None):
     if cle_csv is None:

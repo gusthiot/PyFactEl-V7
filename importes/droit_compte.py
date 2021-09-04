@@ -54,9 +54,6 @@ class DroitCompte(Fichier):
                 msg += "Couple user id '" + donnee['id_user'] + "' et compte id '" + \
                        donnee['id_compte'] + "' de la ligne " + str(ligne) + " pas unique\n"
 
-            donnee['debut'] = donnee['debut'].replace('"', '')
-            donnee['fin'] = donnee['fin'].replace('"', '')
-
             if donnee['debut'] != 'NULL':
                 donnee['debut'], info = Outils.est_une_date(donnee['debut'], "la date de début", ligne)
                 msg += info

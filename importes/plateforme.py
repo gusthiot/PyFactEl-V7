@@ -57,13 +57,13 @@ class Plateforme(Fichier):
                 msg += "l'id plateforme de la ligne " + str(ligne) + " n'est pas unique \n"
             donnee['code_p'], info = Outils.est_un_alphanumerique(donnee['code_p'], "le code P", ligne)
             msg += info
-            donnee['centre'], info = Outils.est_un_alphanumerique(donnee['centre'], "le centre financier", ligne, vide=True)
+            donnee['centre'], info = Outils.est_un_alphanumerique(donnee['centre'], "le centre financier", ligne)
             msg += info
-            donnee['fonds'], info = Outils.est_un_alphanumerique(donnee['fonds'], "les fonds à créditer", ligne, vide=True)
+            donnee['fonds'], info = Outils.est_un_alphanumerique(donnee['fonds'], "les fonds à créditer", ligne)
             msg += info
             donnee['intitule'], info = Outils.est_un_texte(donnee['intitule'], "l'intitulé", ligne)
             msg += info
-            donnee['grille'], info = Outils.est_un_document(donnee['grille'], "la grille tarifaire", ligne)
+            donnee['grille'], info = Outils.est_un_document(donnee['grille'], "la grille tarifaire", ligne, True)
             msg += info
 
             donnees_dict[donnee['id_plateforme']] = donnee

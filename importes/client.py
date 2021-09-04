@@ -49,24 +49,21 @@ class Client(Fichier):
         for donnee in self.donnees:
             donnee['code_sap'], info = Outils.est_un_alphanumerique(donnee['code_sap'], "le code client sap", ligne)
             msg += info
-            if donnee['code_sap'] == "":
-                msg += "le code sap de la ligne " + str(ligne) + " ne peut être vide\n"
 
             donnee['code'], info = Outils.est_un_alphanumerique(donnee['code'], "le code client", ligne)
             msg += info
-            if donnee['code'] == "":
-                msg += "le code client de la ligne " + str(ligne) + " ne peut être vide\n"
-            elif donnee['code'] not in self.codes:
-                self.codes.append(donnee['code'])
-            else:
-                msg += "le code client '" + donnee['code'] + "' de la ligne " + str(ligne) +\
-                       " n'est pas unique\n"
+            if info == "":
+                if donnee['code'] not in self.codes:
+                    self.codes.append(donnee['code'])
+                else:
+                    msg += "le code client '" + donnee['code'] + "' de la ligne " + str(ligne) +\
+                           " n'est pas unique\n"
 
             donnee['abrev_labo'], info = Outils.est_un_alphanumerique(donnee['abrev_labo'], "l'abrev. labo", ligne)
             msg += info
-            donnee['nom_labo'], info = Outils.est_un_texte(donnee['nom_labo'], "le nom labo", ligne)
+            donnee['nom_labo'], info = Outils.est_un_texte(donnee['nom_labo'], "le nom labo", ligne, True)
             msg += info
-            donnee['ref'], info = Outils.est_un_texte(donnee['ref'], "la référence", ligne, vide=True)
+            donnee['ref'], info = Outils.est_un_texte(donnee['ref'], "la référence", ligne, True)
             msg += info
             donnee['dest'], info = Outils.est_un_texte(donnee['dest'], "le destinataire", ligne, True)
             msg += info
@@ -76,23 +73,21 @@ class Client(Fichier):
             elif donnee['nature'] not in generaux.obtenir_code_n():
                 msg += "le type de labo '" + donnee['nature'] + "' de la ligne " + str(ligne) +\
                     " n'existe pas dans les types N\n"
-
-            if (donnee['mode'] != "") and (donnee['mode'] not in generaux.obtenir_modes_envoi()):
-                msg += "le mode d'envoi '" + donnee['mode'] + "' de la ligne " + str(ligne) +\
-                    " n'existe pas dans les modes d'envoi généraux\n"
-
-            if (donnee['email'] != "") and (not re.match("[^@]+@[^@]+\.[^@]+", donnee['email'])):
-                msg += "le format de l'e-mail '" + donnee['email'] + "' de la ligne " + str(ligne) +\
-                    " n'est pas correct\n"
-
-            if donnee['nature'] != "":
+            else:
                 av_hc = generaux.avantage_hc_par_code_n(donnee['nature'])
-
                 donnee['rh'] = 1
                 donnee['bh'] = 0
                 if av_hc == 'BONUS':
                     donnee['bh'] = 1
                     donnee['rh'] = 0
+
+            if (donnee['mode'] != "") and (donnee['mode'] not in generaux.obtenir_modes_envoi()):
+                msg += "le mode d'envoi '" + donnee['mode'] + "' de la ligne " + str(ligne) +\
+                    " n'existe pas dans les modes d'envoi généraux\n"
+
+            if (donnee['mode'] == "MAIL") and (not re.match("[^@]+@[^@]+\.[^@]+", donnee['email'])):
+                msg += "le format de l'e-mail '" + donnee['email'] + "' de la ligne " + str(ligne) +\
+                    " n'est pas correct\n"
 
             del donnee['annee']
             del donnee['mois']

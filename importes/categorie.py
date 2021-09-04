@@ -50,13 +50,12 @@ class Categorie(Fichier):
         for donnee in self.donnees:
             donnee['id_categorie'], info = Outils.est_un_alphanumerique(donnee['id_categorie'], "l'id catégorie", ligne)
             msg += info
-            if donnee['id_categorie'] == "":
-                msg += "l'id catégorie de la ligne " + str(ligne) + " ne peut être vide\n"
-            elif donnee['id_categorie'] not in ids:
-                ids.append(donnee['id_categorie'])
-            else:
-                msg += "l'id catégorie '" + donnee['id_categorie'] + "' de la ligne " + str(ligne) +\
-                       " n'est pas unique\n"
+            if info == "":
+                if donnee['id_categorie'] not in ids:
+                    ids.append(donnee['id_categorie'])
+                else:
+                    msg += "l'id catégorie '" + donnee['id_categorie'] + "' de la ligne " + str(ligne) +\
+                           " n'est pas unique\n"
 
             if donnee['code_d'] == "":
                 msg += "le code D de la ligne " + str(ligne) + " ne peut être vide\n"
@@ -69,7 +68,8 @@ class Categorie(Fichier):
                 msg += "l'id plateforme '" + donnee['id_plateforme'] + "' de la ligne " + str(ligne) \
                        + " n'est pas référencé\n"
 
-            donnee['no_categorie'], info = Outils.est_un_alphanumerique(donnee['no_categorie'], "le no catégorie", ligne)
+            donnee['no_categorie'], info = Outils.est_un_alphanumerique(donnee['no_categorie'], "le no catégorie",
+                                                                        ligne)
             msg += info
             donnee['intitule'], info = Outils.est_un_texte(donnee['intitule'], "l'intitulé", ligne)
             msg += info

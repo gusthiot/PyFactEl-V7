@@ -53,13 +53,12 @@ class Machine(Fichier):
         for donnee in self.donnees:
             donnee['id_machine'], info = Outils.est_un_alphanumerique(donnee['id_machine'], "l'id machine", ligne)
             msg += info
-            if donnee['id_machine'] == "":
-                msg += "le machine id de la ligne " + str(ligne) + " ne peut être vide\n"
-            elif donnee['id_machine'] not in ids:
-                ids.append(donnee['id_machine'])
-            else:
-                msg += "l'id machine '" + donnee['id_machine'] + "' de la ligne " + str(ligne) +\
-                       " n'est pas unique\n"
+            if info == "":
+                if donnee['id_machine'] not in ids:
+                    ids.append(donnee['id_machine'])
+                else:
+                    msg += "l'id machine '" + donnee['id_machine'] + "' de la ligne " + str(ligne) +\
+                           " n'est pas unique\n"
 
             if donnee['id_cat_mach'] == "":
                 msg += "l'id catégorie machine de la ligne " + str(ligne) + " ne peut être vide\n"

@@ -73,13 +73,12 @@ class Prestation(Fichier):
             donnee['id_prestation'], info = Outils.est_un_alphanumerique(donnee['id_prestation'], "l'id prestation",
                                                                          ligne)
             msg += info
-            if donnee['id_prestation'] == "":
-                msg += "le prestation id de la ligne " + str(ligne) + " ne peut être vide\n"
-            elif donnee['id_prestation'] not in ids:
-                ids.append(donnee['id_prestation'])
-            else:
-                msg += "l'id prestation '" + donnee['id_prestation'] + "' de la ligne " + str(ligne) +\
-                       " n'est pas unique\n"
+            if info == "":
+                if donnee['id_prestation'] not in ids:
+                    ids.append(donnee['id_prestation'])
+                else:
+                    msg += "l'id prestation '" + donnee['id_prestation'] + "' de la ligne " + str(ligne) +\
+                           " n'est pas unique\n"
 
             donnee['no_prestation'], info = Outils.est_un_alphanumerique(donnee['no_prestation'], "le no prestation",
                                                                          ligne)
@@ -116,8 +115,7 @@ class Prestation(Fichier):
 
             donnee['prix_unit'], info = Outils.est_un_nombre(donnee['prix_unit'], "le prix unitaire", ligne, 2)
             msg += info
-            num, info = Outils.est_un_nombre(donnee['no_prestation'], "le numéro prestation", ligne)
-            donnee['no_prestation'] = int(num)
+            donnee['no_prestation'], info = Outils.est_un_nombre(donnee['no_prestation'], "le numéro prestation", ligne)
             msg += info
 
             del donnee['annee']

@@ -324,12 +324,13 @@ class Outils(object):
             return "", colonne + delaligne + " doit être un texte\n"
 
     @staticmethod
-    def est_une_date(donnee, colonne, ligne=-1):
+    def est_une_date(donnee, colonne, ligne=-1, vide=False):
         """
         vérifie que la donnée est bien une date
         :param donnee: donnée à vérifier
         :param colonne: colonne contenant la donnée (nom de la variable)
         :param ligne: ligne contenant la donnée (-1 si pas de ligne)
+        :param vide: True si la variable peut être vide, False sinon
         :return: la donnée formatée et un string vide si ok, "" et un message d'erreur sinon
         """
         if ligne > -1:
@@ -340,18 +341,24 @@ class Outils(object):
             s_d = str(donnee)
             if s_d.startswith('"') and s_d.endswith('"'):
                 s_d = s_d[1:-1]
+            if s_d == "":
+                if not vide:
+                    return "", colonne + delaligne + " ne peut être vide\n"
+                else:
+                    return "", ""
             date = datetime.strptime(s_d, '%Y-%m-%d %H:%M:%S')
             return date, ""
         except ValueError:
             return "", colonne + delaligne + " doit être une date du bon format : YYYY-MM-DD HH:MM:SS\n"
 
     @staticmethod
-    def est_un_document(donnee, colonne, ligne=-1):
+    def est_un_document(donnee, colonne, ligne=-1, vide=False):
         """
         vérifie que la donnée est bien un nom de document
         :param donnee: donnée à vérifier
         :param colonne: colonne contenant la donnée (nom de la variable)
         :param ligne: ligne contenant la donnée (-1 si pas de ligne)
+        :param vide: True si la variable peut être vide, False sinon
         :return: la donnée formatée et un string vide si ok, "" et un message d'erreur sinon
         """
         if ligne > -1:
@@ -361,6 +368,8 @@ class Outils(object):
         try:
             chars = set('\/:*?“<>|')
             s_d = str(donnee)
+            if s_d == "" and not vide:
+                return "", colonne + delaligne + " ne peut être vide\n"
             if any((c in chars) for c in s_d):
                 return "", colonne + delaligne + " n'est pas un nom de document valide\n"
             return s_d, ""
@@ -368,12 +377,13 @@ class Outils(object):
             return "", colonne + delaligne + " doit être un texte\n"
 
     @staticmethod
-    def est_un_chemin(donnee, colonne, ligne=-1):
+    def est_un_chemin(donnee, colonne, ligne=-1, vide=False):
         """
         vérifie que la donnée est bien un chemin
         :param donnee: donnée à vérifier
         :param colonne: colonne contenant la donnée (nom de la variable)
         :param ligne: ligne contenant la donnée (-1 si pas de ligne)
+        :param vide: True si la variable peut être vide, False sinon
         :return: la donnée formatée et un string vide si ok, "" et un message d'erreur sinon
         """
         if ligne > -1:
@@ -383,6 +393,8 @@ class Outils(object):
         try:
             chars = set('*?“<>|')
             s_d = str(donnee)
+            if s_d == "" and not vide:
+                return "", colonne + delaligne + " ne peut être vide\n"
             if any((c in chars) for c in s_d):
                 return "", colonne + delaligne + " n'est pas un chemin valide\n"
             return s_d, ""

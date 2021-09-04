@@ -84,10 +84,10 @@ class Livraison(Fichier):
             msg += info
             donnee['date_commande'], info = Outils.est_une_date(donnee['date_commande'], "la date de commande", ligne)
             msg += info
-            donnee['date_prise'], info = Outils.est_une_date(donnee['date_prise'], "la date de prise", ligne)
+            donnee['date_prise'], info = Outils.est_une_date(donnee['date_prise'], "la date de prise", ligne, True)
             msg += info
 
-            donnee['id_livraison'], info = Outils.est_un_texte(donnee['id_livraison'], "l'id livraison", ligne, True)
+            donnee['id_livraison'], info = Outils.est_un_texte(donnee['id_livraison'], "l'id livraison", ligne)
             msg += info
             donnee['remarque'], info = Outils.est_un_texte(donnee['remarque'], "la remarque", ligne, True)
             msg += info

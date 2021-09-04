@@ -57,19 +57,18 @@ class Compte(Fichier):
                 msg += "le code client " + donnee['code_client'] + " de la ligne " + str(ligne) + \
                        " n'est pas référencé\n"
 
-            donnee['id_compte'], info = Outils.est_un_alphanumerique(donnee['id_compte'], "l'id compte", ligne)
-            msg += info
             donnee['numero'], info = Outils.est_un_alphanumerique(donnee['numero'], "le numéro de compte", ligne)
             msg += info
             donnee['intitule'], info = Outils.est_un_texte(donnee['intitule'], "l'intitulé", ligne)
             msg += info
-            if donnee['id_compte'] == "":
-                msg += "le compte id de la ligne " + str(ligne) + " ne peut être vide\n"
-            elif donnee['id_compte'] not in ids:
-                ids.append(donnee['id_compte'])
-            else:
-                msg += "l'id compte '" + donnee['id_compte'] + "' de la ligne " + str(ligne) +\
-                       " n'est pas unique\n"
+            donnee['id_compte'], info = Outils.est_un_alphanumerique(donnee['id_compte'], "l'id compte", ligne)
+            msg += info
+            if info == "":
+                if donnee['id_compte'] not in ids:
+                    ids.append(donnee['id_compte'])
+                else:
+                    msg += "l'id compte '" + donnee['id_compte'] + "' de la ligne " + str(ligne) +\
+                           " n'est pas unique\n"
             if donnee['exploitation'] != 'TRUE' and donnee['exploitation'] != 'FALSE':
                 msg += "l'exploitation de la ligne " + str(ligne) + " doit être 'TRUE' ou 'FALSE'\n"
 
