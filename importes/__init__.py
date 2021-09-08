@@ -16,3 +16,4 @@ from .plateforme import Plateforme
 from .subside import Subside
 from .plafsubside import PlafSubside
 from .granted import Granted
+from .groupe import Groupe

@@ -7,8 +7,7 @@ class Machine(Fichier):
     Classe pour l'importation des données de Machines Cmi
     """
 
-    cles = ['annee', 'mois', 'id_machine', 'nom', 'id_cat_mach', 'tx_rabais_hc', 'id_cat_mo', 'id_cat_plat',
-            'id_cat_cher', 'id_cat_hp', 'id_cat_hc']
+    cles = ['annee', 'mois', 'id_machine', 'nom', 'id_groupe', 'tx_rabais_hc']
     nom_fichier = "machine.csv"
     libelle = "Machines"
 
@@ -30,7 +29,7 @@ class Machine(Fichier):
                     return 1
         return 0
 
-    def est_coherent(self, categories):
+    def est_coherent(self, groupes):
         """
         vérifie que les données du fichier importé sont cohérentes, et efface les colonnes mois et année
         :param categories: catégories importées
@@ -60,40 +59,10 @@ class Machine(Fichier):
                     msg += "l'id machine '" + donnee['id_machine'] + "' de la ligne " + str(ligne) +\
                            " n'est pas unique\n"
 
-            if donnee['id_cat_mach'] == "":
-                msg += "l'id catégorie machine de la ligne " + str(ligne) + " ne peut être vide\n"
-            elif categories.contient_id(donnee['id_cat_mach']) == 0:
-                msg += "l'id catégorie machine '" + donnee['id_cat_mach'] + "' de la ligne " + str(ligne) \
-                       + " n'est pas référencé\n"
-
-            if donnee['id_cat_mo'] == "":
-                msg += "l'id catégorie opérateur de la ligne " + str(ligne) + " ne peut être vide\n"
-            elif categories.contient_id(donnee['id_cat_mo']) == 0:
-                msg += "l'id catégorie opérateur '" + donnee['id_cat_mo'] + "' de la ligne " + str(ligne) \
-                       + " n'est pas référencé\n"
-
-            if donnee['id_cat_plat'] == "":
-                msg += "l'id catégorie plateforme de la ligne " + str(ligne) + " ne peut être vide\n"
-            elif categories.contient_id(donnee['id_cat_plat']) == 0:
-                msg += "l'id catégorie plateforme '" + donnee['id_cat_plat'] + "' de la ligne " + str(ligne) \
-                       + " n'est pas référencé\n"
-
-            if donnee['id_cat_cher'] == "":
-                msg += "l'id catégorie onéreux de la ligne " + str(ligne) + " ne peut être vide\n"
-            elif categories.contient_id(donnee['id_cat_cher']) == 0:
-                msg += "l'id catégorie onéreux '" + donnee['id_cat_cher'] + "' de la ligne " + str(ligne) \
-                       + " n'est pas référencé\n"
-
-            if donnee['id_cat_hp'] == "":
-                msg += "l'id catégorie hp de la ligne " + str(ligne) + " ne peut être vide\n"
-            elif categories.contient_id(donnee['id_cat_hp']) == 0:
-                msg += "l'id catégorie hp '" + donnee['id_cat_hp'] + "' de la ligne " + str(ligne) \
-                       + " n'est pas référencé\n"
-
-            if donnee['id_cat_hc'] == "":
-                msg += "l'id catégorie hc de la ligne " + str(ligne) + " ne peut être vide\n"
-            elif categories.contient_id(donnee['id_cat_hc']) == 0:
-                msg += "l'id catégorie hc '" + donnee['id_cat_hc'] + "' de la ligne " + str(ligne) \
+            if donnee['id_groupe'] == "":
+                msg += "l'id groupe de la ligne " + str(ligne) + " ne peut être vide\n"
+            elif groupes.contient_id(donnee['id_groupe']) == 0:
+                msg += "l'id groupec '" + donnee['id_groupe'] + "' de la ligne " + str(ligne) \
                        + " n'est pas référencé\n"
 
             donnee['tx_rabais_hc'], info = Outils.est_un_nombre(donnee['tx_rabais_hc'], "le rabais heures creuses",

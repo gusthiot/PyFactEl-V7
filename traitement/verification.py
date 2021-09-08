@@ -44,7 +44,7 @@ class Verification(object):
 
     def verification_coherence(self, generaux, edition, acces, categories, categprix, clients, coefprests, comptes,
                                droits, grants, livraisons, machines, noshows, plafonds, plateformes, prestations,
-                               subsides, users, docpdf):
+                               subsides, users, docpdf, groupes):
         """
         vérifie la cohérence des données importées
         :param generaux: paramètres généraux
@@ -66,6 +66,7 @@ class Verification(object):
         :param subsides: subsides importés
         :param users: users importés
         :param docpdf: paramètres d'ajout de document pdf
+        :param groupes: groupes importés
         :return: 0 si ok, sinon le nombre d'échecs à la vérification
         """
         verif = 0
@@ -73,7 +74,8 @@ class Verification(object):
         verif += livraisons.est_coherent(comptes, prestations, users)
         verif += categories.est_coherent(generaux, plateformes)
         verif += users.est_coherent()
-        verif += machines.est_coherent(categories)
+        verif += groupes.est_coherent(categories)
+        verif += machines.est_coherent(groupes)
         verif += prestations.est_coherent(generaux, coefprests, plateformes, machines)
         verif += categprix.est_coherent(generaux, categories)
         verif += coefprests.est_coherent(generaux)
@@ -84,7 +86,7 @@ class Verification(object):
         verif += droits.est_coherent(comptes, users)
         verif += grants.est_coherent(comptes, generaux)
         verif += plateformes.est_coherent(clients)
-        verif += subsides.est_coherent(plateformes, generaux)
+        verif += subsides.est_coherent(plateformes, clients, machines, generaux)
         verif += plafonds.est_coherent(subsides, generaux)
         verif += edition.est_coherent(clients)
         verif += generaux.est_coherent(clients)

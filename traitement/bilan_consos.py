@@ -59,9 +59,9 @@ class BilanConsos(Recap):
                                     goops += val['valuation-net']
                                 else:
                                     goint += val['valuation-net']
-
-                    donnee += [round(goops, 2), round(extrops, 2), round(goint, 2), round(extrint, 2)]
-                    self.ajouter_valeur(donnee, ii)
-                    ii += 1
+                    if goops > 0 or extrops > 0 or goint > 0 or extrint > 0:
+                        donnee += [round(goops, 2), round(extrops, 2), round(goint, 2), round(extrint, 2)]
+                        self.ajouter_valeur(donnee, ii)
+                        ii += 1
 
         self.csv(dossier_destination, paramtexte)

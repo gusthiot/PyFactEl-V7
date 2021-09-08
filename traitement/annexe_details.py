@@ -23,6 +23,8 @@ class AnnexeDetails(Recap):
         super().__init__(edition)
         self.version = edition.version
         self.nom = ""
+        self.dossier = ""
+        self.chemin = "./"
         self.prefixe = "Annexe-détails_" + str(edition.annee) + "_" + Outils.mois_string(edition.mois) + "_" + \
             str(edition.version)
         if edition.version > 0:
@@ -36,11 +38,11 @@ class AnnexeDetails(Recap):
         :param paramannexe: paramètres d'annexe
         :param par_client: tri des transactions par client
         """
-        destination = "./"
         for donnee in paramannexe.donnees:
             if donnee['nom'] == 'Annexe-détails':
-                destination = donnee['chemin']
-        dossier_destination = DossierDestination(destination)
+                self.chemin = donnee['chemin']
+                self.dossier = donnee['dossier']
+        dossier_destination = DossierDestination(self.chemin)
 
         for code in par_client.keys():
             tbtr = par_client[code]['transactions']

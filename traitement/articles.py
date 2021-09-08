@@ -29,7 +29,14 @@ class Articles(Recap):
         pt = paramtexte.donnees
         for key in categories.donnees.keys():
             cat = categories.donnees[key]
-            donnee = [cat['id_categorie'], pt['item-service'], cat['no_categorie'], cat['intitule'], cat['unite'],
+            if cat['code_d'] == generaux.obtenir_code_d()[0]:
+                type = pt['item-penalty']
+            elif cat['code_d'] == generaux.obtenir_code_d()[1]:
+                type = pt['item-service']
+            else:
+                type = ""
+                Outils.fatal("Erreur code D", "Une catégorie devrait avoir un code D1 ou D2")
+            donnee = [cat['id_categorie'], type, cat['no_categorie'], cat['intitule'], cat['unite'],
                       cat['code_d'], generaux.intitule_long_par_code_d(cat['code_d']),
                       generaux.code_sap_par_code_d(cat['code_d']), cat['id_plateforme'], "FALSE"]
             self.ajouter_valeur(donnee, cat['id_categorie'])

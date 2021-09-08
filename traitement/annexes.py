@@ -11,7 +11,7 @@ class Annexes(object):
     """
     @staticmethod
     def annexes(sommes, clients, edition, livraisons, acces, machines, comptes, paramannexe, generaux,
-                users, categories, noshows, docpdf):
+                users, categories, noshows, docpdf, groupes):
         """
         création des annexes
         :param sommes: sommes calculées
@@ -27,6 +27,7 @@ class Annexes(object):
         :param categories: catégories importées
         :param noshows: no show importés
         :param docpdf: paramètres d'ajout de document pdf
+        :param groupes: groupes importés
         """
 
         if sommes.calculees == 0:
@@ -169,7 +170,7 @@ class Annexes(object):
                                                                        livraisons.sommes, generaux)
                     if av_hc == "RABAIS":
                         contenu_projets += TablesAnnexes.table_prix_jdmu(code_client, id_compte, intitule_compte, sco,
-                                                                         acces.sommes, machines, users)
+                                                                         acces.sommes, machines, users, groupes)
                     contenu_projets += r'''\clearpage'''
 
                     ann_det_titre = "Annexe détaillée du projet : " + intitule_compte
@@ -177,7 +178,7 @@ class Annexes(object):
                                                             "Annexe facture")
                     contenu_details += Annexes.section(client, generaux, reference, ann_det_titre)
                     contenu_details += TablesAnnexes.table_tps_cae_jkmu(code_client, id_compte, intitule_compte, users,
-                                                                        machines, categories, acces)
+                                                                        machines, categories, acces, groupes)
                     if code_client in livraisons.sommes and id_compte in livraisons.sommes[code_client]:
                         contenu_details += TablesAnnexes.table_qte_lvr_jdu(code_client, id_compte, intitule_compte,
                                                                            generaux, livraisons, users)
@@ -204,9 +205,9 @@ class Annexes(object):
                     contenu_annexe_client += TablesAnnexes.table_prix_xaj(scl, generaux, contenu_prix_xaj)
                     if av_hc == "BONUS":
                         contenu_annexe_client += TablesAnnexes.table_points_xbmu(code_client, scl, acces.sommes,
-                                                                                 machines, users)
+                                                                                 machines, users, groupes)
                     contenu_annexe_client += TablesAnnexes.table_prix_xrmu(code_client, scl, noshows.sommes,
-                                                                           machines, users)
+                                                                           machines, users, groupes)
                     contenu_annexe_client += r'''\end{document}'''
                     Latex.creer_latex_pdf('Annexe-client' + suffixe, contenu_annexe_client)
                     pdfs_annexes['Annexe-client'] = ['Annexe-client' + suffixe + ".pdf"]
@@ -226,7 +227,8 @@ class Annexes(object):
                                                                   "Annexe facture")
                         contenu_details_2 += Annexes.section(client, generaux, reference,
                                                              "Annexe détaillée des pénalités de réservation")
-                        contenu_details_2 += TablesAnnexes.table_no_show_xmu(code_client, noshows, machines, users)
+                        contenu_details_2 += TablesAnnexes.table_no_show_xmu(code_client, noshows, machines, users,
+                                                                             groupes)
                     if not contenu_details == "" or not contenu_details_2 == "":
                         contenu_annexe_details = Annexes.entete(edition)
                         contenu_annexe_details += contenu_details

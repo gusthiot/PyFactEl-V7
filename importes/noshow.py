@@ -94,7 +94,7 @@ class NoShow(Fichier):
             return 1
         return 0
 
-    def calcul_montants(self, machines, categprix, clients, comptes, verification):
+    def calcul_montants(self, machines, categprix, clients, comptes, verification, groupes):
         """
         calcule les sous-totaux nécessaires
         :param machines: machines importées et vérifiées
@@ -102,6 +102,7 @@ class NoShow(Fichier):
         :param clients: clients importés et vérifiés
         :param comptes: comptes importés
         :param verification: pour vérifier si les dates et les cohérences sont correctes
+        :param groupes: groupes importés
         """
         if verification.a_verifier != 0:
             info = self.libelle + ". vous devez faire les vérifications avant de calculer les montants"
@@ -118,11 +119,12 @@ class NoShow(Fichier):
             id_user = donnee['id_user']
 
             client = clients.donnees[code_client]
-            machine = machines.donnees[id_machine]
+            id_groupe = machines.donnees[id_machine]['id_groupe']
+            groupe = groupes.donnees[id_groupe]
 
             nat = client['nature']
-            cat_hp = machine['id_cat_hp']
-            cat_hc = machine['id_cat_hc']
+            cat_hp = groupe['id_cat_hp']
+            cat_hc = groupe['id_cat_hc']
             pu_hp = round(categprix.donnees[nat + cat_hp]['prix_unit'], 2)
             pu_hc = round(categprix.donnees[nat + cat_hc]['prix_unit'], 2)
 

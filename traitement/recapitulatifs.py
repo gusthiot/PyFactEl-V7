@@ -33,7 +33,7 @@ class Recapitulatifs(object):
                 fichier_writer.writerow(ligne)
 
     @staticmethod
-    def cae_lignes(edition, acces, comptes, clients, users, machines, categories):
+    def cae_lignes(edition, acces, comptes, clients, users, machines, categories, groupes):
         """
         génération des lignes de données du récapitulatif des accès machines
         :param edition: paramètres d'édition
@@ -43,6 +43,7 @@ class Recapitulatifs(object):
         :param users: users importés
         :param machines: machines importées
         :param categories: catégories importées
+        :param groupes: groupes importés
         :return: lignes de données du récapitulatif
         """
         lignes = []
@@ -52,7 +53,8 @@ class Recapitulatifs(object):
             user = users.donnees[donnee['id_user']]
             op = users.donnees[donnee['id_op']]
             machine = machines.donnees[donnee['id_machine']]
-            id_categorie = machine['id_cat_mach']
+            groupe = groupes.donnees[machine['id_groupe']]
+            id_categorie = groupe['id_cat_mach']
             ligne = [edition.annee, edition.mois, donnee['id_compte'], compte['numero'], compte['intitule'],
                      "U", compte['type_subside'], compte['code_client'], client['abrev_labo'],
                      donnee['id_user'], user['nom'], user['prenom'], donnee['id_machine'], machine['nom'],
@@ -141,7 +143,7 @@ class Recapitulatifs(object):
                 fichier_writer.writerow(ligne)
 
     @staticmethod
-    def nos_lignes(edition, noshows, comptes, clients, users, machines, categories):
+    def nos_lignes(edition, noshows, comptes, clients, users, machines, categories, groupes):
         """
         génération des lignes de données du récapitulatif des réservations
         :param edition: paramètres d'édition
@@ -151,6 +153,7 @@ class Recapitulatifs(object):
         :param users: users importés
         :param machines: machines importées
         :param categories: catégories importées
+        :param groupes: groupes importés
         :return: lignes de données du récapitulatif
         """
         lignes = []
@@ -159,7 +162,8 @@ class Recapitulatifs(object):
             client = clients.donnees[compte['code_client']]
             user = users.donnees[donnee['id_user']]
             machine = machines.donnees[donnee['id_machine']]
-            id_categorie = machine['id_cat_mach']
+            groupe = groupes.donnees[machine['id_groupe']]
+            id_categorie = groupe['id_cat_mach']
             ligne = [edition.annee, edition.mois, donnee['date_debut'], donnee['type'], donnee['id_machine'],
                      machine['nom'], id_categorie, categories.donnees[id_categorie]['intitule'], donnee['id_user'],
                      user['nom'], user['prenom'], donnee['id_compte'], compte['numero'], compte['intitule'],

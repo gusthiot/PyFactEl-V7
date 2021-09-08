@@ -528,16 +528,18 @@ class Outils(object):
         return utilisateurs
 
     @staticmethod
-    def machines_in_somme(somme, machines):
+    def machines_in_somme(somme, machines, groupes):
         """
         création de la liste des machines présentes dans une somme
         :param somme: somme concernée
         :param machines: données machines
+        :param groupes: groupes importés
         :return: liste de machines triée par id_categorie, puis par nom
         """
         machines_utilisees = {}
         for key in somme:
-            id_categorie = machines.donnees[key]['id_cat_mach']
+            id_groupe = machines.donnees[key]['id_groupe']
+            id_categorie = groupes.donnees[id_groupe]['id_cat_mach']
             nom = machines.donnees[key]['nom']
             if id_categorie not in machines_utilisees:
                 machines_utilisees[id_categorie] = {}

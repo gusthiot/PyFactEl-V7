@@ -28,8 +28,7 @@ class Resumes(object):
         dossier_destination.string_ecrire(ticket_complet + ".html", ticket_texte)
 
     @staticmethod
-    def mise_a_jour(edition, clients, comptes, maj_grants, dossier_source, dossier_destination, maj, f_html_sections,
-                    maj_trans):
+    def mise_a_jour(edition, clients, comptes, maj_grants, dossier_source, dossier_destination, maj, f_html_sections):
         """
         modification des résumés mensuels au niveau du client dont la facture est modifiée 
         :param edition: paramètres d'édition
@@ -40,7 +39,6 @@ class Resumes(object):
         :param dossier_destination: Une instance de la classe dossier.DossierDestination
         :param maj: données modifiées pour le client pour les différents fichiers
         :param f_html_sections: section html modifiée pour le client
-        :param maj_trans: données modifiées pour le client pour les transactions
         """
         if len(maj) != len(Resumes.fichiers):
             info = "Résumés : erreur taille tableau"
@@ -57,15 +55,6 @@ class Resumes(object):
                     fichier_writer.writerow(ligne)
                 for ligne in maj[i]:
                     fichier_writer.writerow(ligne)
-
-        fichier_trans = "Transaction_" + str(edition.annee) + "_" + Outils.mois_string(edition.mois) + ".csv"
-        donnees_csv = Resumes.ouvrir_csv_sans_client(dossier_source, fichier_trans, edition.client_unique, 3)
-        with dossier_destination.writer(fichier_trans) as fichier_writer:
-            for ligne in donnees_csv:
-                fichier_writer.writerow(ligne)
-            for key in maj_trans.valeurs.keys():
-                ligne = maj_trans.valeurs[key]
-                fichier_writer.writerow(ligne)
 
         fichier_grant = "granted" + str(edition.annee) + "_" + Outils.mois_string(edition.mois) + ".csv"
         donnees_csv = Resumes.ouvrir_csv_sans_comptes_client(dossier_source, fichier_grant, edition.client_unique,

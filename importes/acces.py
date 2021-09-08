@@ -110,7 +110,7 @@ class Acces(Fichier):
             return 1
         return 0
 
-    def calcul_montants(self, machines, categprix, clients, verification, comptes):
+    def calcul_montants(self, machines, categprix, clients, verification, comptes, groupes):
         """
         calcule les sous-totaux nécessaires
         :param machines: machines importées
@@ -118,6 +118,7 @@ class Acces(Fichier):
         :param clients: clients importés et vérifiés
         :param verification: pour vérifier si les dates et les cohérences sont correctes
         :param comptes: comptes importés
+        :param groupes: groupes importés
 
         """
         if verification.a_verifier != 0:
@@ -133,8 +134,9 @@ class Acces(Fichier):
             id_machine = donnee['id_machine']
             code_client = comptes.donnees[id_compte]['code_client']
             machine = machines.donnees[id_machine]
+            groupe = groupes.donnees[machine['id_groupe']]
             client = clients.donnees[code_client]
-            prix_mach = categprix.donnees[client['nature'] + machine['id_cat_mach']]['prix_unit']
+            prix_mach = categprix.donnees[client['nature'] + groupe['id_cat_mach']]['prix_unit']
 
             if code_client not in self.sommes:
                 self.sommes[code_client] = {'comptes': {}, 'machines': {}}
@@ -203,12 +205,13 @@ class Acces(Fichier):
                 scat['plateforme'] = {}
                 scat['xcher'] = {}
                 for id_machine in sco:
-                    machine = machines.donnees[id_machine]
+                    id_groupe = machines.donnees[id_machine]['id_groupe']
+                    groupe = groupes.donnees[id_groupe]
                     sco[id_machine]['dhi'] = round(sco[id_machine]['duree_hc'] / 60 * sco[id_machine]['du_hc'], 2)
-                    cat_mach = machine['id_cat_mach']
-                    cat_mo = machine['id_cat_mo']
-                    cat_plat = machine['id_cat_plat']
-                    cat_cher = machine['id_cat_cher']
+                    cat_mach = groupe['id_cat_mach']
+                    cat_mo = groupe['id_cat_mo']
+                    cat_plat = groupe['id_cat_plat']
+                    cat_cher = groupe['id_cat_cher']
                     nat = client['nature']
 
                     if cat_mach not in scat['machine']:

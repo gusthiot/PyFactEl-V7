@@ -5,13 +5,14 @@ from latex import Latex
 class TablesAnnexes(object):
 
     @staticmethod
-    def table_no_show_xmu(code_client, noshows, machines, users):
+    def table_no_show_xmu(code_client, noshows, machines, users, groupes):
         """
         No Show X/M/U - Table Client Détail Pénalités/Machine/User
         :param code_client: code du client concerné
         :param noshows: no show importés
         :param machines: machines importées
         :param users: users importés
+        :param groupes: groupes importés
         :return: table au format latex
         """
 
@@ -28,7 +29,7 @@ class TablesAnnexes(object):
 
             somme = noshows.sommes[code_client]
 
-            machines_concernees = Outils.machines_in_somme(somme, machines)
+            machines_concernees = Outils.machines_in_somme(somme, machines, groupes)
 
             for id_categorie, mics in sorted(machines_concernees.items()):
                 for nom_machine, id_machine in sorted(mics.items()):
@@ -251,7 +252,7 @@ class TablesAnnexes(object):
         return Latex.long_tableau(contenu, structure, legende)
 
     @staticmethod
-    def table_tps_cae_jkmu(code_client, id_compte, intitule_compte, users, machines, categories, acces):
+    def table_tps_cae_jkmu(code_client, id_compte, intitule_compte, users, machines, categories, acces, groupes):
         """
         Tps CAE J/K/M/U - Table Compte Détail Temps CAE/Catégorie Machine/Machine/User
         :param code_client: code du client concerné
@@ -261,6 +262,7 @@ class TablesAnnexes(object):
         :param machines: machines importées
         :param categories: catégories importées
         :param acces: accès importés
+        :param groupes: groupes importés
         :return: table au format latex
         """
 
@@ -280,7 +282,7 @@ class TablesAnnexes(object):
             somme = acces.sommes[code_client]['comptes'][id_compte]
             som_cat = acces.sommes[code_client]['categories'][id_compte]['machine']
 
-            machines_utilisees = Outils.machines_in_somme(somme, machines)
+            machines_utilisees = Outils.machines_in_somme(somme, machines, groupes)
 
             for id_categorie, mics in sorted(machines_utilisees.items()):
                 dico_cat = {'hp': Outils.format_heure(som_cat[id_categorie]['duree_hp']),
@@ -509,7 +511,7 @@ class TablesAnnexes(object):
         return Latex.tableau(contenu, structure, legende)
 
     @staticmethod
-    def table_prix_jdmu(code_client, id_compte, intitule_compte, sco, sommes_acces, machines, users):
+    def table_prix_jdmu(code_client, id_compte, intitule_compte, sco, sommes_acces, machines, users, groupes):
         """
         Prix JD/M/U - Table Compte Déductions HC (Rabais) par Machine
         :param code_client: code du client concerné
@@ -519,6 +521,7 @@ class TablesAnnexes(object):
         :param sommes_acces: sommes des accès importés
         :param machines: machines importées
         :param users: users importés
+        :param groupes: groupes importés
         :return: table au format latex
         """
 
@@ -533,7 +536,7 @@ class TablesAnnexes(object):
                 '''
 
             somme = sommes_acces[code_client]['comptes'][id_compte]
-            machines_utilisees = Outils.machines_in_somme(somme, machines)
+            machines_utilisees = Outils.machines_in_somme(somme, machines, groupes)
 
             for id_categorie, mics in sorted(machines_utilisees.items()):
                 for nom_machine, id_machine in sorted(mics.items()):
@@ -575,7 +578,7 @@ class TablesAnnexes(object):
             return ""
 
     @staticmethod
-    def table_points_xbmu(code_client, scl, sommes_acces, machines, users):
+    def table_points_xbmu(code_client, scl, sommes_acces, machines, users, groupes):
         """
         Points XB/M/U - Table Client Récap Bonus/MAchine/User
         :param code_client: code du client concerné
@@ -583,6 +586,7 @@ class TablesAnnexes(object):
         :param sommes_acces: sommes des accès importés
         :param machines: machines importées
         :param users: users importés
+        :param groupes: groupes importés
         :return: table au format latex
         """
         if scl['somme_t_mb'] > 0:
@@ -596,7 +600,7 @@ class TablesAnnexes(object):
                 '''
 
             somme = sommes_acces[code_client]['machines']
-            machines_utilisees = Outils.machines_in_somme(somme, machines)
+            machines_utilisees = Outils.machines_in_somme(somme, machines, groupes)
 
             for id_categorie, mics in sorted(machines_utilisees.items()):
                 for nom_machine, id_machine in sorted(mics.items()):
@@ -634,7 +638,7 @@ class TablesAnnexes(object):
             return ""
 
     @staticmethod
-    def table_prix_xrmu(code_client, scl, sommes_noshows, machines, users):
+    def table_prix_xrmu(code_client, scl, sommes_noshows, machines, users, groupes):
         """
         Prix XR/M/U - Table Client Récap Pénalités Réservations/Machine/user
         :param code_client: code du client concerné
@@ -642,6 +646,7 @@ class TablesAnnexes(object):
         :param sommes_noshows: sommes des no show importés
         :param machines: machines importées
         :param users: users importés
+        :param groupes: groupes importés
         :return: table au format latex
         """
         if scl['rm'] > 0:
@@ -660,7 +665,7 @@ class TablesAnnexes(object):
 
             somme = sommes_noshows[code_client]
 
-            machines_reservees = Outils.machines_in_somme(somme, machines)
+            machines_reservees = Outils.machines_in_somme(somme, machines, groupes)
 
             for id_categorie, mics in sorted(machines_reservees.items()):
                 for nom_machine, id_machine in sorted(mics.items()):

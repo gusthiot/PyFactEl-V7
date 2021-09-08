@@ -24,6 +24,7 @@ from importes import (Client,
                       Compte,
                       Livraison,
                       Machine,
+                      Groupe,
                       Prestation,
                       Categorie,
                       User,
@@ -171,6 +172,7 @@ try:
         grants = Granted(dossier_source, edition)
         livraisons = Livraison(dossier_source)
         machines = Machine(dossier_source)
+        groupes = Groupe(dossier_source)
         noshows = NoShow(dossier_source)
         plafonds = PlafSubside(dossier_source)
         plateformes = Plateforme(dossier_source)
@@ -186,15 +188,21 @@ try:
 
         if verification.verification_coherence(generaux, edition, acces, categories, categprix, clients, coefprests,
                                                comptes, droits, grants, livraisons, machines, noshows, plafonds,
-                                               plateformes, prestations, subsides, users, docpdf) > 0:
+                                               plateformes, prestations, subsides, users, docpdf, groupes) > 0:
             sys.exit("Erreur dans la cohérence")
 
         livraisons.calcul_montants(prestations, coefprests, clients, verification, comptes)
-        acces.calcul_montants(machines, categprix, clients, verification, comptes)
-        noshows.calcul_montants(machines, categprix, clients, comptes, verification)
+        acces.calcul_montants(machines, categprix, clients, verification, comptes, groupes)
+        noshows.calcul_montants(machines, categprix, clients, comptes, verification, groupes)
 
         sommes = Sommes(verification, generaux)
         sommes.calculer_toutes(livraisons, acces, clients, noshows)
+
+        for donnee in paramannexe.donnees:
+            donnee['chemin'] = Outils.chemin([dossier_enregistrement, donnee['dossier']], generaux)
+            Outils.existe(donnee['chemin'], True)
+            donnee['dossier_pdf'] = DossierDestination(donnee['chemin'])
+            donnee['lien'] = Outils.lien_dossier([dossier_lien, donnee['dossier']], generaux)
 
         articles = Articles(edition)
         articles.generer(generaux, categories, prestations, paramtexte)
@@ -204,35 +212,43 @@ try:
         tarifs.csv(dossier_destination, paramtexte)
         transactions = Transactions(edition)
         transactions.generer(acces, noshows, livraisons, prestations, machines, categprix, comptes, clients, users,
-                             droits, plateformes, generaux, articles, tarifs, subsides, plafonds, grants, paramtexte)
+                             droits, plateformes, generaux, articles, tarifs, subsides, plafonds, grants, groupes,
+                             paramtexte)
         transactions.csv(dossier_destination, paramtexte)
 
         new_grants = GrantedNew(edition)
         new_grants.generer(grants, transactions)
         new_grants.csv(DossierDestination(dossier_enregistrement))
 
-        for donnee in paramannexe.donnees:
-            donnee['chemin'] = Outils.chemin([dossier_enregistrement, donnee['dossier']], generaux)
-            Outils.existe(donnee['chemin'], True)
-            donnee['dossier_pdf'] = DossierDestination(donnee['chemin'])
-            donnee['lien'] = Outils.lien_dossier([dossier_lien, donnee['dossier']], generaux)
+        trans_vals = transactions.valeurs
+        if edition.filigrane == "" and edition.version > 0 and \
+                Outils.existe(Outils.chemin([dossier_enregistrement, "csv_0"])):
+            Transactions.mise_a_jour(edition, DossierSource(dossier_enregistrement),
+                                     DossierDestination(dossier_enregistrement), transactions)
+            trans_fichier = "Transaction_" + str(edition.annee) + "_" + Outils.mois_string(edition.mois) + ".csv"
+            trans_vals = transactions.recuperer_valeurs_de_fichier(DossierSource(dossier_enregistrement), trans_fichier)
+
+        bilan_trs = BilansTransacts(edition)
+        bilan_trs.generer(trans_vals, grants, plafonds, paramtexte, paramannexe,
+                          DossierDestination(dossier_enregistrement))
 
         # faire les annexes avant la facture, que le ticket puisse vérifier leur existence
         if Latex.possibles():
             Annexes.annexes(sommes, clients, edition, livraisons, acces, machines, comptes, paramannexe,
-                            generaux, users, categories, noshows, docpdf)
+                            generaux, users, categories, noshows, docpdf, groupes)
 
         Outils.copier_dossier("./reveal.js/", "js", dossier_enregistrement)
         Outils.copier_dossier("./reveal.js/", "css", dossier_enregistrement)
         facture_prod = Facture()
         f_html_sections = facture_prod.factures(sommes, dossier_destination, edition, generaux, clients, comptes,
-                                                paramannexe)
+                                                paramannexe, bilan_trs)
 
         prod2qual = Prod2Qual(dossier_source)
         if prod2qual.actif:
             facture_qual = Facture(prod2qual)
             generaux_qual = Generaux(dossier_source, prod2qual)
-            facture_qual.factures(sommes, dossier_destination, edition, generaux_qual, clients, comptes, paramannexe)
+            facture_qual.factures(sommes, dossier_destination, edition, generaux_qual, clients, comptes, paramannexe,
+                                  bilan_trs)
 
         bm_lignes = BilanMensuel.creation_lignes(edition, sommes, clients, generaux)
         BilanMensuel.bilan(dossier_destination, edition, generaux, bm_lignes)
@@ -241,39 +257,32 @@ try:
         det_lignes = Detail.creation_lignes(edition, sommes, clients, generaux, acces, livraisons, comptes, categories)
         Detail.detail(dossier_destination, edition, det_lignes)
 
-        cae_lignes = Recapitulatifs.cae_lignes(edition, acces, comptes, clients, users, machines, categories)
+        cae_lignes = Recapitulatifs.cae_lignes(edition, acces, comptes, clients, users, machines, categories, groupes)
         Recapitulatifs.cae(dossier_destination, edition, cae_lignes)
         lvr_lignes = Recapitulatifs.lvr_lignes(edition, livraisons, comptes, clients, users, prestations)
         Recapitulatifs.lvr(dossier_destination, edition, lvr_lignes)
-        nos_lignes = Recapitulatifs.nos_lignes(edition, noshows, comptes, clients, users, machines, categories)
+        nos_lignes = Recapitulatifs.nos_lignes(edition, noshows, comptes, clients, users, machines, categories, groupes)
         Recapitulatifs.nos(dossier_destination, edition, nos_lignes)
+
+        if edition.filigrane == "":
+            if edition.version == 0:
+                Resumes.base(edition, DossierSource(dossier_csv), DossierDestination(dossier_enregistrement))
+                Resumes.supprimer(generaux.code_cfact_centre, edition.mois, edition.annee,
+                                  DossierSource(dossier_enregistrement), DossierDestination(dossier_enregistrement))
+            elif Outils.existe(Outils.chemin([dossier_enregistrement, "csv_0"])):
+                maj = [bm_lignes, bc_lignes, det_lignes, cae_lignes, lvr_lignes, nos_lignes]
+                Resumes.mise_a_jour(edition, clients, comptes, new_grants, DossierSource(dossier_enregistrement),
+                                    DossierDestination(dossier_enregistrement), maj, f_html_sections, transactions)
 
         for fichier in [acces.nom_fichier, clients.nom_fichier, coefprests.nom_fichier, droits.nom_fichier,
                         comptes.nom_fichier, livraisons.nom_fichier, machines.nom_fichier, prestations.nom_fichier,
                         categories.nom_fichier, users.nom_fichier, generaux.nom_fichier, grants.nom_fichier,
                         edition.nom_fichier, categprix.nom_fichier, paramannexe.nom_fichier, noshows.nom_fichier,
-                        plafonds.nom_fichier, plateformes.nom_fichier, subsides.nom_fichier, paramtexte.nom_fichier]:
+                        plafonds.nom_fichier, plateformes.nom_fichier, subsides.nom_fichier, paramtexte.nom_fichier,
+                        groupes.nom_fichier]:
             dossier_destination.ecrire(fichier, dossier_source.lire(fichier))
         if docpdf is not None:
             dossier_destination.ecrire(docpdf.nom_fichier, dossier_source.lire(docpdf.nom_fichier))
-
-        trans_vals = transactions.valeurs
-        if edition.filigrane == "":
-            if edition.version == 0:
-                Resumes.base(edition, DossierSource(dossier_csv), DossierDestination(dossier_enregistrement))
-                Resumes.supprimer(generaux.code_cfact_centre, edition.mois, edition.annee,
-                                   DossierSource(dossier_enregistrement), DossierDestination(dossier_enregistrement))
-            elif Outils.existe(Outils.chemin([dossier_enregistrement, "csv_0"])):
-                maj = [bm_lignes, bc_lignes, det_lignes, cae_lignes, lvr_lignes, nos_lignes]
-                Resumes.mise_a_jour(edition, clients, comptes, new_grants, DossierSource(dossier_enregistrement),
-                                    DossierDestination(dossier_enregistrement), maj, f_html_sections, transactions)
-                trans_fichier = "Transaction_" + str(edition.annee) + "_" + Outils.mois_string(edition.mois) + ".csv"
-                trans_vals = transactions.recuperer_valeurs_de_fichier(DossierSource(dossier_enregistrement),
-                                                                       trans_fichier)
-
-        bilan_trs = BilansTransacts(edition)
-        bilan_trs.generer(trans_vals, grants, plafonds, paramtexte, paramannexe,
-                          DossierDestination(dossier_enregistrement))
 
     if sup_present:
         suppression = SuppressionFacture(dossier_source)

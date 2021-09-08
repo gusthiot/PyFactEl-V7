@@ -17,7 +17,7 @@ class Facture(object):
 
         self.prod2qual = prod2qual
 
-    def factures(self, sommes, destination, edition, generaux, clients, comptes, paramannexe):
+    def factures(self, sommes, destination, edition, generaux, clients, comptes, paramannexe, bilan_trs):
         """
         génère la facture sous forme de csv
         
@@ -28,6 +28,7 @@ class Facture(object):
         :param clients: clients importés
         :param comptes: comptes importés
         :param paramannexe: paramètres d'annexe
+        :param bilan_trs: bilans des transactions
         :return: données du combolist et des sections
         """
 
@@ -181,20 +182,51 @@ class Facture(object):
                     ''' + "%.2f" % scl['somme_t'] + r'''</td></tr>
                     </table>
                     '''
-                contenu_client += r'''<table><tr>'''
+                contenu_client += r'''<table id="annexes"><tr>'''
+
+                nom_projets = ""
+                dossier_projets = ""
+                chemin_projets = ""
                 for donnee in paramannexe.donnees:
-                    nom_annexe = donnee['nom'] + "_" + str(edition.annee) + "_" + Outils.mois_string(edition.mois) \
-                                 + "_" + str(edition.version) + "_" + code_client + ".pdf"
+                    nom = donnee['nom'] + "_" + str(edition.annee) + "_" + Outils.mois_string(edition.mois) \
+                                 + "_" + str(edition.version) + "_" + code_client
+                    nom_annexe = nom + ".pdf"
                     dossier_annexe = "../" + donnee['dossier'] + "/" + nom_annexe
                     chemin_annexe = donnee['chemin'] + "/" + nom_annexe
+                    if donnee['nom'] == 'Annexe-projets':
+                        nom_projets = nom + ".csv"
+                        dossier_projets = "../" + donnee['dossier'] + "/" + nom_projets
+                        chemin_projets = donnee['chemin'] + "/" + nom_projets
 
                     if not os.path.isfile(chemin_annexe):
                         continue
 
                     contenu_client += r'''<td><a href="''' + dossier_annexe + r'''" target="new">''' + nom_annexe + r'''
                         </a></td>'''
+
+                contenu_client += r'''</tr><tr>'''
+
+                if nom_projets != "" and os.path.isfile(chemin_projets):
+                    contenu_client += r'''<td><a href="''' + dossier_projets + r'''" target="new">
+                        ''' + nom_projets + r'''</a></td>'''
+
+                nom_details = bilan_trs.ann_dets.prefixe + "_" + code_client + "_" + client['abrev_labo'] + ".csv"
+                dossier_details = "../" + bilan_trs.ann_dets.dossier + "/" + nom_details
+                chemin_details = bilan_trs.ann_dets.chemin + "/" + nom_details
+                if os.path.isfile(chemin_details):
+                    contenu_client += r'''<td><a href="''' + dossier_details + r'''" target="new">
+                        ''' + nom_details + r'''</a></td>'''
+
+                nom_subsides = bilan_trs.ann_subs.prefixe + "_" + code_client + "_" + client['abrev_labo'] + ".csv"
+                dossier_subsides = "../" + bilan_trs.ann_subs.dossier + "/" + nom_subsides
+                chemin_subsides = bilan_trs.ann_subs.chemin + "/" + nom_subsides
+                if os.path.isfile(chemin_subsides):
+                    contenu_client += r'''<td><a href="''' + dossier_subsides + r'''" target="new">
+                        ''' + nom_subsides + r'''</a></td>'''
+
                 contenu_client += r'''</tr></table>'''
-                contenu_client += "</section>"
+
+                contenu_client += r'''</section>'''
                 combo_list[client['abrev_labo'] + " (" + code_client + ")"] = contenu_client
         self.creer_html(destination, combo_list, edition)
         return combo_list
@@ -295,6 +327,12 @@ class Facture(object):
                     vertical-align:middle;
                 }
                 #tableau td {
+                    padding: 3px;
+                }
+                #annexes tr, #annexes td {
+                    border: 0px;
+                }
+                #annexes td {
                     padding: 3px;
                 }
                 #toright {
