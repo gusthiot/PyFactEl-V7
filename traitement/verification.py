@@ -13,15 +13,13 @@ class Verification(object):
         """
         self.a_verifier = 2
 
-    def verification_date(self, edition, acces, clients, comptes, droits, livraisons, machines, noshows, prestations,
-                          users):
+    def verification_date(self, edition, acces, clients, comptes, livraisons, machines, noshows, prestations, users):
         """
         vérifie les dates de toutes les données importées
         :param edition: paramètres d'édition
         :param acces: accès importés
         :param clients: clients importés
         :param comptes: comptes importés
-        :param droits: droits importés
         :param livraisons: livraisons importées
         :param machines: machines importées
         :param noshows: no show importés
@@ -38,13 +36,12 @@ class Verification(object):
         verif += prestations.verification_date(edition.annee, edition.mois)
         verif += users.verification_date(edition.annee, edition.mois)
         verif += noshows.verification_date(edition.annee, edition.mois)
-        verif += droits.verification_date(edition.annee, edition.mois)
         self.a_verifier = 1
         return verif
 
     def verification_coherence(self, generaux, edition, acces, categories, categprix, clients, coefprests, comptes,
-                               droits, grants, livraisons, machines, noshows, plafonds, plateformes, prestations,
-                               subsides, users, docpdf, groupes):
+                               grants, livraisons, machines, noshows, plafonds, plateformes, prestations, subsides,
+                               users, docpdf, groupes, cles):
         """
         vérifie la cohérence des données importées
         :param generaux: paramètres généraux
@@ -55,7 +52,6 @@ class Verification(object):
         :param clients: clients importés
         :param coefprests: coefficients prestations importés
         :param comptes: comptes importés
-        :param droits: droits importés
         :param grants: subsides comptabilisés importés
         :param livraisons: livraisons importées
         :param machines: machines importées
@@ -67,6 +63,7 @@ class Verification(object):
         :param users: users importés
         :param docpdf: paramètres d'ajout de document pdf
         :param groupes: groupes importés
+        :param cles: clés subsides importées
         :return: 0 si ok, sinon le nombre d'échecs à la vérification
         """
         verif = 0
@@ -83,10 +80,10 @@ class Verification(object):
         verif += noshows.est_coherent(comptes, machines, users)
         verif += docpdf.est_coherent(generaux, clients)
         verif += comptes.est_coherent(clients, subsides)
-        verif += droits.est_coherent(comptes, users)
         verif += grants.est_coherent(comptes, generaux)
         verif += plateformes.est_coherent(clients)
-        verif += subsides.est_coherent(plateformes, clients, machines, generaux)
+        verif += subsides.est_coherent()
+        verif += cles.est_coherent(plateformes, clients, machines, generaux, subsides)
         verif += plafonds.est_coherent(subsides, generaux)
         verif += edition.est_coherent(clients)
         verif += generaux.est_coherent(clients)

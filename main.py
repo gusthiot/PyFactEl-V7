@@ -29,11 +29,11 @@ from importes import (Client,
                       Categorie,
                       User,
                       NoShow,
-                      DroitCompte,
                       Granted,
                       PlafSubside,
                       Plateforme,
                       Subside,
+                      CleSubside,
                       DossierSource,
                       DossierDestination)
 from outils import Outils
@@ -168,7 +168,6 @@ try:
         clients = Client(dossier_source)
         coefprests = CoefPrest(dossier_source)
         comptes = Compte(dossier_source)
-        droits = DroitCompte(dossier_source)
         grants = Granted(dossier_source, edition)
         livraisons = Livraison(dossier_source)
         machines = Machine(dossier_source)
@@ -178,17 +177,18 @@ try:
         plateformes = Plateforme(dossier_source)
         prestations = Prestation(dossier_source)
         subsides = Subside(dossier_source)
+        cles = CleSubside(dossier_source)
         users = User(dossier_source)
 
         verification = Verification()
 
-        if verification.verification_date(edition, acces, clients, comptes, droits, livraisons, machines, noshows,
+        if verification.verification_date(edition, acces, clients, comptes, livraisons, machines, noshows,
                                           prestations, users) > 0:
             sys.exit("Erreur dans les dates")
 
         if verification.verification_coherence(generaux, edition, acces, categories, categprix, clients, coefprests,
-                                               comptes, droits, grants, livraisons, machines, noshows, plafonds,
-                                               plateformes, prestations, subsides, users, docpdf, groupes) > 0:
+                                               comptes, grants, livraisons, machines, noshows, plafonds,
+                                               plateformes, prestations, subsides, users, docpdf, groupes, cles) > 0:
             sys.exit("Erreur dans la cohérence")
 
         livraisons.calcul_montants(prestations, coefprests, clients, verification, comptes)
@@ -212,7 +212,7 @@ try:
         tarifs.csv(dossier_destination, paramtexte)
         transactions = Transactions(edition)
         transactions.generer(acces, noshows, livraisons, prestations, machines, categprix, comptes, clients, users,
-                             droits, plateformes, generaux, articles, tarifs, subsides, plafonds, grants, groupes,
+                             plateformes, generaux, articles, tarifs, subsides, plafonds, grants, groupes, cles,
                              paramtexte)
         transactions.csv(dossier_destination, paramtexte)
 
@@ -274,12 +274,12 @@ try:
                 Resumes.mise_a_jour(edition, clients, comptes, new_grants, DossierSource(dossier_enregistrement),
                                     DossierDestination(dossier_enregistrement), maj, f_html_sections, transactions)
 
-        for fichier in [acces.nom_fichier, clients.nom_fichier, coefprests.nom_fichier, droits.nom_fichier,
-                        comptes.nom_fichier, livraisons.nom_fichier, machines.nom_fichier, prestations.nom_fichier,
-                        categories.nom_fichier, users.nom_fichier, generaux.nom_fichier, grants.nom_fichier,
-                        edition.nom_fichier, categprix.nom_fichier, paramannexe.nom_fichier, noshows.nom_fichier,
-                        plafonds.nom_fichier, plateformes.nom_fichier, subsides.nom_fichier, paramtexte.nom_fichier,
-                        groupes.nom_fichier]:
+        for fichier in [acces.nom_fichier, clients.nom_fichier, coefprests.nom_fichier, comptes.nom_fichier,
+                        livraisons.nom_fichier, machines.nom_fichier, prestations.nom_fichier, categories.nom_fichier,
+                        users.nom_fichier, generaux.nom_fichier, grants.nom_fichier, edition.nom_fichier,
+                        categprix.nom_fichier, paramannexe.nom_fichier, noshows.nom_fichier, plafonds.nom_fichier,
+                        plateformes.nom_fichier, subsides.nom_fichier, paramtexte.nom_fichier, groupes.nom_fichier,
+                        cles.nom_fichier]:
             dossier_destination.ecrire(fichier, dossier_source.lire(fichier))
         if docpdf is not None:
             dossier_destination.ecrire(docpdf.nom_fichier, dossier_source.lire(docpdf.nom_fichier))

@@ -10,9 +10,9 @@ class AnnexeDetails(Recap):
 
     cles = ['invoice-year', 'invoice-month', 'invoice-ref', 'platf-name', 'client-code', 'client-name', 'oper-name',
             'oper-note', 'staff-note', 'mach-name', 'user-sciper', 'user-name', 'user-first', 'proj-nbr', 'proj-name',
-            'proj-subs', 'proj-start', 'proj-end', 'item-nbr', 'item-name', 'item-unit', 'transac-date',
-            'transac-quantity', 'valuation-price', 'valuation-brut', 'discount-type', 'discount-CHF', 'valuation-net',
-            'subsid-name', 'subsid-maxproj', 'subsid-maxmois', 'subsid-reste', 'subsid-CHF', 'deduct-CHF',
+            'proj-subs', 'item-nbr', 'item-name', 'item-unit', 'transac-date', 'transac-quantity', 'valuation-price',
+            'valuation-brut', 'discount-type', 'discount-CHF', 'valuation-net', 'subsid-name', 'subsid-start',
+            'subsid-end', 'subsid-ok', 'subsid-maxproj', 'subsid-maxmois', 'subsid-reste', 'subsid-CHF', 'deduct-CHF',
             'subsid-deduct', 'total-fact', 'discount-bonus', 'subsid-bonus']
 
     def __init__(self, edition):

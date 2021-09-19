@@ -11,9 +11,9 @@ from .categprix import CategPrix
 from .user import User
 from .dossier import DossierSource, DossierDestination
 from .noshow import NoShow
-from .droit_compte import DroitCompte
 from .plateforme import Plateforme
 from .subside import Subside
 from .plafsubside import PlafSubside
 from .granted import Granted
 from .groupe import Groupe
+from .clesubside import CleSubside

@@ -10,10 +10,10 @@ class Transactions(Recap):
     cles = ['invoice-year', 'invoice-month', 'invoice-ref', 'client-code', 'client-sap', 'client-name', 'client-class',
             'client-labelclass', 'oper-id', 'oper-name', 'oper-note', 'staff-note', 'mach-id', 'mach-name', 'user-id',
             'user-sciper', 'user-name', 'user-first', 'proj-id', 'proj-nbr', 'proj-name', 'proj-expl', 'proj-subs',
-            'proj-start', 'proj-end', 'item-id', 'item-type', 'item-nbr', 'item-name', 'item-unit', 'item-codeD',
-            'item-labelcode', 'item-sap', 'item-extra', 'platf-code', 'platf-op', 'platf-sap', 'platf-name', 'platf-cf',
-            'platf-fund', 'transac-date', 'transac-quantity', 'transac-usage', 'valuation-price', 'valuation-brut',
-            'discount-type', 'discount-CHF', 'valuation-net', 'subsid-code', 'subsid-name', 'subsid-maxproj',
+            'item-id', 'item-type', 'item-nbr', 'item-name', 'item-unit', 'item-codeD', 'item-labelcode', 'item-sap',
+            'item-extra', 'platf-code', 'platf-op', 'platf-sap', 'platf-name', 'platf-cf', 'platf-fund', 'transac-date',
+            'transac-quantity', 'transac-usage', 'valuation-price', 'valuation-brut', 'discount-type', 'discount-CHF',
+            'valuation-net', 'subsid-code', 'subsid-name', 'subsid-start', 'subsid-end', 'subsid-ok', 'subsid-maxproj',
             'subsid-maxmois', 'subsid-reste', 'subsid-CHF', 'deduct-CHF', 'subsid-deduct', 'total-fact',
             'discount-bonus', 'subsid-bonus']
     
@@ -32,7 +32,7 @@ class Transactions(Recap):
         self.comptabilises = {}
 
     def generer(self, acces, noshows, livraisons, prestations, machines, categprix, comptes, clients, users,
-                droits, plateformes, generaux, articles, tarifs, subsides, plafonds, grants, groupes, paramtexte):
+                plateformes, generaux, articles, tarifs, subsides, plafonds, grants, groupes, cles, paramtexte):
         """
         génération du fichier des transactions
         :param acces: accès importés
@@ -44,7 +44,6 @@ class Transactions(Recap):
         :param comptes: comptes importés
         :param clients: clients importés
         :param users: users importés
-        :param droits: droits importés
         :param plateformes: plateformes importées
         :param generaux: paramètres généraux
         :param articles: articles générés
@@ -53,6 +52,7 @@ class Transactions(Recap):
         :param plafonds: plafonds importés
         :param grants: grants importés
         :param groupes: groupes importés
+        :param cles: clés subsides importées
         :param paramtexte: paramètres textuels
         """
 
@@ -70,7 +70,7 @@ class Transactions(Recap):
             operateur = users.donnees[entree['id_op']]
             ope = [entree['id_op'], operateur['prenom'] + " " + operateur['nom'], entree['remarque_op'],
                    entree['remarque_staff'], id_machine, machine['nom']]
-            util_proj = self.util_proj(entree['id_user'], users, compte, droits)
+            util_proj = self.util_proj(entree['id_user'], users, compte)
 
             # K3 CAE-run #
             if entree['duree_machine_hp'] > 0 or entree['duree_machine_hc'] > 0:
@@ -166,7 +166,7 @@ class Transactions(Recap):
                 tarif = tarifs.valeurs[code_n + groupe['id_cat_hc']]
             ope = ["", "", "", "", id_machine, machine['nom']]
             art = self.art_plate(article, plateformes, clients)
-            util_proj = self.util_proj(entree['id_user'], users, compte, droits)
+            util_proj = self.util_proj(entree['id_user'], users, compte)
             trans = [entree['date_debut'], entree['penalite'], 0]
             prix = round(entree['penalite'] * tarif['valuation-price'], 2)
             val = [tarif['valuation-price'], prix, "", 0, prix]
@@ -194,7 +194,7 @@ class Transactions(Recap):
                 nm = machine['nom']
             ope = [entree['id_operateur'], operateur['prenom'] + " " + operateur['nom'],
                    pt['oper-PO'] + " " + str(entree['date_commande']), entree['remarque'], idm, nm]
-            util_proj = self.util_proj(entree['id_user'], users, compte, droits)
+            util_proj = self.util_proj(entree['id_user'], users, compte)
             trans = [entree['date_livraison'], entree['quantite'], 0]
             tarif = tarifs.valeurs[code_n + id_prestation]
             if entree['rabais'] > 0:
@@ -213,8 +213,10 @@ class Transactions(Recap):
                 compte = comptes.donnees[id_compte]
                 article = articles.valeurs[transact['art'][0]]
                 code_n = transact['rc'][4]
-                dans = self.date_dans_projet(transact['trans'][0], transact['up'][0], compte, droits)
-                subs = self.subsides(subsides, plafonds, grants, compte, code_n, article, dans, transact['val'][4])
+                montant = transact['val'][4]
+                id_mach = transact['ope'][4]
+                date = transact['trans'][0]
+                subs = self.subsides(subsides, cles, plafonds, grants, compte, code_n, article, date, montant, id_mach)
                 if generaux.subsides_par_code_n(code_n) == "BONUS":
                     ded_bon = transact['val'][3]
                     ded_rab = 0
@@ -250,26 +252,17 @@ class Transactions(Recap):
                 generaux.intitule_n_par_code_n(client['nature'])]
 
     @staticmethod
-    def util_proj(id_user, users, compte, droits):
+    def util_proj(id_user, users, compte):
         """
         ajout des valeurs issues de l'utilisateur et du projet (compte)
         :param id_user: id de l'utilisateur de la transaction
         :param users: users importés
         :param compte: compte de la transaction
-        :param droits: droits importés
         :return tableau contenant les valeurs de l'utilisateur et du projet
         """
         user = users.donnees[id_user]
-        id_droit = id_user + compte['id_compte']
-        if id_droit in droits.donnees.keys():
-            debut = droits.donnees[id_droit]['debut']
-            fin = droits.donnees[id_droit]['fin']
-        else:
-            debut = "N/A"
-            fin = "N/A"
-
         return [user['id_user'], user['sciper'], user['nom'], user['prenom'], compte['id_compte'], compte['numero'],
-                compte['intitule'], compte['exploitation'], compte['type_subside'], debut, fin]
+                compte['intitule'], compte['exploitation'], compte['type_subside']]
 
     @staticmethod
     def art_plate(article, plateformes, clients):
@@ -287,75 +280,137 @@ class Transactions(Recap):
                 article['item-extra'], article['platf-code'], plateforme['code_p'], client['code_sap'],
                 plateforme['intitule'], plateforme['centre'], plateforme['fonds']]
 
-    def subsides(self, subsides, plafonds, grants, compte, code_n, article, dans, montant):
+    def subsides(self, subsides, cles, plafonds, grants, compte, code_n, article, date, montant, id_machine):
         """
         ajout des valeurs issues des subsides
         :param subsides: subsides importés
+        :param cles: clés subsides importées
         :param plafonds: plafonds importés
         :param grants: grants importés
         :param compte: compte de la transaction
         :param code_n: code N de la transaction
         :param article: article de la transaction
-        :param dans: si la transaction est dans la période de subside
+        :param date: date dela transaction
         :param montant: montant de la transaction
+        :param id_machine: id_machine de la transaction
         :return tableau contenant les valeurs de subsides
         """
         type_s = compte['type_subside']
-        if type_s != "" and type_s != "STD" and dans:
-            plaf = type_s + article['item-codeD']
-            if plaf in plafonds.donnees.keys():
-                plafond = plafonds.donnees[plaf]
-                sub = type_s + article['platf-code'] + code_n
-                # niv1 = type_s + article['platf-code']
-                # if niv1 in subsides.donnees.keys():
-                #     sub_1 = subsides.donnees[niv1]
-                #     if code_n in sub_1.keys() or "0" in sub_1.keys():
-                #         sub_1 = subsides.donnees[niv1]
-                #
-                #
-
-                if sub in subsides.donnees.keys():
-                    subside = subsides.donnees[sub]
-                    cg_id = compte['id_compte'] + article['item-codeD']
-                    if cg_id in grants.donnees.keys():
-                        grant = grants.donnees[cg_id]['montant']
-                    else:
-                        grant = 0
-                    if cg_id in self.comptabilises.keys():
-                        comptabilise = self.comptabilises[cg_id]['montant']
-                    else:
-                        comptabilise = 0
-                    res_compte = plafond['max_compte'] - (grant + comptabilise)
-                    res_mois = plafond['max_mois'] - comptabilise
-                    res = max(min(res_compte, res_mois), 0)
-                    mon = min(montant, res)
-                    if cg_id not in self.comptabilises.keys():
-                        self.comptabilises[cg_id] = {'id_compte': compte['id_compte'], 'code_d': article['item-codeD'],
-                                                     'montant': mon}
-                    else:
-                        self.comptabilises[cg_id]['montant'] = self.comptabilises[cg_id]['montant'] + mon
-                    return [subside['type'], subside['intitule'], plafond['max_compte'], plafond['max_mois'], res, mon]
-        return ["", "", 0, 0, 0, 0]
+        result = ["", "", "", "", "", 0, 0, 0, 0]
+        if type_s != "" and type_s != "STD":
+            if type_s in subsides.donnees.keys():
+                subside = subsides.donnees[type_s]
+                result[0] = subside['type']
+                result[1] = subside['intitule']
+                result[2] = subside['debut']
+                result[3] = subside['fin']
+                result[4] = "NO"
+                plaf = type_s + article['item-codeD']
+                if plaf in plafonds.donnees.keys():
+                    plafond = plafonds.donnees[plaf]
+                    result[5] = plafond['max_compte']
+                    result[6] = plafond['max_mois']
+                    if subside['debut'] == "NULL" or subside['debut'] <= date:
+                        if subside['fin'] == "NULL" or subside['fin'] >= date:
+                            if type_s in cles.donnees.keys():
+                                dict_s = cles.donnees[type_s]
+                                if self.check_plateforme(dict_s, article['platf-code'], code_n, compte['code_client'],
+                                                         id_machine):
+                                    result[4] = "YES"
+                                    cg_id = compte['id_compte'] + article['item-codeD']
+                                    if cg_id in grants.donnees.keys():
+                                        grant = grants.donnees[cg_id]['montant']
+                                    else:
+                                        grant = 0
+                                    if cg_id in self.comptabilises.keys():
+                                        comptabilise = self.comptabilises[cg_id]['montant']
+                                    else:
+                                        comptabilise = 0
+                                    res_compte = plafond['max_compte'] - (grant + comptabilise)
+                                    res_mois = plafond['max_mois'] - comptabilise
+                                    res = max(min(res_compte, res_mois), 0)
+                                    mo = min(montant, res)
+                                    if cg_id not in self.comptabilises.keys():
+                                        self.comptabilises[cg_id] = {'id_compte': compte['id_compte'],
+                                                                     'code_d': article['item-codeD'],
+                                                                     'montant': mo}
+                                    else:
+                                        self.comptabilises[cg_id]['montant'] = self.comptabilises[cg_id]['montant'] + mo
+                                    result[7] = res
+                                    result[8] = mo
+        return result
 
     @staticmethod
-    def date_dans_projet(date, id_user, compte, droits):
+    def check_plateforme(dict_s, plateforme, code_n, code_client, id_machine):
         """
-        vérifie si la transaction est dans la période de subside
-        :param date: date de la transaction
-        :param id_user: id de l'utilisateur de la transaction
-        :param compte: compte de la transaction
-        :param droits: droits importés
+        vérifie si les clés subsides contiennent la plateforme, ou 0
+        :param dict_s: dict pour le type
+        :param plateforme: plateforme à vérifier
+        :param code_n: code_n à vérifier
+        :param code_client: code client à vérifier
+        :param id_machine: machine à vérifier
+
         """
-        id_droit = id_user + compte['id_compte']
-        if id_droit not in droits.donnees.keys():
-            return False
-        debut = droits.donnees[id_droit]['debut']
-        fin = droits.donnees[id_droit]['fin']
-        if debut != "NULL" and date < debut:
-            return False
-        if fin != "NULL" and date > fin:
-            return False
-        return True
+        if "0" in dict_s:
+            if Transactions.check_code_n(dict_s, "0", code_n, code_client, id_machine):
+                return True
+        if plateforme in dict_s:
+            if Transactions.check_code_n(dict_s, plateforme, code_n, code_client, id_machine):
+                return True
+        return False
+
+    @staticmethod
+    def check_code_n(dict_s, plateforme, code_n, code_client, id_machine):
+        """
+        vérifie si les clés subsides contiennent le code N, ou 0
+        :param dict_s: dict pour le type
+        :param plateforme: plateforme sélectionnée ou 0
+        :param code_n: code_n à vérifier
+        :param code_client: code client à vérifier
+        :param id_machine: machine à vérifier
+
+        """
+        dict_p = dict_s[plateforme]
+        if "0" in dict_p:
+            if Transactions.check_client(dict_p, "0", code_client, id_machine):
+                return True
+        if code_n in dict_p:
+            if Transactions.check_client(dict_p, code_n, code_client, id_machine):
+                return True
+        return False
+
+    @staticmethod
+    def check_client(dict_p, code_n, code_client, id_machine):
+        """
+        vérifie si les clés subsides contiennent le code client, ou 0
+        :param dict_p: dict pour la plateforme
+        :param code_n: code N sélectionné ou 0
+        :param code_client: code client à vérifier
+        :param id_machine: machine à vérifier
+        """
+        dict_n = dict_p[code_n]
+        if "0" in dict_n:
+            if Transactions.check_machine(dict_n, "0", id_machine):
+                return True
+        if code_client in dict_n:
+            if Transactions.check_machine(dict_n, code_client, id_machine):
+                return True
+        return False
+
+    @staticmethod
+    def check_machine(dict_n, client, id_machine):
+        """
+        vérifie si les clés subsides contiennent l'id machine, ou 0
+        :param dict_n: dict pour le code N
+        :param client: client sélectionné ou 0
+        :param id_machine: machine à vérifier
+        """
+        dict_c = dict_n[client]
+        if "0" in dict_c:
+            return True
+        if id_machine in dict_c:
+            return True
+        return False
 
     @staticmethod
     def put_in_transacts(transacts, ref_client, ope, util_proj, art, trans, val):

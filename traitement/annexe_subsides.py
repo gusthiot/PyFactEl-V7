@@ -9,8 +9,8 @@ class AnnexeSubsides(Recap):
     """
 
     cles = ['invoice-year', 'invoice-month', 'client-code', 'client-name', 'proj-id', 'proj-name', 'proj-subs',
-            'proj-start', 'proj-end', 'item-codeD', 'item-labelcode', 'subsid-name', 'subsid-maxproj', 'subsid-maxmois',
-            'subsid-alrdygrant', 'subsid-CHF', 'subsid-deduct', 'discount-bonus', 'subsid-bonus', 'subsid-reste']
+            'item-codeD', 'item-labelcode', 'subsid-name', 'subsid-start', 'subsid-end', 'subsid-ok', 'subsid-maxproj',
+            'subsid-maxmois', 'subsid-alrdygrant', 'subsid-CHF', 'subsid-deduct', 'subsid-bonus', 'subsid-reste']
 
     def __init__(self, edition):
         """

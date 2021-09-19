@@ -76,7 +76,7 @@ class User(Fichier):
 
             donnee['nom'], info = Outils.est_un_texte(donnee['nom'], "le nom", ligne)
             msg += info
-            donnee['nom'], info = Outils.est_un_texte(donnee['nom'], "le nom", ligne)
+            donnee['prenom'], info = Outils.est_un_texte(donnee['prenom'], "le prénom", ligne)
             msg += info
 
             del donnee['annee']
