@@ -56,17 +56,15 @@ class AnnexeSubsides(Recap):
                     if self.nom == "":
                         self.nom = self.prefixe + "_" + code + "_" + base['client-name'] + ".csv"
                     donnee = []
-                    for cle in range(2, len(self.cles)-6):
+                    for cle in range(2, len(self.cles)-5):
                         donnee.append(base[self.cles[cle]])
                     subside = 0
                     deduit = 0
-                    discount = 0
                     bonus = 0
                     for indice in tbtr:
                         val = trans_vals[indice]
                         subside += val['subsid-CHF']
                         deduit += val['subsid-deduct']
-                        discount += val['discount-bonus']
                         bonus += val['subsid-bonus']
                     g_id = id_compte + code_d
                     if g_id in grants.donnees.keys():
@@ -79,8 +77,8 @@ class AnnexeSubsides(Recap):
                         plafond = plafonds.donnees[plaf]
                         reste = plafond['max_compte'] - grant - subside
 
-                        donnee += [round(grant, 2), round(subside, 2), round(deduit, 2), round(discount, 2),
-                                   round(bonus, 2), round(reste, 2)]
+                        donnee += [round(grant, 2), round(subside, 2), round(deduit, 2), round(bonus, 2),
+                                   round(reste, 2)]
                         self.ajouter_valeur(donnee, ii)
                         ii += 1
             if len(self.valeurs) > 0:
