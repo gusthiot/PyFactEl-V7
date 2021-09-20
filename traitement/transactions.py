@@ -220,13 +220,13 @@ class Transactions(Recap):
                 if generaux.subsides_par_code_n(code_n) == "BONUS":
                     ded_bon = transact['val'][3]
                     ded_rab = 0
-                    sub_bon = subs[5]
+                    sub_bon = subs[8]
                     sub_rab = 0
                 else:
                     ded_bon = 0
                     ded_rab = transact['val'][3]
                     sub_bon = 0
-                    sub_rab = subs[5]
+                    sub_rab = subs[8]
                 if article['platf-code'] == compte['code_client']:
                     tot = 0
                 else:
