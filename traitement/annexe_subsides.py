@@ -1,6 +1,7 @@
 from outils import Outils
 from traitement import Recap
 from importes import DossierDestination
+from datetime import datetime
 
 
 class AnnexeSubsides(Recap):
@@ -27,7 +28,8 @@ class AnnexeSubsides(Recap):
         if edition.version > 0:
             self.prefixe += "_" + str(edition.client_unique)
 
-    def generer(self, trans_vals, grants, plafonds, paramtexte, paramannexe, par_client):
+    def generer(self, trans_vals, grants, plafonds, paramtexte, paramannexe, par_client, comptes, clients, subsides,
+                generaux):
         """
         génération des fichiers d'annexes subsides à partir des transactions
         :param trans_vals: valeurs des transactions générées
@@ -36,6 +38,10 @@ class AnnexeSubsides(Recap):
         :param paramtexte: paramètres textuels
         :param paramannexe: paramètres d'annexe
         :param par_client: tri des transactions par client, par compte, par code D
+        :param comptes: comptes importés
+        :param clients: clients importés
+        :param subsides: subsides importés
+        :param generaux: paramètres généraux
         """
         for donnee in paramannexe.donnees:
             if donnee['nom'] == 'Annexe-détails':
@@ -43,43 +49,59 @@ class AnnexeSubsides(Recap):
                 self.dossier = donnee['dossier']
         dossier_destination = DossierDestination(self.chemin)
 
-        for code in par_client.keys():
+        clients_comptes = {}
+        for id_compte in comptes.donnees.keys():
+            compte = comptes.donnees[id_compte]
+            type_s = compte['type_subside']
+            if type_s != "" and type_s != "STD":
+                if type_s in subsides.donnees.keys():
+                    subside = subsides.donnees[type_s]
+                    if subside['debut'] == "NULL" or subside['debut'] < datetime(self.annee, self.mois+1, 1):
+                        if subside['fin'] == "NULL" or subside['fin'] >= datetime(self.annee, self.mois, 1):
+                            code_client = compte['code_client']
+                            if code_client not in clients_comptes:
+                                clients_comptes[code_client] = []
+                            clients_comptes[code_client].append(id_compte)
+
+        for code in clients_comptes.keys():
+            cc = clients_comptes[code]
             self.valeurs = {}
             ii = 0
-            self.nom = ""
-            par_compte = par_client[code]['comptes']
-            for id_compte in par_compte.keys():
-                par_code = par_compte[id_compte]
-                for code_d in par_code.keys():
-                    tbtr = par_code[code_d]
-                    base = trans_vals[tbtr[0]]
-                    if self.nom == "":
-                        self.nom = self.prefixe + "_" + code + "_" + base['client-name'] + ".csv"
-                    donnee = []
-                    for cle in range(2, len(self.cles)-5):
-                        donnee.append(base[self.cles[cle]])
-                    subside = 0
-                    deduit = 0
-                    bonus = 0
-                    for indice in tbtr:
-                        val = trans_vals[indice]
-                        subside += val['subsid-CHF']
-                        deduit += val['subsid-deduct']
-                        bonus += val['subsid-bonus']
-                    g_id = id_compte + code_d
-                    if g_id in grants.donnees.keys():
-                        grant = grants.donnees[g_id]['montant']
-                    else:
-                        grant = 0
-
-                    plaf = base['proj-subs'] + code_d
+            client = clients.donnees[code]
+            self.nom = self.prefixe + "_" + code + "_" + client['abrev_labo'] + ".csv"
+            for id_compte in cc:
+                compte = comptes.donnees[id_compte]
+                type_s = compte['type_subside']
+                subside = subsides.donnees[type_s]
+                for code_d in generaux.obtenir_code_d():
+                    plaf = type_s + code_d
                     if plaf in plafonds.donnees.keys():
                         plafond = plafonds.donnees[plaf]
-                        reste = plafond['max_compte'] - grant - subside
+                        donnee = [client['code'], client['abrev_labo'], compte['id_compte'], compte['intitule'],
+                                  compte['type_subside'], code_d, generaux.intitule_long_par_code_d(code_d),
+                                  subside['intitule'], subside['debut'], subside['fin'], plafond['max_compte'],
+                                  plafond['max_mois']]
+                        subs = 0
+                        deduit = 0
+                        bonus = 0
+                        g_id = id_compte + code_d
+                        if g_id in grants.donnees.keys():
+                            grant = grants.donnees[g_id]['montant']
+                        else:
+                            grant = 0
+                        if code in par_client and id_compte in par_client[code]['comptes']:
+                            par_code = par_client[code]['comptes'][id_compte]
+                            if code_d in par_code.keys():
+                                tbtr = par_code[code_d]
+                                for indice in tbtr:
+                                    val = trans_vals[indice]
+                                    subs += val['subsid-CHF']
+                                    deduit += val['subsid-deduct']
+                                    bonus += val['subsid-bonus']
 
-                        donnee += [round(grant, 2), round(subside, 2), round(deduit, 2), round(bonus, 2),
+                        reste = plafond['max_compte'] - grant - subs
+                        donnee += [round(grant, 2), round(subs, 2), round(deduit, 2), round(bonus, 2),
                                    round(reste, 2)]
                         self.ajouter_valeur(donnee, ii)
                         ii += 1
-            if len(self.valeurs) > 0:
-                self.csv(dossier_destination, paramtexte)
+            self.csv(dossier_destination, paramtexte)

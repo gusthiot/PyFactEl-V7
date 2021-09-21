@@ -229,7 +229,7 @@ try:
             trans_vals = transactions.recuperer_valeurs_de_fichier(DossierSource(dossier_enregistrement), trans_fichier)
 
         bilan_trs = BilansTransacts(edition)
-        bilan_trs.generer(trans_vals, grants, plafonds, paramtexte, paramannexe,
+        bilan_trs.generer(trans_vals, grants, plafonds, comptes, clients, subsides, paramtexte, paramannexe, generaux,
                           DossierDestination(dossier_enregistrement))
 
         # faire les annexes avant la facture, que le ticket puisse vérifier leur existence

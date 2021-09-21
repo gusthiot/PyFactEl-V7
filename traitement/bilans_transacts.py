@@ -23,14 +23,19 @@ class BilansTransacts(object):
         self.bil_conso = BilanConsos(edition)
         self.usr_lab = UserLabo(edition)
 
-    def generer(self, trans_vals, grants, plafonds, paramtexte, paramannexe, dossier_destination):
+    def generer(self, trans_vals, grants, plafonds, comptes, clients, subsides, paramtexte, paramannexe, generaux,
+                dossier_destination):
         """
         tri des transactions et génération des bilans
         :param trans_vals: valeurs des transactions générées
         :param grants: grants importés
         :param plafonds: plafonds importés
+        :param comptes: comptes importés
+        :param clients: clients importés
+        :param subsides: subsides importés
         :param paramtexte: paramètres textuels
         :param paramannexe: paramètres d'annexe
+        :param generaux: paramètres généraux
         :param dossier_destination: Une instance de la classe dossier.DossierDestination
         """
         par_client = {}
@@ -91,7 +96,8 @@ class BilansTransacts(object):
                 ppuc[day] = key
 
         self.ann_dets.generer(trans_vals, paramtexte, paramannexe, par_client)
-        self.ann_subs.generer(trans_vals, grants, plafonds, paramtexte, paramannexe, par_client)
+        self.ann_subs.generer(trans_vals, grants, plafonds, paramtexte, paramannexe, par_client, comptes, clients,
+                              subsides, generaux)
         self.bil_plat.generer(trans_vals, paramtexte, dossier_destination, par_plate)
         self.bil_use.generer(trans_vals, paramtexte, dossier_destination, par_plate)
         self.bil_conso.generer(trans_vals, paramtexte, dossier_destination, par_plate)
