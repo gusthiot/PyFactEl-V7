@@ -11,7 +11,7 @@ class AnnexeSubsides(Recap):
 
     cles = ['invoice-year', 'invoice-month', 'client-code', 'client-name', 'proj-id', 'proj-name', 'proj-subs',
             'item-codeD', 'item-labelcode', 'subsid-name', 'subsid-start', 'subsid-end', 'subsid-maxproj',
-            'subsid-maxmois', 'subsid-alrdygrant', 'subsid-CHF', 'subsid-deduct', 'subsid-bonus', 'subsid-reste']
+            'subsid-maxmois', 'subsid-alrdygrant', 'subsid-CHF', 'subsid-reste']
 
     def __init__(self, edition):
         """
@@ -82,8 +82,6 @@ class AnnexeSubsides(Recap):
                                   subside['intitule'], subside['debut'], subside['fin'], plafond['max_compte'],
                                   plafond['max_mois']]
                         subs = 0
-                        deduit = 0
-                        bonus = 0
                         g_id = id_compte + code_d
                         if g_id in grants.donnees.keys():
                             grant = grants.donnees[g_id]['montant']
@@ -96,12 +94,9 @@ class AnnexeSubsides(Recap):
                                 for indice in tbtr:
                                     val = trans_vals[indice]
                                     subs += val['subsid-CHF']
-                                    deduit += val['subsid-deduct']
-                                    bonus += val['subsid-bonus']
 
                         reste = plafond['max_compte'] - grant - subs
-                        donnee += [round(grant, 2), round(subs, 2), round(deduit, 2), round(bonus, 2),
-                                   round(reste, 2)]
+                        donnee += [round(grant, 2), round(subs, 2), round(reste, 2)]
                         self.ajouter_valeur(donnee, ii)
                         ii += 1
             self.csv(dossier_destination, paramtexte)
