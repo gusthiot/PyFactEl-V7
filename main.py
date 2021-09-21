@@ -14,6 +14,7 @@ Options:
 """
 import datetime
 import sys
+import time
 import traceback
 from docopt import docopt
 
@@ -73,6 +74,7 @@ else:
     dossier_data = Outils.choisir_dossier()
 dossier_source = DossierSource(dossier_data)
 try:
+    start_time = time.time()
     pe_present = Outils.existe(Outils.chemin([dossier_data, Edition.nom_fichier]))
     sup_present = Outils.existe(Outils.chemin([dossier_data, SuppressionFacture.nom_fichier]))
     ann_present = Outils.existe(Outils.chemin([dossier_data, AnnulationVersion.nom_fichier]))
@@ -234,8 +236,10 @@ try:
 
         # faire les annexes avant la facture, que le ticket puisse vérifier leur existence
         if Latex.possibles():
+            latex_time = time.time()
             Annexes.annexes(sommes, clients, edition, livraisons, acces, machines, comptes, paramannexe,
                             generaux, users, categories, noshows, docpdf, groupes)
+            print(str(datetime.timedelta(seconds=(time.time() - latex_time))).split(".")[0])
 
         Outils.copier_dossier("./reveal.js/", "js", dossier_enregistrement)
         Outils.copier_dossier("./reveal.js/", "css", dossier_enregistrement)
@@ -315,7 +319,7 @@ try:
         dossier_suppr = Outils.chemin([dossier_enregistrement, "suppr_" + suffixe])
         if Outils.existe(dossier_suppr):
             msg = "La suppression de la version " + str(suppression.version) + " du client " + \
-                  suppression.client_unique + " existe déjà !"
+                  suppression.client_unique + " existe déjà!"
             Outils.affiche_message(msg)
             sys.exit("Erreur sur la version")
 
@@ -422,7 +426,7 @@ try:
             Resumes.annulation(annulation, DossierSource(dossier_enregistrement),
                                DossierDestination(dossier_enregistrement), DossierSource(dossier_csv))
 
-    Outils.affiche_message("OK !!!")
+    Outils.affiche_message("OK !!! (" + str(datetime.timedelta(seconds=(time.time() - start_time))).split(".")[0] + ")")
 
 except Exception as e:
     Outils.fatal(traceback.format_exc(), "Erreur imprévue :\n")
