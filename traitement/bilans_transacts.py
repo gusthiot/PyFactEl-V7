@@ -59,7 +59,7 @@ class BilansTransacts(object):
 
             par_client[code_client]['transactions'].append(key)
 
-            Outils.affiche_message(subs)
+            Outils.affiche_message(transaction)
 
             if type_s != "" and subs > 0:
                 pcc = par_client[code_client]['comptes']
