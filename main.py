@@ -236,10 +236,8 @@ try:
 
         # faire les annexes avant la facture, que le ticket puisse vérifier leur existence
         if Latex.possibles():
-            latex_time = time.time()
             Annexes.annexes(sommes, clients, edition, livraisons, acces, machines, comptes, paramannexe,
                             generaux, users, categories, noshows, docpdf, groupes)
-            print(str(datetime.timedelta(seconds=(time.time() - latex_time))).split(".")[0])
 
         Outils.copier_dossier("./reveal.js/", "js", dossier_enregistrement)
         Outils.copier_dossier("./reveal.js/", "css", dossier_enregistrement)

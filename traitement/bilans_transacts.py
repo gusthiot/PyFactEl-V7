@@ -4,6 +4,8 @@ from traitement import BilanPlates
 from traitement import BilanUsages
 from traitement import BilanConsos
 from traitement import UserLabo
+from outils import Outils
+
 
 
 class BilansTransacts(object):
@@ -56,6 +58,8 @@ class BilansTransacts(object):
                 par_client[code_client] = {'transactions': [], 'comptes': {}}
 
             par_client[code_client]['transactions'].append(key)
+
+            Outils.affiche_message(subs)
 
             if type_s != "" and subs > 0:
                 pcc = par_client[code_client]['comptes']
