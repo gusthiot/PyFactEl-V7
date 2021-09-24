@@ -28,13 +28,11 @@ class Resumes(object):
         dossier_destination.string_ecrire(ticket_complet + ".html", ticket_texte)
 
     @staticmethod
-    def mise_a_jour(edition, clients, comptes, maj_grants, dossier_source, dossier_destination, maj, f_html_sections):
+    def mise_a_jour(edition, clients, dossier_source, dossier_destination, maj, f_html_sections):
         """
         modification des résumés mensuels au niveau du client dont la facture est modifiée 
         :param edition: paramètres d'édition
         :param clients: clients importés
-        :param comptes: comptes importés
-        :param maj_grants: données modifiées pour le client pour les grants
         :param dossier_source: Une instance de la classe dossier.DossierSource
         :param dossier_destination: Une instance de la classe dossier.DossierDestination
         :param maj: données modifiées pour le client pour les différents fichiers
@@ -55,16 +53,6 @@ class Resumes(object):
                     fichier_writer.writerow(ligne)
                 for ligne in maj[i]:
                     fichier_writer.writerow(ligne)
-
-        fichier_grant = "granted" + str(edition.annee) + "_" + Outils.mois_string(edition.mois) + ".csv"
-        donnees_csv = Resumes.ouvrir_csv_sans_comptes_client(dossier_source, fichier_grant, edition.client_unique,
-                                                             comptes)
-        with dossier_destination.writer(fichier_grant) as fichier_writer:
-            for ligne in donnees_csv:
-                fichier_writer.writerow(ligne)
-            for key in maj_grants.valeurs.keys():
-                ligne = maj_grants.valeurs[key]
-                fichier_writer.writerow(ligne)
 
         ticket_complet = "ticket_" + str(edition.annee) + "_" + Outils.mois_string(edition.mois) + ".html"
         section = list(f_html_sections.values())[0]
@@ -274,7 +262,8 @@ class Resumes(object):
             for ligne in fichier_reader:
                 if ligne == -1:
                     continue
-                if comptes.donnees[ligne[position_id]]['code_client'] != code_client:
+                id_compte = ligne[position_id]
+                if id_compte not in comptes.donnees or comptes.donnees[id_compte]['code_client'] != code_client:
                     donnees_csv.append(ligne)
         except IOError as e:
             Outils.fatal(e, "impossible d'ouvrir le fichier : " + fichier)

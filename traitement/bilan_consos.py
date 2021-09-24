@@ -17,12 +17,7 @@ class BilanConsos(Recap):
         :param edition: paramètres d'édition
         """
         super().__init__(edition)
-        self.version = edition.version
-        self.nom = "Bilan-conso-propre_" + str(edition.annee) + "_" + Outils.mois_string(edition.mois) + "_" + \
-                   str(edition.version)
-        if edition.version > 0:
-            self.nom += "_" + str(edition.client_unique)
-        self.nom += ".csv"
+        self.nom = "Bilan-conso-propre_" + str(edition.annee) + "_" + Outils.mois_string(edition.mois) +  ".csv"
 
     def generer(self, trans_vals, paramtexte, dossier_destination, par_plate):
         """
@@ -48,17 +43,20 @@ class BilanConsos(Recap):
                     extrint = 0
                     for indice in tbtr:
                         val = trans_vals[indice]
+                        net, info = Outils.est_un_nombre(val['valuation-net'], "le net", arrondi=2)
+                        if info != "":
+                            Outils.affiche_message(info)
                         if val['client-code'] == val['platf-code']:
                             if val['item-extra'] == "TRUE":
                                 if val['proj-expl'] == "TRUE":
-                                    extrops += val['valuation-net']
+                                    extrops += net
                                 else:
-                                    extrint += val['valuation-net']
+                                    extrint += net
                             else:
                                 if val['proj-expl'] == "TRUE":
-                                    goops += val['valuation-net']
+                                    goops += net
                                 else:
-                                    goint += val['valuation-net']
+                                    goint += net
                     if goops > 0 or extrops > 0 or goint > 0 or extrint > 0:
                         donnee += [round(goops, 2), round(extrops, 2), round(goint, 2), round(extrint, 2)]
                         self.ajouter_valeur(donnee, ii)

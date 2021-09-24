@@ -220,15 +220,18 @@ try:
 
         new_grants = GrantedNew(edition)
         new_grants.generer(grants, transactions)
-        new_grants.csv(DossierDestination(dossier_enregistrement))
 
         trans_vals = transactions.valeurs
         if edition.filigrane == "" and edition.version > 0 and \
                 Outils.existe(Outils.chemin([dossier_enregistrement, "csv_0"])):
-            Transactions.mise_a_jour(edition, DossierSource(dossier_enregistrement),
+            transactions.mise_a_jour(edition, DossierSource(dossier_enregistrement),
                                      DossierDestination(dossier_enregistrement), transactions)
             trans_fichier = "Transaction_" + str(edition.annee) + "_" + Outils.mois_string(edition.mois) + ".csv"
             trans_vals = transactions.recuperer_valeurs_de_fichier(DossierSource(dossier_enregistrement), trans_fichier)
+            new_grants.mise_a_jour(edition, DossierSource(dossier_enregistrement),
+                                   DossierDestination(dossier_enregistrement), new_grants, comptes)
+        else:
+            new_grants.csv(DossierDestination(dossier_enregistrement))
 
         bilan_trs = BilansTransacts(edition)
         bilan_trs.generer(trans_vals, grants, plafonds, comptes, clients, subsides, paramtexte, paramannexe, generaux,
@@ -273,8 +276,8 @@ try:
                                   DossierSource(dossier_enregistrement), DossierDestination(dossier_enregistrement))
             elif Outils.existe(Outils.chemin([dossier_enregistrement, "csv_0"])):
                 maj = [bm_lignes, bc_lignes, det_lignes, cae_lignes, lvr_lignes, nos_lignes]
-                Resumes.mise_a_jour(edition, clients, comptes, new_grants, DossierSource(dossier_enregistrement),
-                                    DossierDestination(dossier_enregistrement), maj, f_html_sections, transactions)
+                Resumes.mise_a_jour(edition, clients, DossierSource(dossier_enregistrement),
+                                    DossierDestination(dossier_enregistrement), maj, f_html_sections)
 
         for fichier in [acces.nom_fichier, clients.nom_fichier, coefprests.nom_fichier, comptes.nom_fichier,
                         livraisons.nom_fichier, machines.nom_fichier, prestations.nom_fichier, categories.nom_fichier,

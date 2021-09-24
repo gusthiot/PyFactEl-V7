@@ -1,4 +1,5 @@
 from outils import Outils
+from traitement import Resumes
 
 
 class GrantedNew(object):
@@ -46,6 +47,28 @@ class GrantedNew(object):
 
             for key in self.valeurs.keys():
                 valeur = self.valeurs[key]
+                ligne = []
+                for i in range(0, len(self.cles)):
+                    ligne.append(valeur[self.cles[i]])
+                fichier_writer.writerow(ligne)
+
+    def mise_a_jour(self, edition, dossier_source, dossier_destination, maj_grants, comptes):
+        """
+        modification des résumés mensuels au niveau du client dont la facture est modifiée
+        :param edition: paramètres d'édition
+        :param dossier_source: Une instance de la classe dossier.DossierSource
+        :param dossier_destination: Une instance de la classe dossier.DossierDestination
+        :param maj_grants: données modifiées pour le client pour les grants
+        :param comptes: comptes importés
+        """
+        fichier_grant = "granted_" + str(edition.annee) + "_" + Outils.mois_string(edition.mois) + ".csv"
+        donnees_csv = Resumes.ouvrir_csv_sans_comptes_client(dossier_source, fichier_grant, edition.client_unique,
+                                                             comptes)
+        with dossier_destination.writer(fichier_grant) as fichier_writer:
+            for ligne in donnees_csv:
+                fichier_writer.writerow(ligne)
+            for key in maj_grants.valeurs.keys():
+                valeur = maj_grants.valeurs[key]
                 ligne = []
                 for i in range(0, len(self.cles)):
                     ligne.append(valeur[self.cles[i]])

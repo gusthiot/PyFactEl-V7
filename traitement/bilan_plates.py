@@ -18,12 +18,7 @@ class BilanPlates(Recap):
         :param edition: paramètres d'édition
         """
         super().__init__(edition)
-        self.version = edition.version
-        self.nom = "Bilan-plateforme-client_" + str(edition.annee) + "_" + Outils.mois_string(edition.mois) + "_" + \
-            str(edition.version)
-        if edition.version > 0:
-            self.nom += "_" + str(edition.client_unique)
-        self.nom += ".csv"
+        self.nom = "Bilan-plateforme-client_" + str(edition.annee) + "_" + Outils.mois_string(edition.mois) + ".csv"
 
     def generer(self, trans_vals, paramtexte, dossier_destination, par_plate):
         """
@@ -53,13 +48,34 @@ class BilanPlates(Recap):
                     sub_remb = 0
                     for indice in tbtr:
                         val = trans_vals[indice]
-                        avant += val['valuation-brut']
-                        compris += val['valuation-net']
-                        deduit += val['deduct-CHF']
-                        sub_ded += val['subsid-deduct']
-                        fact += val['total-fact']
-                        remb += val['discount-bonus']
-                        sub_remb += val['subsid-bonus']
+                        brut, info = Outils.est_un_nombre(val['valuation-brut'], "le brut", arrondi=2)
+                        if info != "":
+                            Outils.affiche_message(info)
+                        avant += brut
+                        net, info = Outils.est_un_nombre(val['valuation-net'], "le net", arrondi=2)
+                        if info != "":
+                            Outils.affiche_message(info)
+                        compris += net
+                        ded, info = Outils.est_un_nombre(val['deduct-CHF'], "le déduit", arrondi=2)
+                        if info != "":
+                            Outils.affiche_message(info)
+                        deduit += ded
+                        subded, info = Outils.est_un_nombre(val['subsid-deduct'], "le déduit de subside", arrondi=2)
+                        if info != "":
+                            Outils.affiche_message(info)
+                        sub_ded += subded
+                        total, info = Outils.est_un_nombre(val['total-fact'], "le total", arrondi=2)
+                        if info != "":
+                            Outils.affiche_message(info)
+                        fact += total
+                        disc, info = Outils.est_un_nombre(val['discount-bonus'], "le discount", arrondi=2)
+                        if info != "":
+                            Outils.affiche_message(info)
+                        remb += disc
+                        bonus, info = Outils.est_un_nombre(val['subsid-bonus'], "le bonus subside", arrondi=2)
+                        if info != "":
+                            Outils.affiche_message(info)
+                        sub_remb += bonus
                     op = base['platf-op'] + base['client-class'] + str(self.annee)[2:4] + \
                         Outils.mois_string(self.mois) + code_d
                     donnee += [round(avant, 2), round(compris, 2), round(deduit, 2), round(sub_ded, 2), round(fact, 2),

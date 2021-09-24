@@ -16,12 +16,7 @@ class BilanUsages(Recap):
         :param edition: paramètres d'édition
         """
         super().__init__(edition)
-        self.version = edition.version
-        self.nom = "Bilan-usage_" + str(edition.annee) + "_" + Outils.mois_string(edition.mois) + "_" + \
-            str(edition.version)
-        if edition.version > 0:
-            self.nom += "_" + str(edition.client_unique)
-        self.nom += ".csv"
+        self.nom = "Bilan-usage_" + str(edition.annee) + "_" + Outils.mois_string(edition.mois) + ".csv"
 
     def generer(self, trans_vals, paramtexte, dossier_destination, par_plate):
         """
@@ -43,8 +38,10 @@ class BilanUsages(Recap):
                         donnee.append(base[self.cles[cle]])
                     usage = 0
                     for indice in tbtr:
-                        val = trans_vals[indice]
-                        usage += val['transac-usage']
+                        val, info = Outils.est_un_nombre(trans_vals[indice]['transac-usage'], "l'usage", arrondi=2)
+                        if info != "":
+                            Outils.affiche_message(info)
+                        usage += val
                     donnee += [round(usage, 4)]
                     self.ajouter_valeur(donnee, ii)
                     ii += 1

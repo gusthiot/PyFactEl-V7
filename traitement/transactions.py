@@ -459,8 +459,7 @@ class Transactions(Recap):
             valeurs[j] = valeur
         return valeurs
 
-    @staticmethod
-    def mise_a_jour(edition, dossier_source, dossier_destination, maj_trans):
+    def mise_a_jour(self, edition, dossier_source, dossier_destination, maj_trans):
         """
         modification des résumés mensuels au niveau du client dont la facture est modifiée
         :param edition: paramètres d'édition
@@ -473,6 +472,10 @@ class Transactions(Recap):
         with dossier_destination.writer(fichier_trans) as fichier_writer:
             for ligne in donnees_csv:
                 fichier_writer.writerow(ligne)
+
             for key in maj_trans.valeurs.keys():
-                ligne = maj_trans.valeurs[key]
+                valeur = maj_trans.valeurs[key]
+                ligne = [self.annee, self.mois]
+                for i in range(2, len(self.cles)):
+                    ligne.append(valeur[self.cles[i]])
                 fichier_writer.writerow(ligne)

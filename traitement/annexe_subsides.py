@@ -56,8 +56,21 @@ class AnnexeSubsides(Recap):
             if type_s != "" and type_s != "STD":
                 if type_s in subsides.donnees.keys():
                     subside = subsides.donnees[type_s]
-                    if subside['debut'] == "NULL" or subside['debut'] < datetime(self.annee, self.mois+1, 1):
-                        if subside['fin'] == "NULL" or subside['fin'] >= datetime(self.annee, self.mois, 1):
+                    if subside['debut'] != 'NULL':
+                        debut, info = Outils.est_une_date(subside['debut'], "la date de début")
+                        if info != "":
+                            Outils.affiche_message(info)
+                    else:
+                        debut = 'NULL'
+                    if subside['fin'] != 'NULL':
+                        fin, info = Outils.est_une_date(subside['fin'], "la date de fin")
+                        if info != "":
+                            Outils.affiche_message(info)
+                    else:
+                        fin = 'NULL'
+
+                    if debut == "NULL" or debut < datetime(self.annee, self.mois+1, 1):
+                        if fin == "NULL" or fin >= datetime(self.annee, self.mois, 1):
                             code_client = compte['code_client']
                             if code_client not in clients_comptes:
                                 clients_comptes[code_client] = []
@@ -84,7 +97,10 @@ class AnnexeSubsides(Recap):
                         subs = 0
                         g_id = id_compte + code_d
                         if g_id in grants.donnees.keys():
-                            grant = grants.donnees[g_id]['montant']
+                            grant, info = Outils.est_un_nombre(grants.donnees[g_id]['montant'], "le montant de grant",
+                                                               min=0, arrondi=2)
+                            if info != "":
+                                Outils.affiche_message(info)
                         else:
                             grant = 0
                         if code in par_client and id_compte in par_client[code]['comptes']:
@@ -92,8 +108,9 @@ class AnnexeSubsides(Recap):
                             if code_d in par_code.keys():
                                 tbtr = par_code[code_d]
                                 for indice in tbtr:
-                                    val = trans_vals[indice]
-                                    subs += val['subsid-CHF']
+                                    val, info = Outils.est_un_nombre(trans_vals[indice]['subsid-CHF'], "le subside CHF",
+                                                                     arrondi=2)
+                                    subs += val
 
                         reste = plafond['max_compte'] - grant - subs
                         donnee += [round(grant, 2), round(subs, 2), round(reste, 2)]

@@ -50,16 +50,18 @@ class BilansTransacts(object):
             code_d = transaction['item-codeD']
             item = transaction['item-id']
             user_id = transaction['user-id']
-            date = transaction['transac-date']
+            date, info = Outils.est_une_date(transaction['transac-date'], "la date de transaction")
+            if info != "":
+                Outils.affiche_message(info)
             type_s = transaction['proj-subs']
-            subs = transaction['subsid-maxproj']
+            subs, info = Outils.est_un_nombre(transaction['subsid-maxproj'], "le subside projet", min=0, arrondi=2)
+            if info != "":
+                Outils.affiche_message(info)
 
             if code_client not in par_client.keys():
                 par_client[code_client] = {'transactions': [], 'comptes': {}}
 
             par_client[code_client]['transactions'].append(key)
-
-            Outils.affiche_message(transaction)
 
             if type_s != "" and subs > 0:
                 pcc = par_client[code_client]['comptes']

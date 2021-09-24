@@ -16,8 +16,7 @@ class UserLabo(Recap):
         :param edition: paramètres d'édition
         """
         super().__init__(edition)
-        self.version = edition.version
-        self.nom = "User-labo" + str(edition.annee) + "_" + Outils.mois_string(edition.mois) + ".csv"
+        self.nom = "User-labo_" + str(edition.annee) + "_" + Outils.mois_string(edition.mois) + ".csv"
 
     def generer(self, trans_vals, paramtexte, dossier_destination, par_plate):
         """
@@ -37,7 +36,9 @@ class UserLabo(Recap):
                     for jour in par_jour.keys():
                         key = par_jour[jour]
                         trans = trans_vals[key]
-                        date = trans['transac-date']
+                        date, info = Outils.est_une_date(trans['transac-date'], "la date de transaction")
+                        if info != "":
+                            Outils.affiche_message(info)
                         donnee = []
                         for cle in range(2, len(self.cles)):
                             if self.cles[cle] == 'day':
