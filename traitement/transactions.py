@@ -451,10 +451,10 @@ class Transactions(Recap):
     def recuperer_valeurs_de_fichier(self, dossier_source, fichier):
         valeurs = {}
         trans_tab = self.ouvrir_csv(dossier_source, fichier)
-        valeur = {}
-        for j in range(0, len(trans_tab)):
+        for j in range(1, len(trans_tab)):
+            valeur = {}
             ligne = trans_tab[j]
-            for i in range(0, len(ligne)):
+            for i in range(2, len(ligne)):
                 valeur[self.cles[i]] = ligne[i]
             valeurs[j] = valeur
         return valeurs

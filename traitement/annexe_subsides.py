@@ -20,13 +20,12 @@ class AnnexeSubsides(Recap):
         """
         super().__init__(edition)
         self.version = edition.version
+        self.unique = edition.client_unique
         self.nom = ""
         self.dossier = ""
         self.chemin = "./"
         self.prefixe = "Annexe-subsides_" + str(edition.annee) + "_" + Outils.mois_string(edition.mois) + "_" + \
             str(edition.version)
-        if edition.version > 0:
-            self.prefixe += "_" + str(edition.client_unique)
 
     def generer(self, trans_vals, grants, plafonds, paramtexte, paramannexe, par_client, comptes, clients, subsides,
                 generaux):
@@ -52,6 +51,8 @@ class AnnexeSubsides(Recap):
         clients_comptes = {}
         for id_compte in comptes.donnees.keys():
             compte = comptes.donnees[id_compte]
+            if self.version > 0 and self.unique != compte['code_client']:
+                continue
             type_s = compte['type_subside']
             if type_s != "" and type_s != "STD":
                 if type_s in subsides.donnees.keys():

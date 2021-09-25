@@ -22,13 +22,12 @@ class AnnexeDetails(Recap):
         """
         super().__init__(edition)
         self.version = edition.version
+        self.unique = edition.client_unique
         self.nom = ""
         self.dossier = ""
         self.chemin = "./"
         self.prefixe = "Annexe-détails_" + str(edition.annee) + "_" + Outils.mois_string(edition.mois) + "_" + \
             str(edition.version)
-        if edition.version > 0:
-            self.prefixe += "_" + str(edition.client_unique)
 
     def generer(self, trans_vals, paramtexte, paramannexe, par_client):
         """
@@ -45,6 +44,8 @@ class AnnexeDetails(Recap):
         dossier_destination = DossierDestination(self.chemin)
 
         for code in par_client.keys():
+            if self.version > 0 and self.unique != code:
+                continue
             tbtr = par_client[code]['transactions']
             base = trans_vals[tbtr[0]]
             self.nom = self.prefixe + "_" + code + "_" + base['client-name'] + ".csv"
