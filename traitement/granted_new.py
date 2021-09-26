@@ -17,6 +17,7 @@ class GrantedNew(object):
         """
         self.nom = "granted_" + str(edition.annee) + "_" + Outils.mois_string(edition.mois) + ".csv"
         self.valeurs = {}
+        self.edition = edition
 
     def generer(self, grants, transactions):
         """
@@ -52,24 +53,24 @@ class GrantedNew(object):
                     ligne.append(valeur[self.cles[i]])
                 fichier_writer.writerow(ligne)
 
-    def mise_a_jour(self, edition, dossier_source, dossier_destination, maj_grants, comptes):
+    def mise_a_jour(self, dossier_source, dossier_destination, maj_grants, comptes):
         """
         modification des résumés mensuels au niveau du client dont la facture est modifiée
-        :param edition: paramètres d'édition
         :param dossier_source: Une instance de la classe dossier.DossierSource
         :param dossier_destination: Une instance de la classe dossier.DossierDestination
         :param maj_grants: données modifiées pour le client pour les grants
         :param comptes: comptes importés
         """
-        fichier_grant = "granted_" + str(edition.annee) + "_" + Outils.mois_string(edition.mois) + ".csv"
-        donnees_csv = Resumes.ouvrir_csv_sans_comptes_client(dossier_source, fichier_grant, edition.client_unique,
+        fichier_grant = "granted_" + str(self.edition.annee) + "_" + Outils.mois_string(self.edition.mois) + ".csv"
+        donnees_csv = Resumes.ouvrir_csv_sans_comptes_client(dossier_source, fichier_grant, self.edition.client_unique,
                                                              comptes)
         with dossier_destination.writer(fichier_grant) as fichier_writer:
             for ligne in donnees_csv:
                 fichier_writer.writerow(ligne)
             for key in maj_grants.valeurs.keys():
                 valeur = maj_grants.valeurs[key]
-                ligne = []
-                for i in range(0, len(self.cles)):
-                    ligne.append(valeur[self.cles[i]])
-                fichier_writer.writerow(ligne)
+                if comptes.donnees[valeur['id_compte']]['code_client'] == self.edition.client_unique:
+                    ligne = []
+                    for i in range(0, len(self.cles)):
+                        ligne.append(valeur[self.cles[i]])
+                    fichier_writer.writerow(ligne)

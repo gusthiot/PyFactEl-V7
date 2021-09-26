@@ -228,8 +228,8 @@ try:
                                      DossierDestination(dossier_enregistrement), transactions)
             trans_fichier = "Transaction_" + str(edition.annee) + "_" + Outils.mois_string(edition.mois) + ".csv"
             trans_vals = transactions.recuperer_valeurs_de_fichier(DossierSource(dossier_enregistrement), trans_fichier)
-            new_grants.mise_a_jour(edition, DossierSource(dossier_enregistrement),
-                                   DossierDestination(dossier_enregistrement), new_grants, comptes)
+            new_grants.mise_a_jour(DossierSource(dossier_enregistrement), DossierDestination(dossier_enregistrement),
+                                   new_grants, comptes)
         else:
             new_grants.csv(DossierDestination(dossier_enregistrement))
 
