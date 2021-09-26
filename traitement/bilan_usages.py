@@ -38,7 +38,7 @@ class BilanUsages(Recap):
                         donnee.append(base[self.cles[cle]])
                     usage = 0
                     for indice in tbtr:
-                        val, info = Outils.est_un_nombre(trans_vals[indice]['transac-usage'], "l'usage", arrondi=2)
+                        val, info = Outils.est_un_nombre(trans_vals[indice]['transac-usage'], "l'usage", arrondi=4)
                         if info != "":
                             Outils.affiche_message(info)
                         usage += val
