@@ -459,15 +459,15 @@ class Outils(object):
         try:
             fl_d = float(donnee)
             if min is not None and fl_d < min:
-                return 0, colonne + delaligne + " doit être un nombre > " + str(min) + "\n"
+                return -1, colonne + delaligne + " doit être un nombre >= " + str(min) + "\n"
             if max is not None and fl_d > max:
-                return 0, colonne + delaligne + " doit être un nombre < " + str(max) + "\n"
+                return -1, colonne + delaligne + " doit être un nombre <= " + str(max) + "\n"
             if arrondi > -1:
                 return round(fl_d, arrondi), ""
             else:
                 return fl_d, ""
         except ValueError:
-            return 0, colonne + delaligne + " doit être un nombre\n"
+            return -1, colonne + delaligne + " doit être un nombre\n"
 
     @staticmethod
     def est_un_entier(donnee, colonne, ligne=-1, min=None, max=None):
@@ -487,12 +487,12 @@ class Outils(object):
         try:
             entier = int(donnee)
             if min is not None and entier < min:
-                return 0, colonne + delaligne + " doit être un nombre entier > " + str(min) + "\n"
+                return -1, colonne + delaligne + " doit être un nombre entier >= " + str(min) + "\n"
             if max is not None and entier > max:
-                return 0, colonne + delaligne + " doit être un nombre entier < " + str(max) + "\n"
+                return -1, colonne + delaligne + " doit être un nombre entier <= " + str(max) + "\n"
             return entier, ""
         except ValueError:
-            return 0, colonne + delaligne + " doit être un nombre entier\n"
+            return -1, colonne + delaligne + " doit être un nombre entier\n"
 
     @staticmethod
     def format_2_dec(nombre):

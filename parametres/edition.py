@@ -69,7 +69,6 @@ class Edition(object):
         self.mois_txt = mois_fr[self.mois-1]
 
         if msg != "":
-            msg = self.libelle + "\n" + msg
             Outils.fatal(ErreurConsistance(), Edition.libelle + "\n" + msg)
 
     def est_coherent(self, clients):
