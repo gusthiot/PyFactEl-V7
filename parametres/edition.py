@@ -18,6 +18,7 @@ class Edition(object):
         """
         donnees_csv = []
         self.verifie_coherence = 0
+        msg = ""
         try:
             for ligne in dossier_source.reader(self.nom_fichier):
                 donnees_csv.append(ligne)
@@ -31,27 +32,21 @@ class Edition(object):
                          str(len(donnees_csv)) + ", attendu : " + str(num))
 
         self.annee, err = Outils.est_un_entier(donnees_csv[0][1], "l'année", min=2000, max=2099)
-        if err != "":
-            Outils.affiche_message(Edition.libelle + "\n" + err)
+        msg += err
 
         self.mois, err = Outils.est_un_entier(donnees_csv[1][1], "le mois", min=1, max=12)
-        if err != "":
-            Outils.affiche_message(Edition.libelle + "\n" + err)
+        msg += err
 
         self.version, err = Outils.est_un_entier(donnees_csv[2][1], "la version", min=0)
-        if err != "":
-            Outils.affiche_message(Edition.libelle + "\n" + err)
+        msg += err
 
         self.client_unique = donnees_csv[3][1]
         if self.version == 0 and self.client_unique != "":
-            Outils.fatal(ErreurConsistance(),
-                         Edition.libelle + ": il ne peut pas y avoir de client unique pour la version 0")
+            msg += " il ne peut pas y avoir de client unique pour la version 0"
         if self.version > 0 and self.client_unique == "":
-            Outils.fatal(ErreurConsistance(),
-                         Edition.libelle + ": il doit y avoir un client unique pour une version > 0")
+            msg += " il doit y avoir un client unique pour une version > 0"
         self.filigrane, err = Outils.est_un_texte(donnees_csv[4][1], "le filigrane", vide=True)
-        if err != "":
-            Outils.affiche_message(Edition.libelle + "\n" + err)
+        msg += err
 
         jours = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
         if self.mois != 2:
@@ -72,6 +67,10 @@ class Edition(object):
         mois_fr = ["janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août", "septembre", "octobre",
                    "novembre", "décembre"]
         self.mois_txt = mois_fr[self.mois-1]
+
+        if msg != "":
+            msg = self.libelle + "\n" + msg
+            Outils.fatal(ErreurConsistance(), Edition.libelle + "\n" + msg)
 
     def est_coherent(self, clients):
         """
