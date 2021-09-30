@@ -75,6 +75,8 @@ else:
 dossier_source = DossierSource(dossier_data)
 try:
     start_time = time.time()
+    generaux = Generaux(dossier_source)
+
     pe_present = Outils.existe(Outils.chemin([dossier_data, Edition.nom_fichier]))
     sup_present = Outils.existe(Outils.chemin([dossier_data, SuppressionFacture.nom_fichier]))
     ann_present = Outils.existe(Outils.chemin([dossier_data, AnnulationVersion.nom_fichier]))
@@ -116,12 +118,49 @@ try:
         Outils.affiche_message(msg)
         sys.exit("Erreur sur les fichiers")
 
-    generaux = Generaux(dossier_source)
-
     if pe_present:
+        ## importation des bruts
+
         edition = Edition(dossier_source)
         paramannexe = Paramannexe(dossier_source)
         paramtexte = Paramtexte(dossier_source)
+
+        acces = Acces(dossier_source)
+        categories = Categorie(dossier_source)
+        categprix = CategPrix(dossier_source)
+        clients = Client(dossier_source)
+        coefprests = CoefPrest(dossier_source)
+        comptes = Compte(dossier_source)
+        grants = Granted(dossier_source, edition)
+        livraisons = Livraison(dossier_source)
+        machines = Machine(dossier_source)
+        groupes = Groupe(dossier_source)
+        noshows = NoShow(dossier_source)
+        plafonds = PlafSubside(dossier_source)
+        plateformes = Plateforme(dossier_source)
+        prestations = Prestation(dossier_source)
+        subsides = Subside(dossier_source)
+        cles = CleSubside(dossier_source)
+        users = User(dossier_source)
+
+        if Outils.existe(Outils.chemin([dossier_data, DocPdf.nom_fichier])):
+            docpdf = DocPdf(dossier_source)
+        else:
+            docpdf = None
+
+        ## vérification de la cohérence
+
+        verification = Verification()
+        if verification.verification_date(edition, acces, clients, comptes, livraisons, machines, noshows,
+                                          prestations, users) > 0:
+            sys.exit("Erreur dans les dates")
+
+        if verification.verification_coherence(generaux, edition, acces, categories, categprix, clients, coefprests,
+                                               comptes, grants, livraisons, machines, noshows, plafonds,
+                                               plateformes, prestations, subsides, users, docpdf, groupes, cles) > 0:
+            sys.exit("Erreur dans la cohérence")
+
+        ## génération du dossier destination
 
         if edition.version > 0 and edition.client_unique == generaux.code_cfact_centre:
             chemin = generaux.chemin_propre
@@ -159,39 +198,19 @@ try:
 
         dossier_destination = DossierDestination(dossier_csv)
 
-        if Outils.existe(Outils.chemin([dossier_data, DocPdf.nom_fichier])):
-            docpdf = DocPdf(dossier_source)
-        else:
-            docpdf = None
+        ## copie des fichiers bruts
 
-        acces = Acces(dossier_source)
-        categories = Categorie(dossier_source)
-        categprix = CategPrix(dossier_source)
-        clients = Client(dossier_source)
-        coefprests = CoefPrest(dossier_source)
-        comptes = Compte(dossier_source)
-        grants = Granted(dossier_source, edition)
-        livraisons = Livraison(dossier_source)
-        machines = Machine(dossier_source)
-        groupes = Groupe(dossier_source)
-        noshows = NoShow(dossier_source)
-        plafonds = PlafSubside(dossier_source)
-        plateformes = Plateforme(dossier_source)
-        prestations = Prestation(dossier_source)
-        subsides = Subside(dossier_source)
-        cles = CleSubside(dossier_source)
-        users = User(dossier_source)
+        for fichier in [acces.nom_fichier, clients.nom_fichier, coefprests.nom_fichier, comptes.nom_fichier,
+                        livraisons.nom_fichier, machines.nom_fichier, prestations.nom_fichier, categories.nom_fichier,
+                        users.nom_fichier, generaux.nom_fichier, grants.nom_fichier, edition.nom_fichier,
+                        categprix.nom_fichier, paramannexe.nom_fichier, noshows.nom_fichier, plafonds.nom_fichier,
+                        plateformes.nom_fichier, subsides.nom_fichier, paramtexte.nom_fichier, groupes.nom_fichier,
+                        cles.nom_fichier]:
+            dossier_destination.ecrire(fichier, dossier_source.lire(fichier))
+        if docpdf is not None:
+            dossier_destination.ecrire(docpdf.nom_fichier, dossier_source.lire(docpdf.nom_fichier))
 
-        verification = Verification()
-
-        if verification.verification_date(edition, acces, clients, comptes, livraisons, machines, noshows,
-                                          prestations, users) > 0:
-            sys.exit("Erreur dans les dates")
-
-        if verification.verification_coherence(generaux, edition, acces, categories, categprix, clients, coefprests,
-                                               comptes, grants, livraisons, machines, noshows, plafonds,
-                                               plateformes, prestations, subsides, users, docpdf, groupes, cles) > 0:
-            sys.exit("Erreur dans la cohérence")
+        ## calcul des sommes intermédiaires
 
         livraisons.calcul_montants(prestations, coefprests, clients, verification, comptes)
         acces.calcul_montants(machines, categprix, clients, verification, comptes, groupes)
@@ -205,6 +224,8 @@ try:
             Outils.existe(donnee['chemin'], True)
             donnee['dossier_pdf'] = DossierDestination(donnee['chemin'])
             donnee['lien'] = Outils.lien_dossier([dossier_lien, donnee['dossier']], generaux)
+
+        ## traitement
 
         articles = Articles(edition)
         articles.generer(generaux, categories, prestations, paramtexte)
@@ -278,16 +299,6 @@ try:
                 maj = [bm_lignes, bc_lignes, det_lignes, cae_lignes, lvr_lignes, nos_lignes]
                 Resumes.mise_a_jour(edition, clients, DossierSource(dossier_enregistrement),
                                     DossierDestination(dossier_enregistrement), maj, f_html_sections)
-
-        for fichier in [acces.nom_fichier, clients.nom_fichier, coefprests.nom_fichier, comptes.nom_fichier,
-                        livraisons.nom_fichier, machines.nom_fichier, prestations.nom_fichier, categories.nom_fichier,
-                        users.nom_fichier, generaux.nom_fichier, grants.nom_fichier, edition.nom_fichier,
-                        categprix.nom_fichier, paramannexe.nom_fichier, noshows.nom_fichier, plafonds.nom_fichier,
-                        plateformes.nom_fichier, subsides.nom_fichier, paramtexte.nom_fichier, groupes.nom_fichier,
-                        cles.nom_fichier]:
-            dossier_destination.ecrire(fichier, dossier_source.lire(fichier))
-        if docpdf is not None:
-            dossier_destination.ecrire(docpdf.nom_fichier, dossier_source.lire(docpdf.nom_fichier))
 
     if sup_present:
         suppression = SuppressionFacture(dossier_source)
