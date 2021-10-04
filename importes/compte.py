@@ -74,7 +74,7 @@ class Compte(Fichier):
 
             if donnee['type_subside'] == "":
                 msg += "le type subside de la ligne " + str(ligne) + " ne peut être vide\n"
-            elif donnee['type_subside'] != "STD" and not subsides.contient_type(donnee['type_subside']):
+            elif not subsides.contient_type(donnee['type_subside']):
                 msg += "le type subside " + donnee['type_subside'] + " de la ligne " + str(ligne) + \
                        " n'est pas référencé\n"
 

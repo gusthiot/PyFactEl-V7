@@ -74,7 +74,7 @@ class CoefPrest(Fichier):
                 msg += "Couple categorie '" + donnee['categorie'] + "' et nature '" + \
                        donnee['nature'] + "' de la ligne " + str(ligne) + " pas unique\n"
 
-            donnee['coefficient'], info = Outils.est_un_nombre(donnee['coefficient'], "le coefficient", ligne, 2)
+            donnee['coefficient'], info = Outils.est_un_nombre(donnee['coefficient'], "le coefficient", ligne, 2, 0)
             msg += info
 
             donnees_dict[donnee['nature'] + donnee['categorie']] = donnee

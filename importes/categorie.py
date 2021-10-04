@@ -59,8 +59,8 @@ class Categorie(Fichier):
 
             if donnee['code_d'] == "":
                 msg += "le code D de la ligne " + str(ligne) + " ne peut être vide\n"
-            elif donnee['code_d'] not in generaux.obtenir_code_d():
-                msg += "le code D de la ligne " + str(ligne) + " n'existe pas dans les codes D\n"
+            elif donnee['code_d'] != generaux.obtenir_code_d()[0] and donnee['code_d'] != generaux.obtenir_code_d()[1]:
+                msg += "le code D de la ligne " + str(ligne) + " n'est pas un code D1 ou D2\n"
 
             if donnee['id_plateforme'] == "":
                 msg += "l'id plateforme de la ligne " + str(ligne) + " ne peut être vide\n"

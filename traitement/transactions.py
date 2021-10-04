@@ -297,7 +297,7 @@ class Transactions(Recap):
         """
         type_s = compte['type_subside']
         result = ["", "", "", "", "", 0, 0, 0, 0]
-        if type_s != "" and type_s != "STD":
+        if type_s != "":
             if type_s in subsides.donnees.keys():
                 subside = subsides.donnees[type_s]
                 result[0] = subside['type']

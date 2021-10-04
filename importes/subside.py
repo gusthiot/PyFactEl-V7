@@ -62,6 +62,9 @@ class Subside(Fichier):
             if donnee['fin'] != 'NULL':
                 donnee['fin'], info = Outils.est_une_date(donnee['fin'], "la date de fin", ligne)
                 msg += info
+            if donnee['debut'] != 'NULL' and donnee['fin'] != 'NULL':
+                if donnee['debut'] > donnee['fin']:
+                    msg += "la date de fin de la ligne " + str(ligne) + " doit être postérieure à la date de début"
 
             donnees_dict[donnee['type']] = donnee
 

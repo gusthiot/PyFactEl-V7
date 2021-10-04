@@ -113,9 +113,7 @@ class Prestation(Fichier):
                     msg += "l'id machine '" + donnee['id_machine'] + "' de la ligne " + str(ligne) \
                            + " n'est pas référencé ni égal à 0\n"
 
-            donnee['prix_unit'], info = Outils.est_un_nombre(donnee['prix_unit'], "le prix unitaire", ligne, 2)
-            msg += info
-            donnee['no_prestation'], info = Outils.est_un_nombre(donnee['no_prestation'], "le numéro prestation", ligne)
+            donnee['prix_unit'], info = Outils.est_un_nombre(donnee['prix_unit'], "le prix unitaire", ligne, 2, 0)
             msg += info
 
             del donnee['annee']

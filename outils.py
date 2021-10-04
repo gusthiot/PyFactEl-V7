@@ -391,7 +391,7 @@ class Outils(object):
         else:
             delaligne = ""
         try:
-            chars = set('*?“<>|')
+            chars = set('*?"<>|')
             s_d = str(donnee)
             if s_d == "" and not vide:
                 return "", colonne + delaligne + " ne peut être vide\n"

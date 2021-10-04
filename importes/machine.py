@@ -62,7 +62,7 @@ class Machine(Fichier):
             if donnee['id_groupe'] == "":
                 msg += "l'id groupe de la ligne " + str(ligne) + " ne peut être vide\n"
             elif groupes.contient_id(donnee['id_groupe']) == 0:
-                msg += "l'id groupec '" + donnee['id_groupe'] + "' de la ligne " + str(ligne) \
+                msg += "l'id groupe '" + donnee['id_groupe'] + "' de la ligne " + str(ligne) \
                        + " n'est pas référencé\n"
 
             donnee['tx_rabais_hc'], info = Outils.est_un_nombre(donnee['tx_rabais_hc'], "le rabais heures creuses",

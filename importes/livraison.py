@@ -75,9 +75,9 @@ class Livraison(Fichier):
                 msg += "l'id opérateur '" + donnee['id_operateur'] + "' de la ligne " + str(ligne) \
                        + " n'est pas référencé\n"
 
-            donnee['quantite'], info = Outils.est_un_nombre(donnee['quantite'], "la quantité", ligne, 1)
+            donnee['quantite'], info = Outils.est_un_nombre(donnee['quantite'], "la quantité", ligne, 1, 0)
             msg += info
-            donnee['rabais'], info = Outils.est_un_nombre(donnee['rabais'], "le rabais", ligne, 2)
+            donnee['rabais'], info = Outils.est_un_nombre(donnee['rabais'], "le rabais", ligne, 2, 0)
             msg += info
 
             donnee['date_livraison'], info = Outils.est_une_date(donnee['date_livraison'], "la date de livraison", ligne)

@@ -98,7 +98,7 @@ class Generaux(object):
             code_sq, err = Outils.est_un_entier(code_sq, "le code sap qas", min=1)
             erreurs += err
         for quantite in self._donnees['quantite'][1:]:
-            quantite, err = Outils.est_un_nombre(quantite, "la quantité", arrondi=3)
+            quantite, err = Outils.est_un_nombre(quantite, "la quantité", arrondi=3, min=0)
             erreurs += err
         for unite in self._donnees['unite'][1:]:
             unite, err = Outils.est_un_texte(unite, "l'unité")
@@ -122,7 +122,7 @@ class Generaux(object):
             modes, err = Outils.est_un_alphanumerique(modes, "le mode d'envoi", vide=True)
             erreurs += err
         self._donnees['min_fact_rese'][1], err = Outils.est_un_nombre(
-            self._donnees['min_fact_rese'][1], "le montant minimum pour des frais de facturation", arrondi=2)
+            self._donnees['min_fact_rese'][1], "le montant minimum pour des frais de facturation", arrondi=2, min=0)
         erreurs += err
 
         codes_n = []

@@ -73,7 +73,7 @@ class NoShow(Fichier):
             elif donnee['type'] != "HP" and donnee['type'] != "HC":
                 msg += "HP/HC " + str(ligne) + " doit être égal à HP ou HC\n"
 
-            donnee['penalite'], info = Outils.est_un_nombre(donnee['penalite'], "la pénalité", ligne, 2)
+            donnee['penalite'], info = Outils.est_un_nombre(donnee['penalite'], "la pénalité", ligne, 2, 0)
             msg += info
 
             donnee['date_debut'], info = Outils.est_une_date(donnee['date_debut'], "la date de début", ligne)
