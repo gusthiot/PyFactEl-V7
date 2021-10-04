@@ -80,11 +80,12 @@ class Prestation(Fichier):
                     msg += "l'id prestation '" + donnee['id_prestation'] + "' de la ligne " + str(ligne) +\
                            " n'est pas unique\n"
 
-            donnee['no_prestation'], info = Outils.est_un_alphanumerique(donnee['no_prestation'], "le no prestation",
-                                                                         ligne)
-            msg += info
             if donnee['no_prestation'] == "":
                 msg += "le numéro de prestation de la ligne " + str(ligne) + " ne peut être vide\n"
+            else:
+                donnee['no_prestation'], info = Outils.est_un_alphanumerique(donnee['no_prestation'],
+                                                                             "le no prestation", ligne)
+                msg += info
 
             donnee['designation'], info = Outils.est_un_texte(donnee['designation'], "la désignation", ligne)
             msg += info
