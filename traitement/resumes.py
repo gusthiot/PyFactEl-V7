@@ -54,11 +54,12 @@ class Resumes(object):
                 for ligne in maj[i]:
                     fichier_writer.writerow(ligne)
 
-        ticket_complet = "ticket_" + str(edition.annee) + "_" + Outils.mois_string(edition.mois) + ".html"
-        section = list(f_html_sections.values())[0]
-        nom_client = clients.donnees[edition.client_unique]['abrev_labo'] + " (" + edition.client_unique + ")"
-        Resumes.maj_ticket(dossier_source, dossier_destination, ticket_complet, section, edition.client_unique,
-                           nom_client)
+        if len(f_html_sections) > 0:
+            ticket_complet = "ticket_" + str(edition.annee) + "_" + Outils.mois_string(edition.mois) + ".html"
+            section = list(f_html_sections.values())[0]
+            nom_client = clients.donnees[edition.client_unique]['abrev_labo'] + " (" + edition.client_unique + ")"
+            Resumes.maj_ticket(dossier_source, dossier_destination, ticket_complet, section, edition.client_unique,
+                               nom_client)
 
     @staticmethod
     def maj_ticket(dossier_source, dossier_destination, nom_fichier, section, code, nom_client):
